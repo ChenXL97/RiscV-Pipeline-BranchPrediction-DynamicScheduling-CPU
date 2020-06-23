@@ -332,12 +332,16 @@ module Top
         #100;
         end
     initial begin
+    	$dumpfile("test.vcd");
+    	$dumpvars(0,Top);
         rst=0;
         IRQ=1;
         #50
         rst=1;
         #1000
         IRQ=0;
+        #10000
+        $finish;
         end
 
 
