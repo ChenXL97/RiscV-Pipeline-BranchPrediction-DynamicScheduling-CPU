@@ -1,0 +1,29 @@
+#-----------------------------------------------------------
+# Vivado v2018.1 (64-bit)
+# SW Build 2188600 on Wed Apr  4 18:40:38 MDT 2018
+# IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
+# Start of session at: Tue Jun 23 18:30:38 2020
+# Process ID: 13996
+# Current directory: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent6008 D:\学习\高计体实验\RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU\cpu\cpu.xpr
+# Log file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/vivado.log
+# Journal file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.xpr
+launch_runs synth_1 -jobs 4 -scripts_only
+wait_on_run synth_1
+reset_run synth_1
+launch_simulation
+source ReadIns.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top TOP [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+launch_simulation
+source TOP.tcl
+relaunch_sim
+relaunch_sim
+relaunch_sim
