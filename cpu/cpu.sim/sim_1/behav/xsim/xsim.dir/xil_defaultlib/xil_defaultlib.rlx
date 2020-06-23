@@ -1,0 +1,22 @@
+0.6
+2018.1
+Apr  4 2018
+19:30:32
+D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.sim/sim_1/behav/xsim/glbl.v,1522801934,verilog,,,,glbl,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/ALUop.v,1473433160,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/ALUout.v,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/headfile.v,ALUop,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/ALUout.v,1502179000,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/CPSR.v,,ALUout,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/CPSR.v,1473433224,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/DataMemory.v,,CPSR,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/DataMemory.v,1503884632,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/IM.v,,DataMemory,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/IM.v,1473432080,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/MUX_2_1.v,,IM,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/MUX_2_1.v,1472654330,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/MUX_4_1.v,,MUX_2_1,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/MUX_4_1.v,1471849768,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/NPC.v,,MUX_4_1,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/NPC.v,1472613522,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/RegFiles.v,,NPC,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/RegFiles.v,1473386926,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/SignExtend.v,,RegFiles,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/SignExtend.v,1472451172,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/control.v,,SignExtend,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/Top_tb.v,1473433554,verilog,,,,Top,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/control.v,1473432860,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_control_module.v,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/headfile.v,control,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/headfile.v,1472540320,verilog,,,,,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_control_module.v,1471863618,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_encode_module.v,,smg_control_module,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_encode_module.v,1470034998,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_interface.v,,smg_encode_module,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_interface.v,1470035260,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_scan_module.v,,smg_interface,,,,,,,,
+D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/smg_scan_module.v,1503884350,verilog,,D:/学习/高计体实验/梁鹏201506021023/RTL/pipeline/Top_tb.v,,smg_scan_module,,,,,,,,

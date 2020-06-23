@@ -1,0 +1,24 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/ALUop.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/ALUout.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/CPSR.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/DataMemory.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/IM.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/MUX_2_1.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/MUX_4_1.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/NPC.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/RegFiles.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/SignExtend.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/control.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/smg_control_module.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/smg_encode_module.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/smg_interface.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/smg_scan_module.v" \
+"../../../../../../¡∫≈Ù201506021023/RTL/pipeline/Top_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort
