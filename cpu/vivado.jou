@@ -2,13 +2,110 @@
 # Vivado v2018.1 (64-bit)
 # SW Build 2188600 on Wed Apr  4 18:40:38 MDT 2018
 # IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
-# Start of session at: Tue Jun 23 10:34:17 2020
-# Process ID: 1264
+# Start of session at: Tue Jun 23 19:11:14 2020
+# Process ID: 11564
 # Current directory: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu
-# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent10744 D:\学习\高计体实验\RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU\cpu\cpu.xpr
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent820 D:\学习\高计体实验\RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU\cpu\cpu.xpr
 # Log file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/vivado.log
 # Journal file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu\vivado.jou
 #-----------------------------------------------------------
 start_gui
 open_project D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.xpr
-update_compile_order -fileset sources_1
+launch_simulation
+source TOP.tcl
+relaunch_sim
+close_sim
+launch_simulation
+launch_simulation
+source TOP.tcl
+relaunch_sim
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top IF [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+relaunch_sim
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+relaunch_sim
+close_sim
+launch_simulation
+launch_simulation
+source TOP.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top IF [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top TOP [current_fileset]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+relaunch_sim
+launch_simulation
+source IF.tcl
+relaunch_sim
+current_sim simulation_3
+current_sim simulation_4
+close_sim
+launch_simulation
+source IF.tcl
+# Disabling source management mode.  This is to allow the top design properties to be set without GUI intervention.
+set_property source_mgmt_mode None [current_project]
+set_property top TOP [get_filesets sim_1]
+set_property top_lib xil_defaultlib [get_filesets sim_1]
+# Re-enabling previously disabled source management mode.
+set_property source_mgmt_mode DisplayOnly [current_project]
+relaunch_sim
+close_sim
+relaunch_sim
+move_files -fileset sim_1 [get_files  D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/IF.v]
+move_files [get_files  D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/IF.v]
+relaunch_sim
+close_sim
+launch_simulation
+source TOP.tcl
+current_wave_config {Untitled 7}
+add_wave {{/TOP/IF}} 
+current_wave_config {Untitled 7*}
+add_wave {{/TOP/IF/InsMem}} 
+relaunch_sim
+relaunch_sim
+relaunch_sim
+remove_forces { {/TOP/IF/InsMem/ins_mem[64]} {/TOP/IF/InsMem/ins_mem[63]} {/TOP/IF/InsMem/ins_mem[62]} {/TOP/IF/InsMem/ins_mem[61]} {/TOP/IF/InsMem/ins_mem[60]} {/TOP/IF/InsMem/ins_mem[59]} {/TOP/IF/InsMem/ins_mem[58]} {/TOP/IF/InsMem/ins_mem[57]} {/TOP/IF/InsMem/ins_mem[56]} {/TOP/IF/InsMem/ins_mem[55]} {/TOP/IF/InsMem/ins_mem[54]} {/TOP/IF/InsMem/ins_mem[53]} {/TOP/IF/InsMem/ins_mem[52]} {/TOP/IF/InsMem/ins_mem[51]} {/TOP/IF/InsMem/ins_mem[50]} {/TOP/IF/InsMem/ins_mem[49]} {/TOP/IF/InsMem/ins_mem[48]} {/TOP/IF/InsMem/ins_mem[47]} {/TOP/IF/InsMem/ins_mem[46]} {/TOP/IF/InsMem/ins_mem[45]} {/TOP/IF/InsMem/ins_mem[44]} {/TOP/IF/InsMem/ins_mem[43]} {/TOP/IF/InsMem/ins_mem[42]} {/TOP/IF/InsMem/ins_mem[41]} {/TOP/IF/InsMem/ins_mem[40]} {/TOP/IF/InsMem/ins_mem[39]} {/TOP/IF/InsMem/ins_mem[38]} {/TOP/IF/InsMem/ins_mem[37]} {/TOP/IF/InsMem/ins_mem[36]} {/TOP/IF/InsMem/ins_mem[35]} {/TOP/IF/InsMem/ins_mem[34]} {/TOP/IF/InsMem/ins_mem[33]} {/TOP/IF/InsMem/ins_mem[32]} {/TOP/IF/InsMem/ins_mem[31]} {/TOP/IF/InsMem/ins_mem[30]} {/TOP/IF/InsMem/ins_mem[29]} {/TOP/IF/InsMem/ins_mem[28]} {/TOP/IF/InsMem/ins_mem[27]} {/TOP/IF/InsMem/ins_mem[26]} {/TOP/IF/InsMem/ins_mem[25]} {/TOP/IF/InsMem/ins_mem[24]} {/TOP/IF/InsMem/ins_mem[23]} {/TOP/IF/InsMem/ins_mem[22]} {/TOP/IF/InsMem/ins_mem[21]} {/TOP/IF/InsMem/ins_mem[20]} {/TOP/IF/InsMem/ins_mem[19]} {/TOP/IF/InsMem/ins_mem[18]} {/TOP/IF/InsMem/ins_mem[17]} {/TOP/IF/InsMem/ins_mem[16]} {/TOP/IF/InsMem/ins_mem[15]} {/TOP/IF/InsMem/ins_mem[14]} {/TOP/IF/InsMem/ins_mem[13]} {/TOP/IF/InsMem/ins_mem[12]} {/TOP/IF/InsMem/ins_mem[11]} {/TOP/IF/InsMem/ins_mem[10]} {/TOP/IF/InsMem/ins_mem[9]} }
+relaunch_sim
+current_wave_config {Untitled 7*}
+add_wave {{/TOP/IF/InsMem}} 
+relaunch_sim
+current_wave_config {Untitled 7*}
+add_wave {{/TOP/IF/InsMem/ins_mem}} 
+current_wave_config {Untitled 7*}
+add_wave {{/TOP/IF/InsMem/pc}} 
+relaunch_sim
+relaunch_sim
+relaunch_sim
+relaunch_sim
+relaunch_sim
+relaunch_sim
+close [ open D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/DE.v w ]
+add_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/DE.v
+close [ open D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/DE_PipReg.v w ]
+add_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/DE_PipReg.v
+close [ open D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/Decoder.v w ]
+add_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/Decoder.v
+close [ open D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/HeadFile.vh w ]
+add_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/HeadFile.vh
+set_property is_global_include true [get_files  D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/HeadFile.vh]
+set_property file_type Verilog [get_files  D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/HeadFile.vh]
+close [ open D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/headfile.v w ]
+add_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/headfile.v
+export_ip_user_files -of_objects  [get_files D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/headfile.v] -no_script -reset -force -quiet
+remove_files  D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/headfile.v
+file delete -force D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/headfile.v
+set_property source_mgmt_mode None [current_project]
+set_property source_mgmt_mode None [current_project]
+set_property source_mgmt_mode DisplayOnly [current_project]

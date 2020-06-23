@@ -1,0 +1,25 @@
+#-----------------------------------------------------------
+# Vivado v2018.1 (64-bit)
+# SW Build 2188600 on Wed Apr  4 18:40:38 MDT 2018
+# IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
+# Start of session at: Tue Jun 23 20:42:31 2020
+# Process ID: 9832
+# Current directory: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample
+# Command line: vivado.exe -gui_launcher_event rodinguilauncherevent6776 D:\学习\高计体实验\RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU\cpu-sample\cpu-sample.xpr
+# Log file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/vivado.log
+# Journal file: D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample\vivado.jou
+#-----------------------------------------------------------
+start_gui
+open_project D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/cpu-sample.xpr
+INFO: [ProjectBase 1-489] The host OS only allows 260 characters in a normal path. The project is stored in a path with more than 80 characters. If you experience issues with IP, Block Designs, or files not being found, please consider moving the project to a location with a shorter path. Alternately consider using the OS subst command to map part of the path to a drive letter.
+Current project path is 'D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample'
+INFO: [Project 1-313] Project file moved from 'D:/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample' since last save.
+Scanning sources...
+Finished scanning sources
+INFO: [IP_Flow 19-234] Refreshing IP repositories
+INFO: [IP_Flow 19-1704] No user IP repositories specified
+INFO: [IP_Flow 19-2313] Loaded Vivado IP repository 'D:/Software/Vivado/Vivado/2018.1/data/ip'.
+open_project: Time (s): cpu = 00:00:12 ; elapsed = 00:00:07 . Memory (MB): peak = 848.852 ; gain = 110.207
+add_files {D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/MUX_2_1.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/smg_control_module.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/CPSR.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/MUX_4_1.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/smg_interface.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/PC.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/SignExtend.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/Top.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/RegFiles.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/Top_tb.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/headfile.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/smg_encode_module.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/MUX_2_1_4bits.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/IM.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/control.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/smg_scan_module.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/DataMemory.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/ALUop.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/NPC.v D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu-sample/RTL/pipeline/ALUout.v}
+update_compile_order -fileset sources_1
+update_compile_order -fileset sources_1

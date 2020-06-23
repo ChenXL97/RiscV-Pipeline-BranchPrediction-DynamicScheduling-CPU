@@ -1,0 +1,17 @@
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/InsMem.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module InsMem
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/IF_PipReg.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module IF_PipReg
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/ReadIns.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module ReadIns
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module TOP
+WARNING: [VRFC 10-756] identifier TOMA_rst_reg is used before its declaration [D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v:43]
+WARNING: [VRFC 10-756] identifier TOMA_write_pc_reg is used before its declaration [D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v:44]
+WARNING: [VRFC 10-756] identifier BTB_write_pc_reg is used before its declaration [D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v:45]
+WARNING: [VRFC 10-756] identifier TOMA_addr_reg is used before its declaration [D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v:46]
+WARNING: [VRFC 10-756] identifier BTB_addr_reg is used before its declaration [D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/TOP.v:47]
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/PC.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module PC
+INFO: [VRFC 10-2263] Analyzing Verilog file "D:/学习/高计体实验/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/new/IF.v" into library xil_defaultlib
+INFO: [VRFC 10-311] analyzing module IF
