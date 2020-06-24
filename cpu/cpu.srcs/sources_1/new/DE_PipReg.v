@@ -18,7 +18,7 @@ module DE_PipReg(
     input predict_is_taken,
     input [31:0] pc,
     input [31:0] predict_pc,
-    input [`ROB_ITEM_INDEX]de_out,
+    input [`ROB_ITEM_INDEX] de_out,
     output reg [`ROB_ITEM_INDEX] DE_pip_reg
     );
     

@@ -56,8 +56,13 @@ module TOP( );
         .EX_rst(EX_rst),
         .EX_write_pc(EX_update),
         .EX_addr(EX_result_pc),
+        .BTB_write_pc(predict_is_taken),
+        .BTB_addr(predict_pc),
         .pc(pc),
         .IF_pip_reg(IF_pip_reg)
+        
+        
+        
     );
 
 //#####################################################

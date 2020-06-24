@@ -14,7 +14,7 @@
 module EX(
     input clk,
     input rst,
-    input DE_pip_reg,
+    input [`ROB_ITEM_INDEX] DE_pip_reg,
     output reg EX_rst,
     output reg EX_block,
     output reg EX_update,

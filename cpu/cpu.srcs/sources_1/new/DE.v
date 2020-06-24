@@ -24,7 +24,7 @@ module DE(
     //输出
     output predict_is_taken,
     output [31:0] predict_pc,
-    output reg [`ROB_ITEM_INDEX] DE_pip_reg
+    output [`ROB_ITEM_INDEX] DE_pip_reg
     );
     
     //Decoder模块
@@ -49,6 +49,7 @@ module DE(
         .EX_update(EX_update), 
         .EX_ins_pc(EX_ins_pc), 
         .EX_result_pc(EX_result_pc), 
+        .predict_is_taken(predict_is_taken),
         .predict_pc(predict_pc)
         );
         
@@ -64,4 +65,26 @@ module DE(
         .DE_pip_reg(DE_pip_reg)
         );
         
+     //测试指令是否正确
+     reg [`ROB_ITEM_INDEX] de_ins_mem[64:0];
+     wire right;
+     wire [71:0] act_ins;
+     wire [71:0] right_ins;
+     wire [31:0] de_imm;
+     wire [31:0] imm;
+     wire [31:0] right_imm;
+     initial begin
+        #5
+        $readmemb("test_file/de_output.txt",de_ins_mem);//将path路径下得data.txt的数据以二进制的形式写入到data_src_mem中
+        $display("%b",de_ins_mem[0]);
+        
+     end
+     
+     assign act_ins = DE_pip_reg[167:96];
+     assign right_ins = de_ins_mem[pc-2][167:96];
+     assign right = (DE_pip_reg[167:96]==right_ins);
+//     assign de_imm = de_out[`IMM];
+     assign imm = DE_pip_reg[`IMM];
+     assign right_imm = de_ins_mem[pc-2][`IMM];
+     
 endmodule
