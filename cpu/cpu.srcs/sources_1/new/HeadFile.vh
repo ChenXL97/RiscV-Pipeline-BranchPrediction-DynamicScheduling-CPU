@@ -1,28 +1,35 @@
 `ifndef HEADFILE_H_
 
-`define DE_LENGTH 134
+`define ROB_ITEM_LEN 167:0
 `define NPC 31:0
-`define RES 63:32
-`define IMM 95:64
-`define DST 100:96
-`define RS2 105:101
-`define RS1 110:106
-`define RAM 111
-`define BRANCH 112
-`define SHIFT 113
-`define LOGIC 114
-`define CMP 115
-`define ADD 116
-`define MUL 117
-`define DIV 118
-`define SP 119
-`define RINFO 120
-`define FADD 121
-`define FMD 122
-`define FSP 123
-`define FCMP 124
-
-
-
+`define OPC 63:32
+`define RES 95:64
+`define IMM 127:96
+`define DST 132:128
+`define RS2 137:133
+`define RS1 142:138
+`define RAM 143
+`define BRANCH RAM+1
+`define SHIFT RAM+2
+`define LOGIC RAM+3
+`define CMP RAM+4
+`define ADD RAM+5
+`define MUL RAM+6
+`define DIV RAM+7
+`define SP RAM+8
+`define RINFO RAM+9
+`define FADD RAM+10
+`define FMUL RAM+11
+`define FDIV RAM+12
+`define FSP RAM+13
+`define FCMP RAM+14
+`define DONE 158
+`define BUSY 159
+`define OP1 164:163
+`define OP2 162:160
+`define IMMUSE 165
+`define RSS 166
+`define PREDICT 167
+`define DE_OUT_LEN 70:0
 
 `endif

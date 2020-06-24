@@ -13,23 +13,24 @@
 module IF(
     input clk,
     input rst,
-    input TOMA_rst, //用于TOMA清空流水线
-    input TOMA_write_pc,  //为 1 代表TOMA要写PC
-    input [31:0]TOMA_addr,  //TOMA写PC的具体地址
+    input EX_block, //用于EX阻塞流水线
+    input EX_rst, //用于EX清空流水线
+    input EX_write_pc,  //为 1 代表EX要写PC
+    input [31:0]EX_addr,  //EX写PC的具体地址
     input BTB_write_pc,  //为 1 代表BTB要写PC
     input [31:0]BTB_addr,  //为BTB写PC的具体地址
-
+    output [31:0] pc,
     output [31:0] IF_pip_reg
     );
 
     //pc模块
-    wire [31:0]pc;  //pc地址
     PC PC
     (
         .clk(clk),
         .rst(rst),
-        .op({TOMA_write_pc,BTB_write_pc}),
-        .TOMA_addr(TOMA_addr),
+        .EX_block(EX_block),
+        .op({EX_write_pc,BTB_write_pc}),
+        .EX_addr(EX_addr),
         .BTB_addr(BTB_addr),
         .pc(pc)
     );
@@ -48,7 +49,7 @@ module IF(
     (
         .clk(clk),
         .rst(rst),
-        .TOMA_rst(TOMA_rst),
+        .EX_rst(EX_rst),
         .ins(ins),
         .IF_pip_reg(IF_pip_reg)
     );

@@ -1,3 +1,4 @@
+`include "HeadFile.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Create Date: 2020/06/23 14:47:21
 // Module Name: TOP
@@ -33,84 +34,64 @@ module TOP( );
 //#####################################################
 //##########   IF模块   ###############################
 //#####################################################
-    wire TOMA_rst; //TODO 需要将该线连到TOMA模块，为 1 代表TOMA要清空流水线
-    wire TOMA_write_pc;  //TODO 需要将该线连到TOMA模块，为 1 代表TOMA要写PC
-    wire [31:0]TOMA_addr;  //TODO 需要将该线连到TOMA模块，为TOMA写PC的具体地址
-    wire BTB_write_pc;  //TODO 需要将该线连到BTB模块，为 1 代表BTB要写PC
-    wire [31:0]BTB_addr;  //TODO 需要将该线连到BTB模块，为BTB写PC的具体地址
+    //连DE段的线
+    wire predict_is_taken;  //为 1 代表BTB要写PC
+    wire [31:0]predict_pc;  //为BTB写PC的具体地址
 
-    //TODO 到时候这些赋值全部删除
-    assign TOMA_rst = TOMA_rst_reg;
-    assign TOMA_write_pc = TOMA_write_pc_reg;
-    assign BTB_write_pc = BTB_write_pc_reg;
-    assign TOMA_addr = TOMA_addr_reg;
-    assign BTB_addr = BTB_addr_reg;
-    
+    wire [31:0] pc;
     wire [31:0]IF_pip_reg;
     
+    //连EX段的线
+    wire EX_rst; //为 1 代表EX要清空流水线
+    wire EX_block; //为1代表EX要阻塞
+    wire EX_update;  //为 1 代表EX要写PC
+    wire [31:0]EX_result_pc;  //为EX写PC的具体地址
+
+    //IF模块，包含PC，InsMem,IF_PipReg
     IF IF
     (
         .clk(clk),
         .rst(rst),
-        .TOMA_rst(TOMA_rst),
-        .TOMA_write_pc(TOMA_write_pc),
-        .TOMA_addr(TOMA_addr),
-        .BTB_write_pc(BTB_write_pc),
-        .BTB_addr(BTB_addr),
+        .EX_block(EX_block),
+        .EX_rst(EX_rst),
+        .EX_write_pc(EX_update),
+        .EX_addr(EX_result_pc),
+        .pc(pc),
         .IF_pip_reg(IF_pip_reg)
     );
 
 //#####################################################
 //##########   DE模块   ###############################
 //#####################################################
-    wire [134:0] DE_pip_reg;
-    wire is_branch;
+    wire [`ROB_ITEM_LEN] DE_pip_reg;
+    
+    //DE模块，包含Decoder，BTB, DE_PipReg
     DE DE
     (
         .clk(clk),
         .rst(rst),
+        .EX_rst(EX_rst),
         .IF_pip_reg(IF_pip_reg),
-        .is_branch(is_branch),
-        .branch_addr(branch_addr),
+        .pc(pc),
+        .EX_update(EX_update),
+        .EX_result_pc(EX_result_pc),
+        .predict_is_taken(predict_is_taken),
+        .predict_pc(predict_pc),
         .DE_pip_reg(DE_pip_reg)
     );
-    
-
 
 //#####################################################
-//##########   BTB模块   ###############################
-//#####################################################
-//    BTB BTB
-//    (
-//        .clk(clk),
-//        .rst(rst),
-//        .DE_pip_reg(DE_pip_reg),
-//        .is_branch(is_branch),
-//        .branch_addr(branch_addr)
-//    );
-
-    //BTB模块 TODO到时候这些寄存器都做到模块里面
-    reg BTB_write_pc_reg;
-    reg BTB_addr_reg;
-    initial begin
-        BTB_write_pc_reg <= 0;
-        BTB_addr_reg <= 0;
-    end
-    
-    
-//#####################################################
-//##########   TOMA模块   ###############################
-//#####################################################
-    //TOMA模块 TODO到时候这些寄存器都做到模块里面
-    reg TOMA_rst_reg;
-    reg TOMA_write_pc_reg;
-    reg TOMA_addr_reg;
-
-    initial begin
-        TOMA_rst_reg <= 0;
-        TOMA_write_pc_reg <= 0;
-        TOMA_addr_reg <= 0;
-    end
-    
+//##########   EX模块   ###############################
+//#####################################################    
+    EX EX
+    (
+        .clk(clk),
+        .rst(rst),
+        .DE_pip_reg(DE_pip_reg),
+        .EX_rst(EX_rst),
+        .EX_block(EX_block),
+        .EX_update(EX_update),
+        .EX_result_pc(EX_result_pc)
+    );
     
 endmodule
