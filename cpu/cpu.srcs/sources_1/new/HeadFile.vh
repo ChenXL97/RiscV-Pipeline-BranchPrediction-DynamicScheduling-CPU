@@ -1,7 +1,8 @@
 `ifndef HEADFILE_H_
 
-`define ROB_ITEM_LEN 167:0
-`define NPC 31:0
+`define ROB_ITEM_INDEX 167:0
+`define ROB_ITEM_LEN 168
+`define PPC 31:0
 `define OPC 63:32
 `define RES 95:64
 `define IMM 127:96
@@ -27,9 +28,10 @@
 `define BUSY 159
 `define OP1 164:163
 `define OP2 162:160
+`define OP1_2 164:160
 `define IMMUSE 165
 `define RSS 166
 `define PREDICT 167
-`define DE_OUT_LEN 70:0
+`define ROB_ITEM_INDEX 70:0
 
 `endif

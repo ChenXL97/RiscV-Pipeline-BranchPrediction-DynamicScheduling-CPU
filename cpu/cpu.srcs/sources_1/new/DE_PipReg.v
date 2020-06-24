@@ -16,17 +16,21 @@ module DE_PipReg(
     input rst,
     input EX_rst,
     input predict_is_taken,
-    input [`DE_OUT_LEN]de_out,
     input [31:0] pc,
     input [31:0] predict_pc,
-    output reg [`ROB_ITEM_LEN] DE_pip_reg
+    input [`ROB_ITEM_INDEX]de_out,
+    output reg [`ROB_ITEM_INDEX] DE_pip_reg
     );
     
     always@(posedge clk or posedge rst or posedge EX_rst)
         if(rst || EX_rst)
             DE_pip_reg<=0;
         else 
-            DE_pip_reg <= {predict_is_taken,de_out,32'b0, pc, predict_pc};
-    
+            begin   
+                DE_pip_reg <= de_out;
+                DE_pip_reg[`PREDICT] <= predict_is_taken;
+                DE_pip_reg[`OPC] <= pc;
+                DE_pip_reg[`PPC] <= predict_pc;
+            end
 
 endmodule
