@@ -1,5 +1,3 @@
-`include "headfile.v"
-
 module Top
 (
 	input CLK,

@@ -1,7 +1,6 @@
 
 *.wpc
 *.lpr
-*.xpr
 cpu-sample/RTL/.DS_Store
 cpu-sample/RTL/pipeline/.DS_Store
 .DS_Store

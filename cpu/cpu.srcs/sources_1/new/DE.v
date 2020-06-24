@@ -14,7 +14,7 @@ module DE(
     input clk,
     input rst,
     input [31:0] IF_pip_reg,
-    output reg [DE_LENGTH:0] DE_pip_reg
+    output reg [`DE_LENGTH:0] DE_pip_reg
     );
     
     
