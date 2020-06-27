@@ -18,7 +18,7 @@ module InsMem(
     
     reg [31:0] ins_mem[64:0];
     initial begin
-        $readmemb("test_file/ins_input.txt",ins_mem);//Read data in '*.txt' as binary form to ins_mem
+        $readmemb("../test_file/ins_input.txt",ins_mem);//Read data in '*.txt' as binary form to ins_mem
         $display("%b",ins_mem[0]);
     end
     

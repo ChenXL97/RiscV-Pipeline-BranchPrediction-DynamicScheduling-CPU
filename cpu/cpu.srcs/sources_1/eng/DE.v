@@ -75,7 +75,7 @@ module DE(
      wire [31:0] right_imm;
      initial begin
         #5
-        $readmemb("test_file/de_output.txt",de_ins_mem);//Read data in 'data.txt' as binary form to Reg 'de_ins_mem'
+        $readmemb("../test_file/de_output.txt",de_ins_mem);//Read data in 'data.txt' as binary form to Reg 'de_ins_mem'
         $display("%b",de_ins_mem[0]);
         
      end

@@ -16,6 +16,10 @@ module TOP( );
     reg clk;
     initial begin
         clk <= 0;
+        $dumpfile("test.vcd");
+        $dumpvars(0, TOP);
+        # 10000
+        $finish;
     end
         
     always #10 begin
