@@ -38,17 +38,26 @@ module Decoder(
                         3'h0: //1 Load Byte LB
                             begin
                                 de_out[`OP1_2] = 5'b00_000;
-                                de_out[`IMM] = {20'b0, ins[31:20]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                                else
+                                    de_out[`IMM] = {20'b0, ins[31:20]};
                             end
                         3'h1: //2 Load Half Byte LH
                             begin
                                 de_out[`OP1_2] = 5'b00_010;
-                                de_out[`IMM] = {20'b0, ins[31:20]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                                else
+                                    de_out[`IMM] = {20'b0, ins[31:20]};
                             end
                         3'h2: //3 Load Word LW
                             begin
                                 de_out[`OP1_2] = 5'b00_100;
-                                de_out[`IMM] = {20'b0, ins[31:20]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                                else
+                                    de_out[`IMM] = {20'b0, ins[31:20]};
                             end
                         3'h3: //4 Load Byte Unsigned LBU
                             begin
@@ -63,29 +72,44 @@ module Decoder(
                         3'h5: //6 Save Byte SB
                             begin
                                 de_out[`OP1_2] = 5'b01_000;
-                                de_out[`IMM] = {20'b0, ins[31:25],ins[11:7]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
+                                else
+                                    de_out[`IMM] = {20'b0,  ins[31:25],ins[11:7]};
                             end
                         3'h6: //7 Save Half Byte SH
                             begin
                                 de_out[`OP1_2] = 5'b01_010;
-                                de_out[`IMM] = {20'b0, ins[31:25],ins[11:7]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
+                                else
+                                    de_out[`IMM] = {20'b0,  ins[31:25],ins[11:7]};
                             end
                         default://Default as 8 Save Word SW
                             begin
                                 de_out[`OP1_2] = 5'b01_100;
-                                de_out[`IMM] = {20'b0, ins[31:25],ins[11:7]};
+                                if(ins[31])
+                                    de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
+                                else
+                                    de_out[`IMM] = {20'b0,  ins[31:25],ins[11:7]};
                             end
                     endcase
                 else
                     if(!ins[12]) //9 Float Load FL
                         begin
                             de_out[`OP1_2] = 5'b10_000;
-                            de_out[`IMM] = {20'b0, ins[31:20]};
+                            if(ins[31])
+                                de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                            else
+                                de_out[`IMM] = {20'b0, ins[31:20]};
                         end
                     else //10 Float Save FS
                         begin
                             de_out[`OP1_2] = 5'b11_000;
-                            de_out[`IMM] = {20'b0, ins[31:25],ins[11:7]};
+                            if(ins[31])
+                                de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
+                            else
+                                de_out[`IMM] = {20'b0,  ins[31:25],ins[11:7]};
                         end
             end
             //2 BRANCH : Ins 11-12
@@ -96,12 +120,18 @@ module Decoder(
                 if(!ins[6]) //11 Jump And Link JAL (PC += sign_extend(offset))
                     begin
                         de_out[`OP1_2] = 5'b00_000;
-                        de_out[`IMM] = {11'b0, ins[31],ins[19:12],ins[20],ins[30:21],1'b0};
+                        if(ins[31])
+                            de_out[`IMM] = {11'b11111_11111_1, ins[31],ins[19:12],ins[20],ins[30:21],1'b0};
+                        else
+                            de_out[`IMM] = {11'b0, ins[31],ins[19:12],ins[20],ins[30:21],1'b0};
                     end
                 else //12 Jump And Link Register JALR (x[rd]=pc+4, pc = x[rs1] + sign_extend(offset), pc[0] = 0)
                     begin
                         de_out[`OP1_2] = 5'b00_100;
-                        de_out[`IMM] = {20'b0, ins[31:20]};
+                        if(ins[31])
+                            de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                        else
+                            de_out[`IMM] = {20'b0, ins[31:20]};
                     end
             end
             //2 BRANCH : Ins 13-19
@@ -109,10 +139,16 @@ module Decoder(
             begin
                 de_out[`BRANCH] = 1'b1;
                 de_out[`IMMUSE] = 1'b1;
-                if(!ins[6]) //13-18 Conditional Branch: BEQ BNE BLT BGE BLTU BGEU
+                if(!ins[6]) //13-18 Conditional Branch:
                     begin
                         de_out[`OP1_2] = { 2'b01, ins[14:12]};
-                        de_out[`IMM] = {19'b0, ins[31],ins[7],ins[30:25],ins[11:8],1'b0};
+                        if(!ins[14]) // BEQ BNE BLT BGE
+                            if(ins[31])
+                               de_out[`IMM] = {19'b11111_11111_11111_1111,ins[31],ins[7],ins[30:25],ins[11:8],1'b0};
+                            else
+                               de_out[`IMM] = {19'b0, ins[31],ins[7],ins[30:25],ins[11:8],1'b0};
+                        else  //BLTU BGEU
+                            de_out[`IMM] = {19'b0, ins[31],ins[7],ins[30:25],ins[11:8],1'b0};
                     end
                 else //19 Add Upper immediate to PC AUIPC (x[rd] = pc + sign_extend(immediate[31:12]<<12))
                     begin
@@ -143,7 +179,10 @@ module Decoder(
                     begin
                         de_out[`OP1_2] = { ins[14], 1'b0, ins[13:12], 1'b0   };
                         de_out[`IMMUSE] = 1'b1;
-                        de_out[`IMM] = {20'b0, ins[31:20]};
+                        if(ins[31])
+                            de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                        else
+                            de_out[`IMM] = {20'b0, ins[31:20]};
                     end
             end
             //5 CMP : Ins 32-35
@@ -152,11 +191,17 @@ module Decoder(
                 de_out[`CMP] = 1'b1;
                 if(!ins[14]) //32-33 R-type SLT SLTU 
                     de_out[`OP1_2] = { ins[14:13],3'b0   };
-                else //34-35 I-type SLTI SLTIU 
+                else //34-35 I-type 
                     begin
                         de_out[`OP1_2] = { ins[14:13],3'b0   };
                         de_out[`IMMUSE] = 1'b1;
-                        de_out[`IMM] = {20'b0, ins[31:20]};
+                        if(!ins[13]) 
+                            if(!ins[31])   // SLTI
+                                de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                            else // SLTIU
+                                de_out[`IMM] = {20'b0, ins[31:20]};
+                        else
+                            de_out[`IMM] = {20'b0, ins[31:20]};
                     end
             end
             //6 ADD : Ins 36-39
@@ -170,7 +215,10 @@ module Decoder(
                         begin
                             de_out[`OP1_2] = { 1'b0, ins[14:13],2'b0  };
                             de_out[`IMMUSE] = 1'b1;
-                            de_out[`IMM] = {20'b0, ins[31:20]};
+                            if(ins[31])
+                                de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:20]};
+                            else
+                                de_out[`IMM] = {20'b0, ins[31:20]};
                         end
                 else //39 Write upper immediate
                     begin

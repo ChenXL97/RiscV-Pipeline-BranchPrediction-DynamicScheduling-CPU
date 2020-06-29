@@ -69,23 +69,27 @@ module DE(
      //test
      reg [`ROB_ITEM_INDEX] de_ins_mem[64:0];
      wire right;
-     wire [71:0] act_ins;
-     wire [71:0] right_ins;
+     wire [71:0] right_de_out;
+     wire [71:0] act_de_out;
+     wire [31:0] test_pc;
+     wire [`ROB_ITEM_INDEX] right_ins;
      wire [31:0] de_imm;
      wire [31:0] imm;
      wire [31:0] right_imm;
      initial begin
         #5
-        $readmemb("test_file/de_output.txt",de_ins_mem);
+        $readmemb("test_file/de_output_fb.txt",de_ins_mem);
         $display("%b",de_ins_mem[0]);
         
      end
      
-     assign act_ins = DE_pip_reg[167:96];
-     assign right_ins = de_ins_mem[pc-2][167:96];
-     assign right = (DE_pip_reg[167:96]==right_ins);
+     assign test_pc = pc >> 2;
+     assign right_ins = de_ins_mem[test_pc-2];
+     assign right_de_out = right_ins[167:96];
+     assign act_de_out = DE_pip_reg[167:96];
+     assign right = (DE_pip_reg[167:96]==right_ins[167:96]);
 //     assign de_imm = de_out[`IMM];
      assign imm = DE_pip_reg[`IMM];
-     assign right_imm = de_ins_mem[pc-2][`IMM];
+     assign right_imm = de_ins_mem[test_pc-2][`IMM];
      
 endmodule
