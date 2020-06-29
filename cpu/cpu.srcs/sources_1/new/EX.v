@@ -40,10 +40,12 @@ module EX(
 //    assign operand_A_i = DE_pip_reg[]
     
 //    EX_ADD EX_ADD(
+//        .enable()
 //        .op1_op2_i(op1_op2),
 //        .operand_A_i(operand_A_i),
 //        .operand_B_i(operand_B_i),
 //        .EX_ADD_result_o(EX_ADD_result_o)
+//        .Done()
 //    );
     
 //    EX_CMP EX_CMP(

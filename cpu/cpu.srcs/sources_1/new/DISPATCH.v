@@ -26,10 +26,11 @@ module DISPATCH(
     input rst_i,
     input  [`ROB_ITEM_INDEX]DE_pip_reg_i,
     
-    //output EX_pip_reg_o,
-    output [31:0]op_A_o,
-    output [31:0]op_B_o,
-    output [4:0]opcode
+    output [31:0]reg_A_o,
+    output [31:0]reg_B_o,
+    output [31:0]imm32_o,
+    output [4:0]opcode_o,
+    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o
     );
 
 
@@ -47,6 +48,7 @@ wire [31:0] pipe_result_wb_w; //data forwarding
 
 wire [31:0] dispatch_ra_value_w;
 wire [31:0] dispatch_rb_value_w;
+wire [`ROB_ITEM_INDEX]DISPATCH_pip_reg_w;
 
 
 REG_FILES REG_FILES
@@ -65,7 +67,17 @@ REG_FILES REG_FILES
     .rb0_value_o(dispatch_rb_value_w)
 );
 
-assign op_A_o = dispatch_ra_value_w;
-assign op_B_o = dispatch_rb_value_w;
+DISPATCH_PipReg DISPATCH_PipReg
+(
+    .clk_i(clk_i),
+    .rst_i(rst_i),
+    .DE_PipReg_i(DE_pip_reg_i),
+    .DISPATCH_pipreg_o(DISPATCH_pip_reg_w)
 
+);
+
+assign reg_A_o = dispatch_ra_value_w;
+assign reg_B_o = dispatch_rb_value_w;
+assign DISPATCH_pip_reg_o = DISPATCH_pip_reg_w;
+assign imm32_o = imm_value_w;
 endmodule

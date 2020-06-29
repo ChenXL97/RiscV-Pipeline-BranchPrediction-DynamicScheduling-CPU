@@ -88,9 +88,11 @@ module TOP( );
 //#####################################################
 //##########   DISPATCHÄ£¿é   #########################
 //#####################################################
-    wire [31:0]op_A;
-    wire [31:0]op_B;
-    wire [4:0]opcode;    
+    wire [31:0]reg_A_w;
+    wire [31:0]reg_B_w;
+    wire [31:0]imm32_w;
+    wire [4:0]opcode_w;    
+    wire [`ROB_ITEM_INDEX] DISPATCH_pip_reg_w;
     DISPATCH DIAPATCH
     (
         .clk_i(clk),
@@ -98,9 +100,11 @@ module TOP( );
         .DE_pip_reg_i(DE_pip_reg),
                 
         //output EX_pip_reg_o,
-        .op_A_o(op_A),
-        .op_B_o(op_B),
-        .opcode(opcode)
+        .reg_A_o(reg_A_w),
+        .reg_B_o(reg_B_w),
+        .imm32_o(imm32_w),
+        .opcode_o(opcode_w),
+        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
     );
 
 
