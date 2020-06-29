@@ -289,7 +289,7 @@ module Decoder(
                     de_out[`OP1_2] = {ins[14:13],3'b0};
                 end
             default:
-                    de_out = `ROB_ITEM_LEN'bxxxx;
+                    de_out = `ROB_ITEM_LEN'b0;
             endcase
     end
     
