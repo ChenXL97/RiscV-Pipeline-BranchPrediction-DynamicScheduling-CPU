@@ -22,7 +22,7 @@ module InsMem(
         $display("%b",ins_mem[0]);
     end
     
-    assign ins = ins_mem[pc];
+    assign ins = ins_mem[pc>>2];
             
 
 endmodule

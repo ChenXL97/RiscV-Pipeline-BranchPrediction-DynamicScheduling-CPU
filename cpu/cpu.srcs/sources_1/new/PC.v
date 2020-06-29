@@ -28,7 +28,7 @@ module PC(
                 casex(op)
                     2'b1x:pc <= EX_addr;
                     2'b01:pc <= BTB_addr;
-                    default :pc <= pc+1;
+                    default :pc <= pc+4;
                 endcase
               end
               
