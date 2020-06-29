@@ -64,8 +64,8 @@ begin: REGFILE
     reg [31:0] reg_r29_q;
     reg [31:0] reg_r30_q;
     reg [31:0] reg_r31_q;
-    always @ (posedge clk_i or negedge rst_i)
-        if (!rst_i)
+    always @ (posedge clk_i or posedge rst_i)
+        if (rst_i)
         begin
             reg_r1_q       <= 32'h00000001;
             reg_r2_q       <= 32'h00000001;

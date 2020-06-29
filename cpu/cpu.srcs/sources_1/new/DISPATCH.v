@@ -25,6 +25,9 @@ module DISPATCH(
     input clk_i,
     input rst_i,
     input  [`ROB_ITEM_INDEX]DE_pip_reg_i,
+    input [31:0]EX_result_i,
+    input [`ROB_ITEM_INDEX]EX_pip_reg_i,
+    
     
     output [31:0]reg_A_o,
     output [31:0]reg_B_o,
@@ -48,8 +51,8 @@ wire [31:0] imm_value_w = DE_pip_reg_i[`IMM];
 wire [4:0] dispatch_ra_index_w = DE_pip_reg_i[`RS1];
 wire [4:0] dispatch_rb_index_w = DE_pip_reg_i[`RS2];
 wire [4:0] opcode_w = DE_pip_reg_i[`OP1_2];
-wire [4:0] pipe_rd_wb_w; // data forwarding
-wire [31:0] pipe_result_wb_w; //data forwarding
+wire [4:0] pipe_rd_wb_w = EX_pip_reg_i[`DST]; // data forwarding
+wire [31:0] pipe_result_wb_w = EX_result_i; //data forwarding
 
 
 wire [31:0] dispatch_ra_value_w;

@@ -53,7 +53,7 @@ module EX_ADD(
          begin
             result_r = (reg_A_i + imm32_i);
          end
-        `INS_LUI:
+        `INS_LUI: // x[rd]=sext(imm[31:12]<<12)
          begin
             result_r = imm32_i << 12;
          end
