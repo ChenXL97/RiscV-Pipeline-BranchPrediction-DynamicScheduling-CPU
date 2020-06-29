@@ -29,7 +29,8 @@ module EX(
     output reg EX_block,
     output reg EX_update,
     output reg [31:0] EX_result_pc_o,
-    output reg [31:0] EX_result_o
+    output reg [31:0] EX_result_o,
+    output [`ROB_ITEM_INDEX] EX_pip_reg_o
     );
     
     initial begin
@@ -42,7 +43,6 @@ module EX(
     wire [31:0]EX_BRANCH_result_o;
     wire [31:0]EX_LOGIC_result_o;
     wire [31:0]EX_LS_RAM_result_o;
-    
 //    assign operand_A_i = DE_pip_reg[]
     
     EX_ADD EX_ADD(
@@ -70,8 +70,14 @@ module EX(
 //        .operand_B_i(reg_B_i),
 //        .EX_BRANCH_result_o(EX_BRANCH_result_o)
 //    );
-
-
+    wire [`ROB_ITEM_INDEX]EX_pip_reg_w;
+      EX_PipReg EXPipReg(
+      .clk_i(clk_i),
+      .rst_i(rst_i),
+      .DISPATCH_PipReg_i(DISPATCH_pip_reg_i),
+      .EX_pipreg_o(EX_pip_reg_w)
+      );
+    assign EX_pip_reg_o = EX_pip_reg_w;
 always @(posedge clk_i or posedge rst_i) begin
     if (rst_i) begin
         // reset
@@ -112,7 +118,7 @@ end
 
 
 
-//    //EX_PipReg
+//    // EX Pipeline Register
 //    EX_PipReg EX_PipReg(
 //        .clk(clk),
 //        .rst(rst),

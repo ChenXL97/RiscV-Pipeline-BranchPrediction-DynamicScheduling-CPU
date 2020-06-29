@@ -72,6 +72,7 @@ module Decoder(
                         3'h5: //6 Save Byte SB
                             begin
                                 de_out[`OP1_2] = 5'b01_000;
+                                de_out[`DST] = 5'b0;
                                 if(ins[31])
                                     de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
                                 else
@@ -80,6 +81,7 @@ module Decoder(
                         3'h6: //7 Save Half Byte SH
                             begin
                                 de_out[`OP1_2] = 5'b01_010;
+                                de_out[`DST] = 5'b0;
                                 if(ins[31])
                                     de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
                                 else
@@ -88,6 +90,7 @@ module Decoder(
                         default://Default as 8 Save Word SW
                             begin
                                 de_out[`OP1_2] = 5'b01_100;
+                                de_out[`DST] = 5'b0;
                                 if(ins[31])
                                     de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
                                 else
@@ -106,6 +109,7 @@ module Decoder(
                     else //10 Float Save FS
                         begin
                             de_out[`OP1_2] = 5'b11_000;
+                            de_out[`DST]  = 5'b0;
                             if(ins[31])
                                 de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
                             else
@@ -141,6 +145,7 @@ module Decoder(
                 de_out[`IMMUSE] = 1'b1;
                 if(!ins[6]) //13-18 Conditional Branch:
                     begin
+                        de_out[`DST] = 5'b0;
                         de_out[`OP1_2] = { 2'b01, ins[14:12]};
                         if(!ins[14]) // BEQ BNE BLT BGE
                             if(ins[31])
