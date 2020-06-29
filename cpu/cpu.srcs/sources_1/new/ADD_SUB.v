@@ -22,12 +22,14 @@ module ADD_SUB(
     input                               clk,
     input                               rst,
 
+    // two operation number
     input       [31:0]                  op1,
     input       [31:0]                  op2,
 
-    input                               en,
+    // give one clk postive signal, then start this module
+    input                               start,
 
-    // choose which compute part to use
+    // choose which compute part to use, there is two adder in this module
     input       [1:0]                   use_part,
 
     input       [1:0]                   op_mode1,
@@ -86,7 +88,7 @@ always @ (posedge clk) begin
     if(!rst) begin
         case (use_part)
         'b10: begin
-            if(en) begin
+            if(start) begin
                 u1_en <= 'b1;
                 // sub
                 if(op_mode2[2] == 'b1) begin
@@ -143,7 +145,7 @@ always @ (posedge clk) begin
     if(!rst) begin
         case (use_part)
         'b01: begin
-            if(en) begin
+            if(start) begin
                 u0_en <= 'b1;
                 // sub
                 if(op_mode2[2] == 'b1) begin
