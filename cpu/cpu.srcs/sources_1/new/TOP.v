@@ -3,7 +3,7 @@
 // Create Date: 2020/06/23 14:47:21
 // Module Name: TOP
 // Description: 
-// 顶层文件
+// TOP
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
@@ -12,7 +12,7 @@
 
 module TOP( );
     
-//  模拟clk时钟
+//  clk
     reg clk;
     initial begin
         clk <= 0;
@@ -23,7 +23,7 @@ module TOP( );
     end
     
 
-//  模拟rst重置信号
+//  rst
     reg rst;
     initial begin
        #1 rst <= 0;
@@ -32,22 +32,22 @@ module TOP( );
     end
     
 //#####################################################
-//##########   IF模块   ###############################
+//##########   IF   ###############################
 //#####################################################
-    //连DE段的线
-    wire predict_is_taken;  //为 1 代表BTB要写PC
-    wire [31:0]predict_pc;  //为BTB写PC的具体地址
-
+// DE to IF
+    wire predict_is_taken;  
+    wire [31:0]predict_pc; 
+// IF to DE
     wire [31:0] pc;
     wire [31:0]IF_pip_reg;
     
-    //连EX段的线
+// EX to IF
     wire EX_rst; //为 1 代表EX要清空流水线
     wire EX_block; //为1代表EX要阻塞
     wire EX_update;  //为 1 代表EX要写PC
     wire [31:0]EX_result_pc;  //为EX写PC的具体地址
 
-    //IF模块，包含PC，InsMem,IF_PipReg
+// IF : PC，InsMem,IF_PipReg
     IF IF
     (
         .clk(clk),
@@ -61,16 +61,15 @@ module TOP( );
         .pc(pc),
         .IF_pip_reg(IF_pip_reg)
         
-        
-        
     );
 
 //#####################################################
-//##########   DE模块   ###############################
+//##########   DE   ###############################
 //#####################################################
+// DE to DISPATCH
     wire [`ROB_ITEM_INDEX] DE_pip_reg;
     
-    //DE模块，包含Decoder，BTB, DE_PipReg
+    //DE : Decoder，BTB, DE_PipReg
     DE DE
     (
         .clk(clk),
@@ -86,8 +85,9 @@ module TOP( );
     );
 
 //#####################################################
-//##########   DISPATCH模块   #########################
+//##########   DISPATCH   #########################
 //#####################################################
+// DISPATCH to EX
     wire [31:0]reg_A_w;
     wire [31:0]reg_B_w;
     wire [31:0]imm32_w;
@@ -109,7 +109,7 @@ module TOP( );
 
 
 //#####################################################
-//##########   EX模块   ###############################
+//##########   EX   ###############################
 //#####################################################    
     EX EX
     (

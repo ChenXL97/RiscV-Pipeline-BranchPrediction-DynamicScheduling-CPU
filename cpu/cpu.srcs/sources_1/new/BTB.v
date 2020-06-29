@@ -1,9 +1,9 @@
 `include "HeadFile.vh"
 //////////////////////////////////////////////////////////////////////////////////
 // Create Date: 2020/06/23 14:47:21
-// Module Name: Decoder
+// Module Name: BTB
 // Description: 
-// ·ÖÖ§Ô¤²âÆ÷
+// Branch Table Buffer
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:

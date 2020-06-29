@@ -2,7 +2,7 @@
 // Create Date: 2020/06/23 14:47:21
 // Module Name: IF_PipReg
 // Description: 
-// 取值段流水线寄存器
+// IF Pipeline Register
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
