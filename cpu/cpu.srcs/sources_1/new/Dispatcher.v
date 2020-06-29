@@ -23,9 +23,15 @@
 module Dispatcher(
     input clk_i,
     input rst_i,
-    input [166:0] DE_PipReg_i,
+    input [`ROB_ITEM_INDEX] DE_PipReg_i,
     output EX_ADD_selected_o,
-    input EX_BRANCH_selected_o,
-    input EX_LS_RAM_selectedP_o,
+    output EX_BRANCH_selected_o,
+    output EX_LS_RAM_selected_o
     );
+
+
+assign EX_ADD_selected_o = DE_PipReg_i[`ADD];
+assign EX_BRANCH_selected_o = DE_PipReg_i[`BRANCH];
+assign EX_LS_RAM_selected_o = DE_PipReg_i[`RAM];
+
 endmodule

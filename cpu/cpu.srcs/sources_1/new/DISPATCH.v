@@ -30,7 +30,12 @@ module DISPATCH(
     output [31:0]reg_B_o,
     output [31:0]imm32_o,
     output [4:0]opcode_o,
-    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o
+    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
+    
+    //Select Unit to calculate
+    output EX_ADD_selected_o,
+    output EX_BRANCH_selected_o,
+    output EX_LS_RAM_selected_o
     );
 
 
@@ -75,6 +80,28 @@ DISPATCH_PipReg DISPATCH_PipReg
     .DISPATCH_pipreg_o(DISPATCH_pip_reg_w)
 
 );
+
+
+// Dispatcher
+wire EX_ADD_selected_w = DE_pip_reg_i[`ADD];
+wire EX_BRANCH_selected_w=DE_pip_reg_i[`BRANCH];
+wire EX_LS_RAM_selected_w=DE_pip_reg_i[`RAM];
+
+assign EX_ADD_selected_o = EX_ADD_selected_w;
+assign EX_BRANCH_selected_o = EX_BRANCH_selected_w;
+assign EX_LS_RAM_selected_o = EX_LS_RAM_selected_w;
+
+// Abundunt code, maybe useful in future.
+//Dispatcher Dispatcher
+//(
+//    .clk_i(clk_i),
+//    .rst_i(rst_i),
+//    .DE_PipReg_i(DE_pip_reg_i),
+//    .EX_ADD_selected_o(EX_ADD_selected_w),
+//    .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
+//    .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
+//);
+
 
 assign reg_A_o = dispatch_ra_value_w;
 assign reg_B_o = dispatch_rb_value_w;

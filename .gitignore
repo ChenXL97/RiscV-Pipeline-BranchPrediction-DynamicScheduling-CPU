@@ -35,3 +35,4 @@ cpu-sample/RTL/pipeline/.DS_Store
 cpu/cpu.srcs/sources_1/eng/test
 cpu/cpu.srcs/sources_1/eng/test.vcd
 cpu/cpu.xpr
+cpu/cpu.xpr
