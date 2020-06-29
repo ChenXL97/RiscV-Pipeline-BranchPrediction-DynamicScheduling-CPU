@@ -3,7 +3,7 @@
 // Create Date: 2020/06/23 14:47:21
 // Module Name: EX
 // Description: 
-// EX段模块
+// EX module
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
@@ -112,7 +112,7 @@ end
 
 
 
-//    //DE流水线寄存器
+//    //EX_PipReg
 //    EX_PipReg EX_PipReg(
 //        .clk(clk),
 //        .rst(rst),

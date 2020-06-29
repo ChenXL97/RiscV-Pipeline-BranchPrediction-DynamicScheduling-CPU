@@ -2,7 +2,7 @@
 // Create Date: 2020/06/23 14:47:21
 // Module Name: IF
 // Description: 
-// 取指模块
+// IF
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
@@ -13,17 +13,19 @@
 module IF(
     input clk,
     input rst,
-    input EX_block, //用于EX阻塞流水线
-    input EX_rst, //用于EX清空流水线
-    input EX_write_pc,  //为 1 代表EX要写PC
-    input [31:0]EX_addr,  //EX写PC的具体地址
-    input BTB_write_pc,  //为 1 代表BTB要写PC
-    input [31:0]BTB_addr,  //为BTB写PC的具体地址
+    // EX input
+    input EX_block,
+    input EX_rst,
+    input EX_write_pc, 
+    input [31:0]EX_addr,
+    // BTB input
+    input BTB_write_pc, 
+    input [31:0]BTB_addr, 
     output [31:0] pc,
     output [31:0] IF_pip_reg
     );
 
-    //pc模块
+    //pc
     PC PC
     (
         .clk(clk),
@@ -35,8 +37,9 @@ module IF(
         .pc(pc)
     );
     
-    //Ins_mem模块
-    wire [31:0]ins;  //把指令输出到IF流水线寄存器
+    //Ins_mem
+    // InsMem to IF PipReg
+    wire [31:0]ins;
     InsMem InsMem
     (
         .clk(clk),
@@ -44,7 +47,7 @@ module IF(
         .ins(ins)
     );
     
-    //IF流水线寄存器
+    //IF
     IF_PipReg IF_PipReg
     (
         .clk(clk),

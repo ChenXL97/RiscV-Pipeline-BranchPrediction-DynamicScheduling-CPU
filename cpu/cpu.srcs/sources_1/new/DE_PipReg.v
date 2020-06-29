@@ -3,7 +3,7 @@
 // Create Date: 2020/06/23 14:47:21
 // Module Name: DE_PipReg
 // Description: 
-// DEÁ÷Ë®Ïß¼Ä´æÆ÷
+// DE pipline register
 // Revision:
 // Revision 0.01 - File Created
 // Additional Comments:
