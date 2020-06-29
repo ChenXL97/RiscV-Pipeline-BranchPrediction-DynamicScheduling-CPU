@@ -76,6 +76,28 @@ REG_FILES REG_FILES
     .rb0_value_o(dispatch_rb_value_w)
 );
 
+
+// TODO Bypass
+//reg [31:0] issue_ra_value_r;
+//reg [31:0] issue_rb_value_r;
+
+//always@*
+//begin
+//    issue_ra_value_r = dispatch_ra_value_w;
+//    issue_rb_value_r = dispatch_rb_value_w;
+    
+//    //Bypass - WB
+//    if (pipe_rd_wb_w == dispatch_ra_index_w)
+//        issue_rb_value_r = pipe_result_wb_w;
+//    if (pipe_rd_wb_w==dispatch_rb_index_w)
+//        issue_rb_value_r = pipe_result_wb_w;
+
+
+
+//end
+
+
+
 DISPATCH_PipReg DISPATCH_PipReg
 (
     .clk_i(clk_i),

@@ -27,7 +27,7 @@ if(rst)
 	end
 else
 	if(DMwr==1) begin
-		DM[DMaddr]<=DMin;
+		DM[DMaddr>>2]<=DMin;
 		Dmout<=32'bx;
 	end
 	else if(DMwr==0)

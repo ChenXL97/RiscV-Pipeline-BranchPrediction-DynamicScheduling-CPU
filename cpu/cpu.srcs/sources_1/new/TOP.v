@@ -124,7 +124,7 @@ module TOP();
 //##########   EX Module  #############################
 //#####################################################
     wire EX_is_wr_w;
-
+    wire [31:0]ex_reg_B_w;
     EX EX
     (
         .clk_i(clk),
@@ -142,7 +142,7 @@ module TOP();
         .EX_block(EX_block),
         // EX result
         .EX_result_o(EX_result_w),
-        
+        .reg_B_o(ex_reg_B_w),
         //Pipe_reg
         .EX_pip_reg_o(EX_pip_reg_w),
 
@@ -159,7 +159,7 @@ MEM MEM(
         .clk_i(clk),
         .rst_i(rst),
         .EX_pip_reg_i(EX_pip_reg_w),
-        .rs2_i(reg_B_w),
+        .rs2_i(ex_reg_B_w),
 
         .EX_result_i(EX_result_w),//Address or ALU result
         .MEM_is_write_i(EX_is_wr_w),
