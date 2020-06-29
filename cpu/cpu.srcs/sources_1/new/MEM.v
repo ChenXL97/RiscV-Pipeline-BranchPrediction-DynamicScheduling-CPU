@@ -31,10 +31,14 @@ module MEM(
     output [31:0] MEM_result_o
     );
     
+reg [31:0]DMin;
+always @ (posedge clk_i) 
+    DMin<=rs2_i;
+    
 DataMemory DataMemory(
     .clk(clk_i),
     .rst(rst_i),
-    .DMin(rs2_i),
+    .DMin(DMin),
     .DMaddr(EX_result_i),
     .DMwr(MEM_is_write_i),
     .DMout(MEM_result_o)

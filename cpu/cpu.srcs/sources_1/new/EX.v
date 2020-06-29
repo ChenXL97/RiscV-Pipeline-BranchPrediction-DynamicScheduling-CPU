@@ -31,6 +31,7 @@ module EX(
     output reg [31:0] EX_result_pc_o,
     output reg [31:0] EX_result_o,
     output [`ROB_ITEM_INDEX] EX_pip_reg_o,
+    output [31:0] reg_B_o,
     output reg EX_is_wr_o
     );
     
@@ -47,6 +48,7 @@ module EX(
         REG_B <= reg_B_i;
         IMM32 <= imm32_i;  
     end
+    assign reg_B_o = REG_B;
     
     wire EX_ADD_selected_i = DISPATCH_pip_reg_i[`ADD];
     wire EX_BRANCH_selected_i=DISPATCH_pip_reg_i[`BRANCH];
@@ -112,6 +114,7 @@ always @(posedge clk_i or posedge rst_i) begin
         EX_is_wr_o <= 1'bx; // 0 read 1 write
     end
     else begin
+    
         if (EX_ADD_selected_i) begin
             EX_result_o <= EX_ADD_result_o;
             EX_is_wr_o <= 1'bx;
