@@ -25,20 +25,20 @@ module DISPATCH(
     input clk_i,
     input rst_i,
     input  [`ROB_ITEM_INDEX]DE_pip_reg_i,
-    input [31:0]EX_result_i,
-    input [`ROB_ITEM_INDEX]EX_pip_reg_i,
+    input [31:0]MEM_result_i,
+    input [`ROB_ITEM_INDEX]MEM_pip_reg_i,
     
     
     output [31:0]reg_A_o,
     output [31:0]reg_B_o,
     output [31:0]imm32_o,
     output [4:0]opcode_o,
-    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
+    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o
     
     //Select Unit to calculate
-    output EX_ADD_selected_o,
-    output EX_BRANCH_selected_o,
-    output EX_LS_RAM_selected_o
+//    output  EX_ADD_selected_o,
+//    output  EX_BRANCH_selected_o,
+//    output  EX_LS_RAM_selected_o
     );
 
 
@@ -51,8 +51,8 @@ wire [31:0] imm_value_w = DE_pip_reg_i[`IMM];
 wire [4:0] dispatch_ra_index_w = DE_pip_reg_i[`RS1];
 wire [4:0] dispatch_rb_index_w = DE_pip_reg_i[`RS2];
 wire [4:0] opcode_w = DE_pip_reg_i[`OP1_2];
-wire [4:0] pipe_rd_wb_w = EX_pip_reg_i[`DST]; // data forwarding
-wire [31:0] pipe_result_wb_w = EX_result_i; //data forwarding
+wire [4:0] pipe_rd_wb_w = MEM_pip_reg_i[`DST]; // data forwarding
+wire [31:0] pipe_result_wb_w = MEM_result_i; //data forwarding
 
 
 wire [31:0] dispatch_ra_value_w;
@@ -87,13 +87,12 @@ DISPATCH_PipReg DISPATCH_PipReg
 
 
 // Dispatcher
-wire EX_ADD_selected_w = DE_pip_reg_i[`ADD];
-wire EX_BRANCH_selected_w=DE_pip_reg_i[`BRANCH];
-wire EX_LS_RAM_selected_w=DE_pip_reg_i[`RAM];
 
-assign EX_ADD_selected_o = EX_ADD_selected_w;
-assign EX_BRANCH_selected_o = EX_BRANCH_selected_w;
-assign EX_LS_RAM_selected_o = EX_LS_RAM_selected_w;
+
+
+//assign EX_ADD_selected_o = EX_ADD_selected_w;
+//assign EX_BRANCH_selected_o = EX_BRANCH_selected_w;
+//assign EX_LS_RAM_selected_o = EX_LS_RAM_selected_w;
 
 // Abundunt code, maybe useful in future.
 //Dispatcher Dispatcher

@@ -67,10 +67,10 @@ begin: REGFILE
     always @ (posedge clk_i or posedge rst_i)
         if (rst_i)
         begin
-            reg_r1_q       <= 32'h00000001;
-            reg_r2_q       <= 32'h00000001;
-            reg_r3_q       <= 32'h00000000;
-            reg_r4_q       <= 32'h00000000;
+            reg_r1_q       <= 32'h00000033;
+            reg_r2_q       <= 32'h00000033;
+            reg_r3_q       <= 32'h00000033;
+            reg_r4_q       <= 32'h00000033;
             reg_r5_q       <= 32'h00000000;
             reg_r6_q       <= 32'h00000000;
             reg_r7_q       <= 32'h00000000;

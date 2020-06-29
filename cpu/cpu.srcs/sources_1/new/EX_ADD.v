@@ -37,7 +37,7 @@ module EX_ADD(
     reg [31:0] result_r;
     
     
-    always @ (op1_op2_i or reg_A_i or reg_B_i)
+    always @ (enable_i or op1_op2_i or reg_A_i or reg_B_i)
     if (enable_i) begin
         
     case (op1_op2_i)

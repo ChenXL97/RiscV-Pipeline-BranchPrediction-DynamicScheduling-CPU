@@ -10,12 +10,12 @@
 // 
 //////////////////////////////////////////////////////////////////////////////////
 
-module TOP( );
+module TOP();
     
 //  Simulated clk clock
     reg clk;
     initial begin
-        clk <= 0;
+        clk <= 1;
     end
         
     always #10 begin
@@ -30,9 +30,9 @@ module TOP( );
 //  Simulated Reset Signal 
     reg rst;
     initial begin
-       #1 rst <= 0;
-       #1 rst <= 1;
-       #1 rst <= 0;
+       #5 rst <= 0;
+       #5 rst <= 1;
+       #5 rst <= 0;
     end
     
 //#####################################################
@@ -64,9 +64,7 @@ module TOP( );
         .BTB_addr(predict_pc),
         .pc(pc),
         .IF_pip_reg(IF_pip_reg)
-        
-        
-        
+
     );
 
 //#####################################################
@@ -94,40 +92,38 @@ module TOP( );
 //#####################################################
     wire [31:0]reg_A_w;
     wire [31:0]reg_B_w;
-    wire [31:0]imm32_w;
-    wire [4:0]opcode_w;    
+    wire [31:0]imm32_w;  
     wire [`ROB_ITEM_INDEX] DISPATCH_pip_reg_w;
-    wire EX_ADD_selected_w;
-    wire EX_BRANCH_selected_w;
-    wire EX_LS_RAM_selected_w;
+
     wire [31:0]EX_result_w;
     wire [`ROB_ITEM_INDEX]EX_pip_reg_w;
-    
+    wire [`ROB_ITEM_INDEX] MEM_pip_reg_w;
+    wire [31:0]MEM_result_w;
     DISPATCH DIAPATCH
     (
         .clk_i(clk),
         .rst_i(rst),
         .DE_pip_reg_i(DE_pip_reg),
         
-        //input from EX_result for WB
-        .EX_result_i(EX_result_w),
-        .EX_pip_reg_i(EX_pip_reg_w),
+        //input from MEM_result for WB
+        .MEM_result_i(MEM_result_w),
+        .MEM_pip_reg_i(MEM_pip_reg_w),
                 
         //output EX_pip_reg_o,
         .reg_A_o(reg_A_w),
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
-        .opcode_o(opcode_w),
-        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w),
-        .EX_ADD_selected_o(EX_ADD_selected_w),
-        .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
-        .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
+        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
+//        .EX_ADD_selected_o(EX_ADD_selected_w),
+//        .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
+//        .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
     );
 
 
 //#####################################################
 //##########   EX Module  #############################
 //#####################################################
+    wire EX_is_wr_w;
 
     EX EX
     (
@@ -138,13 +134,7 @@ module TOP( );
         .reg_A_i(reg_A_w),
         .reg_B_i(reg_B_w),
         .imm32_i(imm32_w),
-        .opcode_i(opcode_w),
         .DISPATCH_pip_reg_i(DISPATCH_pip_reg_w),
-
-        //Enable
-        .EX_ADD_selected_i(EX_ADD_selected_w),
-        .EX_LS_RAM_selected_i(EX_LS_RAM_selected_w),
-        .EX_BRANCH_selected_i(EX_LS_RAM_selected_w),
         
         // For Branch
         .EX_update(EX_update),
@@ -154,11 +144,27 @@ module TOP( );
         .EX_result_o(EX_result_w),
         
         //Pipe_reg
-        .EX_pip_reg_o(EX_pip_reg_w)
+        .EX_pip_reg_o(EX_pip_reg_w),
+
+        // write signal
+        .EX_is_wr_o(EX_is_wr_w)
 
     );
-    
 
-    
+//#####################################################
+//##########   MEM Module  ############################
+//#####################################################
+
+MEM MEM(
+        .clk_i(clk),
+        .rst_i(rst),
+        .EX_pip_reg_i(EX_pip_reg_w),
+        .rs2_i(reg_B_w),
+
+        .EX_result_i(EX_result_w),//Address or ALU result
+        .MEM_is_write_i(EX_is_wr_w),
+        .MEM_pip_reg_o(MEM_pip_reg_w),
+        .MEM_result_o(MEM_result_w)
+);  
     
 endmodule

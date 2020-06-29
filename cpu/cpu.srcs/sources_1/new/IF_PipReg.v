@@ -19,7 +19,7 @@ module IF_PipReg(
     
     always@(posedge clk or posedge rst or posedge EX_rst)
         if(rst || EX_rst)
-            IF_pip_reg<=0;
+            IF_pip_reg<=32'bx;
         else 
             IF_pip_reg<=ins;
     
