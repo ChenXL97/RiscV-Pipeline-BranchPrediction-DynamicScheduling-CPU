@@ -93,6 +93,10 @@ module TOP( );
     wire [31:0]imm32_w;
     wire [4:0]opcode_w;    
     wire [`ROB_ITEM_INDEX] DISPATCH_pip_reg_w;
+    wire EX_ADD_selected_w;
+    wire EX_BRANCH_selected_w;
+    wire EX_LS_RAM_selected_w;
+    
     DISPATCH DIAPATCH
     (
         .clk_i(clk),
@@ -104,22 +108,42 @@ module TOP( );
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
         .opcode_o(opcode_w),
-        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
+        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w),
+        .EX_ADD_selected_o(EX_ADD_selected_w),
+        .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
+        .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
     );
 
 
 //#####################################################
 //##########   EXÄ£¿é   ###############################
-//#####################################################    
+//#####################################################
+    wire [31:0]EX_result_w;
+
     EX EX
     (
-        .clk(clk),
-        .rst(rst),
-        .DE_pip_reg(DE_pip_reg),
-        .EX_rst(EX_rst),
-        .EX_block(EX_block),
+        .clk_i(clk),
+        .rst_i(rst),
+        
+        
+        .reg_A_i(reg_A_w),
+        .reg_B_i(reg_B_w),
+        .imm32_i(imm32_w),
+        .opcode_i(opcode_w),
+        .DISPATCH_pip_reg_i(DISPATCH_pip_reg_w),
+
+        //Enable
+        .EX_ADD_selected_i(EX_ADD_selected_w),
+        .EX_LS_RAM_selected_i(EX_LS_RAM_selected_w),
+        .EX_BRANCH_selected_i(EX_LS_RAM_selected_w),
+        
+        // For Branch
         .EX_update(EX_update),
-        .EX_result_pc(EX_result_pc)
+        .EX_result_pc_o(EX_result_pc),
+        .EX_block(EX_block),
+        // EX result
+        .EX_result_o(EX_result_w)
+
     );
     
 endmodule

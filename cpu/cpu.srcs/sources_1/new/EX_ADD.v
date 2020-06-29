@@ -18,17 +18,18 @@
 // Additional Comments:
 // 
 //////////////////////////////////////////////////////////////////////////////////
-`define ADD 5'b00000
-`define SUB 5'b00100
-`define ADDI 5'b01000
-`define LUI 5'b10000
+`define INS_ADD 5'b00000
+`define INS_SUB 5'b00100
+`define INS_ADDI 5'b01000
+`define INS_LUI 5'b10000
 
 module EX_ADD(
     // INPUTS
-    input is_selected_i,
+    input enable_i,
     input [4:0]op1_op2_i,
-    input [31:0]operand_A_i,
-    input [31:0]operand_B_i,
+    input [31:0]reg_A_i,
+    input [31:0]reg_B_i,
+    input [31:0]imm32_i,
     
     // OUTPUTS
     output [31:0]EX_ADD_result_o
@@ -36,27 +37,31 @@ module EX_ADD(
     reg [31:0] result_r;
     
     
-    always @ (op1_op2_i or operand_A_i or operand_B_i)
-    begin
+    always @ (op1_op2_i or reg_A_i or reg_B_i)
+    if (enable_i) begin
         
     case (op1_op2_i)
-        `ADD:
+        `INS_ADD:
         begin
-            result_r = (operand_A_i + operand_B_i);
+            result_r = (reg_A_i + reg_B_i);
         end
-        `SUB:
+        `INS_SUB:
         begin
-            result_r = (operand_A_i - operand_B_i);
+            result_r = (reg_A_i - reg_B_i);
         end
-        `ADDI:
+        `INS_ADDI:
          begin
-            result_r = (operand_A_i + operand_B_i);
+            result_r = (reg_A_i + imm32_i);
          end
-        `LUI:
+        `INS_LUI:
          begin
-            result_r = (operand_A_i + operand_B_i);
+            result_r = imm32_i << 12;
          end
     endcase
     end
+    else begin
+        result_r = 32'hx;
+    end
+    
     assign EX_ADD_result_o = result_r;
 endmodule

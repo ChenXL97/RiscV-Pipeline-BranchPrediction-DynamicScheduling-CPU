@@ -47,6 +47,7 @@ wire [31:0] imm_value_w = DE_pip_reg_i[`IMM];
 //---------------------------------------------------------------------
 wire [4:0] dispatch_ra_index_w = DE_pip_reg_i[`RS1];
 wire [4:0] dispatch_rb_index_w = DE_pip_reg_i[`RS2];
+wire [4:0] opcode_w = DE_pip_reg_i[`OP1_2];
 wire [4:0] pipe_rd_wb_w; // data forwarding
 wire [31:0] pipe_result_wb_w; //data forwarding
 
@@ -107,4 +108,5 @@ assign reg_A_o = dispatch_ra_value_w;
 assign reg_B_o = dispatch_rb_value_w;
 assign DISPATCH_pip_reg_o = DISPATCH_pip_reg_w;
 assign imm32_o = imm_value_w;
+assign opcode_o = opcode_w;
 endmodule

@@ -12,25 +12,31 @@
 
 
 module EX(
-    input clk,
-    input rst,
-    input [`ROB_ITEM_INDEX] DE_pip_reg,
+    input clk_i,
+    input rst_i,
+
+    input [31:0]reg_A_i,
+    input [31:0]reg_B_i,
+    input [31:0]imm32_i,
+    input [`ROB_ITEM_INDEX] DISPATCH_pip_reg_i,
+    input [4:0]opcode_i,
+    
+    input EX_ADD_selected_i,
+    input EX_BRANCH_selected_i,
+    input EX_LS_RAM_selected_i,
+    
     output reg EX_rst,
     output reg EX_block,
     output reg EX_update,
-    output reg [31:0] EX_result_pc
+    output reg [31:0] EX_result_pc_o,
+    output reg [31:0] EX_result_o
     );
     
     initial begin
-        EX_rst <= 0;
-        EX_block <= 0;
-        EX_update <= 0;
-        EX_result_pc <= 0;
+
     end
     
-    wire [4:0]op1_op2;
-    wire [31:0]operand_A_i;
-    wire [31:0]operand_B_i;
+   
     wire [31:0]EX_ADD_result_o;
     wire [31:0]EX_CMP_result_o;
     wire [31:0]EX_BRANCH_result_o;
@@ -39,15 +45,57 @@ module EX(
     
 //    assign operand_A_i = DE_pip_reg[]
     
-//    EX_ADD EX_ADD(
-//        .enable()
+    EX_ADD EX_ADD(
+        .enable_i(EX_ADD_selected_i),
+        .op1_op2_i(opcode_i),
+        .reg_A_i(reg_A_i),
+        .reg_B_i(reg_B_i),
+        .imm32_i(imm32_i),
+        .EX_ADD_result_o(EX_ADD_result_o)
+        //.Done()
+    );
+
+//    EX_LS_RAM EX_LS_RAM(
+//        .enable_i(EX_LS_RAM_selected_i),
 //        .op1_op2_i(op1_op2),
-//        .operand_A_i(operand_A_i),
-//        .operand_B_i(operand_B_i),
-//        .EX_ADD_result_o(EX_ADD_result_o)
-//        .Done()
+//        .operand_A_i(reg_A_i),
+//        .operand_B_i(reg_B_i),
+//        .EX_LS_RAM_result_o(EX_LS_RAM_result_o)
 //    );
-    
+
+//    EX_BRANCH EX_BRANCH(
+//        .enable_i(EX_BRANCH_selected_i),
+//        .op1_op2_i(op1_op2),
+//        .operand_A_i(reg_A_i),
+//        .operand_B_i(reg_B_i),
+//        .EX_BRANCH_result_o(EX_BRANCH_result_o)
+//    );
+
+
+always @(posedge clk_i or posedge rst_i) begin
+    if (rst_i) begin
+        // reset
+        EX_rst <= 0;
+        EX_block <= 0;
+        EX_update <= 0;
+        EX_result_pc_o <= 0;
+        EX_result_o <= 0;
+    end
+    else begin
+        if (EX_ADD_selected_i) begin
+            EX_result_o <= EX_ADD_result_o;
+        end    
+        else if (EX_BRANCH_selected_i) begin
+            EX_result_pc_o <= EX_BRANCH_result_o;
+            EX_result_o <=EX_BRANCH_result_o;
+        end
+        else if (EX_LS_RAM_result_o) begin
+            EX_result_o <= EX_LS_RAM_result_o;
+        end
+    end
+end
+
+
 //    EX_CMP EX_CMP(
 //        .op1_op2_i(op1_op2),
 //        .operand_A_i(operand_A_i),
@@ -62,19 +110,6 @@ module EX(
 //        .EX_LOGIC_result_o(EX_LOGIC_result_o)
 //    );
 
-//    EX_LS_RAM EX_LS_RAM(
-//        .op1_op2_i(op1_op2),
-//        .operand_A_i(operand_A_i),
-//        .operand_B_i(operand_B_i),
-//        .EX_LS_RAM_result_o(EX_LS_RAM_result_o)
-//    );
-
-//    EX_BRANCH EX_BRANCH(
-//        .op1_op2_i(op1_op2),
-//        .operand_A_i(operand_A_i),
-//        .operand_B_i(operand_B_i),
-//        .EX_BRANCH_result_o(EX_BRANCH_result_o)
-//    );
 
 
 //    //DEÁ÷Ë®Ïß¼Ä´æÆ÷
