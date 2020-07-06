@@ -24,9 +24,9 @@
 module DISPATCH(
     input clk_i,
     input rst_i,
-    input  [`ROB_ITEM_INDEX]DE_pip_reg_i,
-    input [31:0]MEM_result_i,
-    input [`ROB_ITEM_INDEX]MEM_pip_reg_i,
+    input  [`ROB_ITEM_INDEX] DE_pip_reg_i,
+    input [31:0] MEM_result_i,
+    input [`ROB_ITEM_INDEX] MEM_pip_reg_i,
     
     
     output [31:0]reg_A_o,

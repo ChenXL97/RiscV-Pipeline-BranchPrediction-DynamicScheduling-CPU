@@ -27,13 +27,16 @@ module DISPATCH_PipReg(
     output reg[`ROB_ITEM_INDEX] DISPATCH_pipreg_o
     );
 
-	always@(posedge clk_i or posedge rst_i)
-        if(rst_i)
-            DISPATCH_pipreg_o<=0;
-        else 
-            begin   
-                DISPATCH_pipreg_o<=DE_PipReg_i;
-            end
+
+
+
+always @ (posedge clk_i or posedge rst_i) begin
+    if(rst_i)
+        DISPATCH_pipreg_o<=0;
+    else begin   
+        DISPATCH_pipreg_o<=DE_PipReg_i;
+    end
+end
 
 
 endmodule
