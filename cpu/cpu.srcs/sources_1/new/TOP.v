@@ -51,6 +51,7 @@ wire        [31:0]              ex_tar_addr;
 wire                            ex_need_jmp;
 wire                            ex_stall;
 wire                            ex_flush;
+wire        [4:0]               ex_rd;
 
 /* decode */
 wire        [31:0]              de_cur_pc;
@@ -62,6 +63,7 @@ wire        [31:0]              de_cur_pc;
 
 /* dispatch */
 wire        [31:0]              dis_cur_pc;
+wire        [4:0]               dis_rd;
 
 
 
@@ -150,10 +152,11 @@ wire        [31:0]              dis_cur_pc;
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
         .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w),
-        .dis_cur_pc(dis_cur_pc)
-        // .EX_ADD_selected_o(EX_ADD_selected_w),
-        // .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
-        // .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
+        .dis_cur_pc(dis_cur_pc),
+        .dis_rd(dis_rd),
+        .ex_rd(ex_rd),
+        .ex_done(ex_done),
+        .ex_res(ex_res)
    );
 
 
@@ -167,6 +170,7 @@ EX ex (
     .op2                    (reg_B_w),
     .imm_data               (imm32_w),
     .dis_cur_pc             (dis_cur_pc),
+    .dis_rd                 (dis_rd),
     .op_mode1               (DISPATCH_pip_reg_w[`OP1]),
     .op_mode2               (DISPATCH_pip_reg_w[`OP2]),
     .func_part              (DISPATCH_pip_reg_w[157:143]),
@@ -175,24 +179,9 @@ EX ex (
     .ex_tar_addr               (ex_tar_addr),
     .ex_need_jmp               (ex_need_jmp),
     .ex_stall                   (ex_stall),
-    .ex_flush                   (ex_flush)
+    .ex_flush                   (ex_flush),
+    .ex_rd                      (ex_rd)
 );
 
 
-
-//#####################################################
-//##########  REG FILE  ############################
-//#####################################################
-
-// REG_FILE reg_file(
-//     .clk                        (clk),
-//     .rst                        (rst),
-//     .reg_addr                   (reg_file_addr),
-//     .reg_rw                     (reg_file_rw),
-//     .reg_wdata                  (reg_file_wdata),
-//     .reg_rdata                  (reg_file_rdata)
-// );
-
-
-    
 endmodule

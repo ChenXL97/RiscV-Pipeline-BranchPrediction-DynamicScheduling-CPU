@@ -35,7 +35,11 @@ module DISPATCH(
     output [31:0]imm32_o,
     output [4:0]opcode_o,
     output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
-    output reg [31:0] dis_cur_pc
+    output reg [31:0] dis_cur_pc,
+    output reg [4:0] dis_rd,
+    input [4:0] ex_rd,
+    input ex_done,
+    input [31:0] ex_res
     
     //Select Unit to calculate
 //    output  EX_ADD_selected_o,
@@ -78,31 +82,31 @@ REG_FILES REG_FILES
     .rst_i(rst_i),
 
     // Write ports
-    .rd0_value_i(pipe_result_wb_w),
-    .rd0_i(pipe_rd_wb_w),
+    .rd0_value_i(ex_res),
+    .rd0_i(ex_rd),
 
     // Read ports
     .ra0_i(dispatch_ra_index_w),
     .rb0_i(dispatch_rb_index_w),
     .ra0_value_o(dispatch_ra_value_w),
-    .rb0_value_o(dispatch_rb_value_w)
+    .rb0_value_o(dispatch_rb_value_w),
+    .ex_done(ex_done)
 );
 
 
-// TODO Bypass
-//reg [31:0] issue_ra_value_r;
-//reg [31:0] issue_rb_value_r;
-
-//always@*
-//begin
-//    issue_ra_value_r = dispatch_ra_value_w;
-//    issue_rb_value_r = dispatch_rb_value_w;
-    
-//    //Bypass - WB
-//    if (pipe_rd_wb_w == dispatch_ra_index_w)
-//        issue_rb_value_r = pipe_result_wb_w;
-//    if (pipe_rd_wb_w==dispatch_rb_index_w)
-//        issue_rb_value_r = pipe_result_wb_w;
+always @ (posedge clk_i) begin
+    if(!rst_i) begin
+        if(ex_stall) begin
+            dis_rd <= dis_rd;
+        end
+        else begin
+            dis_rd <= DE_pip_reg_i[`DST];
+        end
+    end
+    else begin
+        dis_rd <= 'd0;
+    end
+end
 
 
 

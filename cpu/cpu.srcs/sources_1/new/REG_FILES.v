@@ -27,6 +27,7 @@ module REG_FILES(
     input [4:0] rd0_i,
     input [4:0] ra0_i,
     input [4:0] rb0_i,
+    input ex_done,
     output [31:0] ra0_value_o,
     output [31:0] rb0_value_o
     );
@@ -67,11 +68,11 @@ begin: REGFILE
     always @ (posedge clk_i or posedge rst_i)
         if (rst_i)
         begin
-            reg_r1_q       <= 32'd1;
-            reg_r2_q       <= 32'd2;
-            reg_r3_q       <= 32'd3;
-            reg_r4_q       <= 32'd4;
-            reg_r5_q       <= 32'd5;
+            reg_r1_q       <= 32'd0;
+            reg_r2_q       <= 32'd0;
+            reg_r3_q       <= 32'd0;
+            reg_r4_q       <= 32'd0;
+            reg_r5_q       <= 32'd0;
             reg_r6_q       <= 32'h00000000;
             reg_r7_q       <= 32'h00000000;
             reg_r8_q       <= 32'h00000000;
@@ -99,39 +100,38 @@ begin: REGFILE
             reg_r30_q      <= 32'h00000000;
             reg_r31_q      <= 32'h00000000;
         end
-        else
-        begin
-            if      (rd0_i == 5'd1) reg_r1_q <= rd0_value_i;
-            if      (rd0_i == 5'd2) reg_r2_q <= rd0_value_i;
-            if      (rd0_i == 5'd3) reg_r3_q <= rd0_value_i;
-            if      (rd0_i == 5'd4) reg_r4_q <= rd0_value_i;
-            if      (rd0_i == 5'd5) reg_r5_q <= rd0_value_i;
-            if      (rd0_i == 5'd6) reg_r6_q <= rd0_value_i;
-            if      (rd0_i == 5'd7) reg_r7_q <= rd0_value_i;
-            if      (rd0_i == 5'd8) reg_r8_q <= rd0_value_i;
-            if      (rd0_i == 5'd9) reg_r9_q <= rd0_value_i;
-            if      (rd0_i == 5'd10) reg_r10_q <= rd0_value_i;
-            if      (rd0_i == 5'd11) reg_r11_q <= rd0_value_i;
-            if      (rd0_i == 5'd12) reg_r12_q <= rd0_value_i;
-            if      (rd0_i == 5'd13) reg_r13_q <= rd0_value_i;
-            if      (rd0_i == 5'd14) reg_r14_q <= rd0_value_i;
-            if      (rd0_i == 5'd15) reg_r15_q <= rd0_value_i;
-            if      (rd0_i == 5'd16) reg_r16_q <= rd0_value_i;
-            if      (rd0_i == 5'd17) reg_r17_q <= rd0_value_i;
-            if      (rd0_i == 5'd18) reg_r18_q <= rd0_value_i;
-            if      (rd0_i == 5'd19) reg_r19_q <= rd0_value_i;
-            if      (rd0_i == 5'd20) reg_r20_q <= rd0_value_i;
-            if      (rd0_i == 5'd21) reg_r21_q <= rd0_value_i;
-            if      (rd0_i == 5'd22) reg_r22_q <= rd0_value_i;
-            if      (rd0_i == 5'd23) reg_r23_q <= rd0_value_i;
-            if      (rd0_i == 5'd24) reg_r24_q <= rd0_value_i;
-            if      (rd0_i == 5'd25) reg_r25_q <= rd0_value_i;
-            if      (rd0_i == 5'd26) reg_r26_q <= rd0_value_i;
-            if      (rd0_i == 5'd27) reg_r27_q <= rd0_value_i;
-            if      (rd0_i == 5'd28) reg_r28_q <= rd0_value_i;
-            if      (rd0_i == 5'd29) reg_r29_q <= rd0_value_i;
-            if      (rd0_i == 5'd30) reg_r30_q <= rd0_value_i;
-            if      (rd0_i == 5'd31) reg_r31_q <= rd0_value_i;
+        else begin
+            if      (ex_done && rd0_i == 5'd1) reg_r1_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd2) reg_r2_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd3) reg_r3_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd4) reg_r4_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd5) reg_r5_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd6) reg_r6_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd7) reg_r7_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd8) reg_r8_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd9) reg_r9_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd10) reg_r10_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd11) reg_r11_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd12) reg_r12_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd13) reg_r13_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd14) reg_r14_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd15) reg_r15_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd16) reg_r16_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd17) reg_r17_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd18) reg_r18_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd19) reg_r19_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd20) reg_r20_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd21) reg_r21_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd22) reg_r22_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd23) reg_r23_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd24) reg_r24_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd25) reg_r25_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd26) reg_r26_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd27) reg_r27_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd28) reg_r28_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd29) reg_r29_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd30) reg_r30_q <= rd0_value_i;
+            if      (ex_done && rd0_i == 5'd31) reg_r31_q <= rd0_value_i;
         end
         
         //-----------------------------------------------------------------
@@ -139,8 +139,7 @@ begin: REGFILE
             //-----------------------------------------------------------------
             reg [31:0] ra0_value_r;
             reg [31:0] rb0_value_r;
-            always @ *
-            begin
+            always @ (*) begin
                 case (ra0_i)
                 5'd1: ra0_value_r = reg_r1_q;
                 5'd2: ra0_value_r = reg_r2_q;

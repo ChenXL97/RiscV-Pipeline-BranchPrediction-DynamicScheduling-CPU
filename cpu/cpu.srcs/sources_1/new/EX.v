@@ -33,6 +33,7 @@ module EX(
 
     input       [1:0]                   op_mode1,
     input       [2:0]                   op_mode2,
+    input       [4:0]                   dis_rd,
 
     output                              ex_done,
 
@@ -49,7 +50,9 @@ module EX(
     output      reg                     ex_stall,
     
     // set flush when branch inst need jmp
-    output      reg                     ex_flush
+    output      reg                     ex_flush,
+
+    output      reg     [4:0]           ex_rd
     );
 
 
@@ -74,6 +77,7 @@ wire        [31:0]                      branch_res;
 
 
 reg         [1:0]                       use_part;
+reg                                     trick;
 
 
 
@@ -89,37 +93,75 @@ always @ (posedge clk) begin
     if(!rst) begin
         // current inst is valid and not running 
         if(func_part != 'd0 && func_busy == 'd0) begin
-            func_start <= func_part;
+            // func_start <= func_part;
             func_working <= func_part;
+            ex_rd <= dis_rd;
+            trick <= 'd1;
         end
 
         // current inst is running
         else if(func_part != 'd0 && func_busy == 'd1) begin
-            func_start <= 'd0;
+            // func_start <= 'd0;
             func_working <= func_working;
+            ex_rd <= ex_rd;
+            trick <= 'd0;
         end
 
         else begin
-            func_start <= 'd0;
+            // func_start <= 'd0;
             func_working <= func_working;
+            ex_rd <= ex_rd;
+            trick <= 'd0;
         end
     end
 
     else begin
-        func_start <= 'd0;
+        // func_start <= 'd0;
         func_working <= 'd0;
+        ex_rd <= 'd0;
+        trick <= 'd0;
     end
 end
+
+
+
+// always @ (posedge clk) begin
+//     if(!rst) begin
+//         // current inst is valid and not running 
+//         if(func_part != 'd0 && func_busy == 'd0) begin
+//             func_start <= func_part;
+//         end
+
+//         // current inst is running
+//         else if(func_part != 'd0 && func_busy == 'd1) begin
+//             func_start <= 'd0;
+//         end
+
+//         else begin
+//             func_start <= 'd0;
+//         end
+//     end
+
+//     else begin
+//         func_start <= 'd0;
+//     end
+// end
 
 
 always @ (*) begin
     if(!rst) begin
         if(func_start != 'd0 && func_busy == 'd0) begin
             func_busy = 'd1;
+            func_start = func_part;
         end
 
         // current inst is running
         else if(func_busy == 'd1) begin
+            if(trick == 'd1)
+                func_start = 'd0;
+            else 
+                func_start = func_start;
+
             if(ex_done) begin
                 func_busy = 'd0;
             end
@@ -130,11 +172,13 @@ always @ (*) begin
 
         else begin
             func_busy = func_busy;
+            func_start = func_start;
         end
     end
 
     else begin
         func_busy = 'd0;
+        func_start = 'd0;
     end
 end
 
