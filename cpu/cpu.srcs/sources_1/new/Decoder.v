@@ -266,21 +266,21 @@ module Decoder(
             end
             //12-13 FMUL/FDIV : Ins56-57 
             4'd13: 
-            if(!ins[6]) //56 Float Multiply FMUL 
+            if(!ins[31]) //56 Float Multiply FMUL 
                 begin
                     de_out[`FMUL] = 1'b1;
-                    de_out[`OP1_2] = 5'b00_000;
+                    de_out[`OP1_2] = { 2'b00, ins[14:12]  };
                 end
             else //57 Float Divide FDIV
                 begin
                     de_out[`FDIV] = 1'b1;
-                    de_out[`OP1_2] = 5'b10_000;
+                    de_out[`OP1_2] = { 2'b00, ins[14:12]  };
                 end
-            //14 FSP : Ins58 FSQRT
+            //14 FSP : Ins58 FCVT FCVTW
             4'd14: 
                 begin
                     de_out[`FSP] = 1'b1;
-                    de_out[`OP1_2] = 5'b00_000;
+                    de_out[`OP1_2] = { ins[31:30], ins[14:12]  };
                 end
             //15 FCMP : Ins59-61 FEQ FLT FLE
             4'd15: 
