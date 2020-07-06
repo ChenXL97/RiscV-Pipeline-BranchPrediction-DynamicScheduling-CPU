@@ -61,7 +61,7 @@ wire     [31:0]                         u1_res;
 
 
 
-addsub_no_u addsub_no_u_0(
+adder_suber addsub_no_u_0(
     .A                      (op1),
     .B                      (op2),
     .CLK                    (clk),
@@ -70,7 +70,7 @@ addsub_no_u addsub_no_u_0(
     .S                      (u0_res)
 );
 
-addsub_no_u addsub_no_u_1(
+adder_suber addsub_no_u_1(
     .A                      (op1),
     .B                      (op2),
     .CLK                    (clk),
@@ -90,7 +90,7 @@ always @ (posedge clk) begin
         'b10: begin
             if(start) begin
                 u1_en <= 'd1;
-                u0_en <= u0_add;
+                u0_en <= 'd0;
                 u0_add <= u0_add;
                 // sub
                 if(op_mode2[2] == 'b1) begin

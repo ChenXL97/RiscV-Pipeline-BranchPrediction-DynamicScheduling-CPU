@@ -49,7 +49,8 @@ wire                            ex_done;
 wire        [31:0]              ex_res;
 wire        [31:0]              ex_tar_addr;               
 wire                            ex_need_jmp;
-
+wire                            ex_stall;
+wire                            ex_flush;
 
 
 
@@ -121,7 +122,7 @@ wire                            ex_need_jmp;
     wire [`ROB_ITEM_INDEX] DISPATCH_pip_reg_w;
 
     wire [31:0]EX_result_w;
-    wire [`ROB_ITEM_INDEX]EX_pip_reg_w;
+    wire [`ROB_ITEM_INDEX] EX_pip_reg_w;
     wire [`ROB_ITEM_INDEX] MEM_pip_reg_w;
     wire [31:0]MEM_result_w;
     DISPATCH DIAPATCH
@@ -138,10 +139,10 @@ wire                            ex_need_jmp;
         .reg_A_o(reg_A_w),
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
-        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w),
-       .EX_ADD_selected_o(EX_ADD_selected_w),
-       .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
-       .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
+        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
+        // .EX_ADD_selected_o(EX_ADD_selected_w),
+        // .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
+        // .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
    );
 
 
@@ -155,12 +156,15 @@ EX ex (
     .op2                    (reg_B_w),
     .imm_data               (imm32_w),
     .cur_pc                 (pc),
-    .op_mode1               (),
-    .op_mode2               (),
+    .op_mode1               (DISPATCH_pip_reg_w[`OP1]),
+    .op_mode2               (DISPATCH_pip_reg_w[`OP2]),
+    .func_part              (DISPATCH_pip_reg_w[157:143]),
     .ex_done                   (ex_done),
     .ex_res                    (ex_res),
     .ex_tar_addr               (ex_tar_addr),
-    .ex_need_jmp               (ex_need_jmp)
+    .ex_need_jmp               (ex_need_jmp),
+    .ex_stall                   (ex_stall),
+    .ex_flush                   (ex_flush)
 );
 
 
@@ -169,14 +173,14 @@ EX ex (
 //##########  REG FILE  ############################
 //#####################################################
 
-REG_FILE reg_file(
-    .clk                        (clk),
-    .rst                        (rst),
-    .reg_addr                   (reg_file_addr),
-    .reg_rw                     (reg_file_rw),
-    .reg_wdata                  (reg_file_wdata),
-    .reg_rdata                  (reg_file_rdata)
-);
+// REG_FILE reg_file(
+//     .clk                        (clk),
+//     .rst                        (rst),
+//     .reg_addr                   (reg_file_addr),
+//     .reg_rw                     (reg_file_rw),
+//     .reg_wdata                  (reg_file_wdata),
+//     .reg_rdata                  (reg_file_rdata)
+// );
 
 
     

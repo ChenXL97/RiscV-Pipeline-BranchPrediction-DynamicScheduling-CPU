@@ -3,8 +3,33 @@
 		"path": "$ROOTPATH$\\TOP.v",
 		"bookmarks": [
 			{
-				"line": 115,
+				"line": 38,
+				"column": 19,
+				"label": ""
+			},
+			{
+				"line": 116,
 				"column": 58,
+				"label": ""
+			},
+			{
+				"line": 148,
+				"column": 55,
+				"label": ""
+			}
+		]
+	},
+	{
+		"path": "$ROOTPATH$\\EX.v",
+		"bookmarks": [
+			{
+				"line": 53,
+				"column": 26,
+				"label": ""
+			},
+			{
+				"line": 135,
+				"column": 12,
 				"label": ""
 			}
 		]
