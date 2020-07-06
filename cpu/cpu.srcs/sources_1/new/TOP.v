@@ -18,22 +18,48 @@ module TOP();
         clk <= 1;
     end
         
-    always #10 begin
+    always begin
+        #1;
         clk <= ~clk;
     end
+
         
-    always #10 begin
-        clk <= ~clk;
-    end
-    
 
 //  Simulated Reset Signal 
     reg rst;
     initial begin
-       #5 rst <= 0;
-       #5 rst <= 1;
-       #5 rst <= 0;
+       rst <= 'd1;
+       #3;
+       rst <= 'd0;
     end
+
+
+
+
+/* reg file wire */
+wire        [31:0]              reg_file_rdata;
+wire        [31:0]              reg_file_wdata;
+wire                            reg_file_rw;
+wire        [4:0]               reg_file_addr;
+
+
+
+/* ex */
+wire                            ex_done;
+wire        [31:0]              ex_res;
+wire        [31:0]              ex_tar_addr;               
+wire                            ex_need_jmp;
+wire                            ex_stall;
+wire                            ex_flush;
+
+
+
+
+
+
+
+
+
     
 //#####################################################
 //##########   IF Module   ############################
@@ -96,7 +122,7 @@ module TOP();
     wire [`ROB_ITEM_INDEX] DISPATCH_pip_reg_w;
 
     wire [31:0]EX_result_w;
-    wire [`ROB_ITEM_INDEX]EX_pip_reg_w;
+    wire [`ROB_ITEM_INDEX] EX_pip_reg_w;
     wire [`ROB_ITEM_INDEX] MEM_pip_reg_w;
     wire [31:0]MEM_result_w;
     DISPATCH DIAPATCH
@@ -114,57 +140,48 @@ module TOP();
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
         .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
-//        .EX_ADD_selected_o(EX_ADD_selected_w),
-//        .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
-//        .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
-    );
+        // .EX_ADD_selected_o(EX_ADD_selected_w),
+        // .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
+        // .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
+   );
 
 
 //#####################################################
 //##########   EX Module  #############################
 //#####################################################
-    wire EX_is_wr_w;
-    wire [31:0]ex_reg_B_w;
-    EX EX
-    (
-        .clk_i(clk),
-        .rst_i(rst),
-        
-        
-        .reg_A_i(reg_A_w),
-        .reg_B_i(reg_B_w),
-        .imm32_i(imm32_w),
-        .DISPATCH_pip_reg_i(DISPATCH_pip_reg_w),
-        
-        // For Branch
-        .EX_update(EX_update),
-        .EX_result_pc_o(EX_result_pc),
-        .EX_block(EX_block),
-        // EX result
-        .EX_result_o(EX_result_w),
-        .reg_B_o(ex_reg_B_w),
-        //Pipe_reg
-        .EX_pip_reg_o(EX_pip_reg_w),
+EX ex (
+    .clk                    (clk),
+    .rst                    (rst),
+    .op1                    (reg_A_w),
+    .op2                    (reg_B_w),
+    .imm_data               (imm32_w),
+    .cur_pc                 (pc),
+    .op_mode1               (DISPATCH_pip_reg_w[`OP1]),
+    .op_mode2               (DISPATCH_pip_reg_w[`OP2]),
+    .func_part              (DISPATCH_pip_reg_w[157:143]),
+    .ex_done                   (ex_done),
+    .ex_res                    (ex_res),
+    .ex_tar_addr               (ex_tar_addr),
+    .ex_need_jmp               (ex_need_jmp),
+    .ex_stall                   (ex_stall),
+    .ex_flush                   (ex_flush)
+);
 
-        // write signal
-        .EX_is_wr_o(EX_is_wr_w)
 
-    );
 
 //#####################################################
-//##########   MEM Module  ############################
+//##########  REG FILE  ############################
 //#####################################################
 
-MEM MEM(
-        .clk_i(clk),
-        .rst_i(rst),
-        .EX_pip_reg_i(EX_pip_reg_w),
-        .rs2_i(ex_reg_B_w),
+// REG_FILE reg_file(
+//     .clk                        (clk),
+//     .rst                        (rst),
+//     .reg_addr                   (reg_file_addr),
+//     .reg_rw                     (reg_file_rw),
+//     .reg_wdata                  (reg_file_wdata),
+//     .reg_rdata                  (reg_file_rdata)
+// );
 
-        .EX_result_i(EX_result_w),//Address or ALU result
-        .MEM_is_write_i(EX_is_wr_w),
-        .MEM_pip_reg_o(MEM_pip_reg_w),
-        .MEM_result_o(MEM_result_w)
-);  
+
     
 endmodule
