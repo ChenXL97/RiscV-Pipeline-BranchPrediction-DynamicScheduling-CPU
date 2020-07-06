@@ -82,8 +82,8 @@ wire                            ex_flush;
     (
         .clk(clk),
         .rst(rst),
-        .EX_block(EX_block),
         .EX_rst(EX_rst),
+        .EX_block(ex_stall),
         .EX_write_pc(EX_update),
         .EX_addr(EX_result_pc),
         .BTB_write_pc(predict_is_taken),

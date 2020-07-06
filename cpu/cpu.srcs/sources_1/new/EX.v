@@ -48,6 +48,7 @@ module EX(
 
 
 reg         [14:0]                      func_start;
+reg         [14:0]                      func_working;
 reg                                     func_busy;
 
 
@@ -71,42 +72,91 @@ reg         [1:0]                       use_part;
 assign ex_done = add_done | logic_done;
 
 
+
+/* parts' control signal */
+// start signal only keeps positive for 1 clk
 always @ (posedge clk) begin
     if(!rst) begin
         // current inst is valid and not running 
         if(func_part != 'd0 && func_busy == 'd0) begin
-            func_busy <= 'd1;
             func_start <= func_part;
-            // ex_stall <= 'd0;
+            func_working <= func_part;
         end
 
         // current inst is running
         else if(func_part != 'd0 && func_busy == 'd1) begin
             func_start <= 'd0;
-
-            if(ex_done) begin
-                func_busy <= 'd0;
-                // ex_stall <= 'd0;
-            end
-            else begin
-                func_busy <= 'd1;
-                // ex_stall <= 'd1;
-            end
+            func_working <= func_working;
         end
 
         else begin
-            func_busy <= func_busy;
             func_start <= 'd0;
-            // ex_stall <= 'd0;
+            func_working <= func_working;
         end
     end
 
     else begin
-        func_busy <= 'd0;
         func_start <= 'd0;
-        // ex_stall <= 'd0;
+        func_working <= 'd0;
     end
 end
+
+
+always @ (*) begin
+    if(!rst) begin
+        if(func_start != 'd0 && func_busy == 'd0) begin
+            func_busy = 'd1;
+        end
+
+        // current inst is running
+        else if(func_busy == 'd1) begin
+            if(ex_done) begin
+                func_busy = 'd0;
+            end
+            else begin
+                func_busy = 'd1;
+            end
+        end
+
+        else begin
+            func_busy = func_busy;
+        end
+    end
+
+    else begin
+        func_busy = 'd0;
+    end
+end
+
+
+always @ (*) begin
+    if(!rst) begin
+        // when inst is done, keep fetching
+        if(ex_done) begin
+            ex_stall = 'd0;
+        end
+
+        // some inst can be done in 1 clk so there's no need to set stall
+        // while some inst cannot done in 1 clk and stall the whole pipeline
+        else begin
+            // add & sub need multiple clk
+            if(func_working[`ADD - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
+            // else if () begin
+                
+            // end
+            else begin
+                ex_stall = 'd0;
+            end
+        end
+    end
+    else begin
+        ex_stall = 'd0;
+    end
+end
+
+
 
 
 

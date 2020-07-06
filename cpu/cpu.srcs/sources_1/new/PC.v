@@ -27,11 +27,12 @@ module PC(
               pc<=0;
           else if(!EX_block)
               begin
-                casex(op)
-                    2'b1x:pc <= EX_addr;
-                    2'b01:pc <= BTB_addr;
-                    default :pc <= pc+4;
-                endcase
+                // casex(op)
+                //     2'b1x:pc <= EX_addr;
+                //     2'b01:pc <= BTB_addr;
+                //     default :pc <= pc+4;
+                // endcase
+				pc <= pc + 'd4;
               end
               
 endmodule
