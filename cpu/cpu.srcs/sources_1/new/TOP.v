@@ -52,10 +52,16 @@ wire                            ex_need_jmp;
 wire                            ex_stall;
 wire                            ex_flush;
 
+/* decode */
+wire        [31:0]              de_cur_pc;
 
 
 
 
+
+
+/* dispatch */
+wire        [31:0]              dis_cur_pc;
 
 
 
@@ -104,13 +110,15 @@ wire                            ex_flush;
         .clk(clk),
         .rst(rst),
         .EX_rst(EX_rst),
+        .ex_stall(ex_stall),
         .IF_pip_reg(IF_pip_reg),
         .pc(pc),
         .EX_update(EX_update),
         .EX_result_pc(EX_result_pc),
         .predict_is_taken(predict_is_taken),
         .predict_pc(predict_pc),
-        .DE_pip_reg(DE_pip_reg)
+        .DE_pip_reg(DE_pip_reg),
+        .de_cur_pc(de_cur_pc)
     );
 
 //#####################################################
@@ -130,16 +138,19 @@ wire                            ex_flush;
         .clk_i(clk),
         .rst_i(rst),
         .DE_pip_reg_i(DE_pip_reg),
+        .de_cur_pc(de_cur_pc),
         
         //input from MEM_result for WB
         .MEM_result_i(MEM_result_w),
         .MEM_pip_reg_i(MEM_pip_reg_w),
+        .ex_stall(ex_stall),
                 
         //output EX_pip_reg_o,
         .reg_A_o(reg_A_w),
         .reg_B_o(reg_B_w),
         .imm32_o(imm32_w),
-        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w)
+        .DISPATCH_pip_reg_o(DISPATCH_pip_reg_w),
+        .dis_cur_pc(dis_cur_pc)
         // .EX_ADD_selected_o(EX_ADD_selected_w),
         // .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
         // .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
@@ -155,7 +166,7 @@ EX ex (
     .op1                    (reg_A_w),
     .op2                    (reg_B_w),
     .imm_data               (imm32_w),
-    .cur_pc                 (pc),
+    .dis_cur_pc             (dis_cur_pc),
     .op_mode1               (DISPATCH_pip_reg_w[`OP1]),
     .op_mode2               (DISPATCH_pip_reg_w[`OP2]),
     .func_part              (DISPATCH_pip_reg_w[157:143]),

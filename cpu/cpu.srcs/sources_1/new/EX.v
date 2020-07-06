@@ -1,14 +1,22 @@
 `include "HeadFile.vh"
-//////////////////////////////////////////////////////////////////////////////////
-// Create Date: 2020/06/23 14:47:21
-// Module Name: EX
-// Description: 
-// EX module
-// Revision:
-// Revision 0.01 - File Created
-// Additional Comments:
-// 
-//////////////////////////////////////////////////////////////////////////////////
+/***************************************************************************************************
+                                THE PROJECT IS DESIGNED AND CODED BY
+                                            WINTERS WEN
+                                NATIONAL UNIVERSITY OF DEFENSE TECHNOLOGY
+
+                                            /
+                                          / -----------
+                                        /   \      /
+                                              \  /
+                                               /
+                                           /       \
+                                        /      *       \
+                                    /            *          \
+                                               *
+                                                 *
+                                
+***************************************************************************************************/
+`timescale 1ns/100ps
 
 `define OFFSET 143
 
@@ -19,7 +27,7 @@ module EX(
     input       [31:0]                  op1,  // rs1
     input       [31:0]                  op2,  // rs2
     input       [31:0]                  imm_data,  // imm
-    input       [31:0]                  cur_pc,
+    input       [31:0]                  dis_cur_pc,
 
     input       [14:0]                  func_part,
 
@@ -35,7 +43,7 @@ module EX(
 
     //  jmp info signal 
     output      [31:0]                  ex_tar_addr,
-    output      reg                     ex_need_jmp,
+    output                              ex_need_jmp,
 
     // set stall when some inst needs multiply clks
     output      reg                     ex_stall,
@@ -57,8 +65,10 @@ wire                                    logic_done;
 wire        [31:0]                      logic_res;
 wire                                    add_done;
 wire        [31:0]                      add_res;
-
-
+wire                                    ram_done;
+wire        [31:0]                      ram_res;
+wire                                    branch_done;
+wire        [31:0]                      branch_res;
 
 
 
@@ -69,7 +79,7 @@ reg         [1:0]                       use_part;
 
 
 
-assign ex_done = add_done | logic_done;
+assign ex_done = add_done | logic_done | ram_done | branch_done;
 
 
 
@@ -143,9 +153,9 @@ always @ (*) begin
             if(func_working[`ADD - `OFFSET] && func_busy) begin
                 ex_stall = 'd1;
             end
-            // else if () begin
-                
-            // end
+            else if (func_working[`RAM - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
             else begin
                 ex_stall = 'd0;
             end
@@ -167,8 +177,17 @@ always @ (*) begin
         if(add_done) begin
             ex_res = add_res;
         end
+        
         else if (logic_done) begin
             ex_res = logic_res;
+        end
+
+        else if (ram_done) begin
+            ex_res = ram_res;
+        end
+
+        else if (branch_done) begin
+            ex_res = branch_res;
         end
 
         else begin
@@ -209,6 +228,43 @@ ADD_SUB add_sub(
             .done                   (add_done),
             .res                    (add_res)
 );
+
+
+
+RAM data_ram(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (op2),
+            .imm_data               (imm_data),
+            .start                  (func_start[`RAM - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (op_mode1),
+            .op_mode2               (op_mode2),
+            .done                   (ram_done),
+            .res                    (ram_res)
+);
+
+
+
+BRANCH branch(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (op2),
+            .imm_data               (imm_data),
+            .cur_pc                 (dis_cur_pc),
+            .start                  (func_start[`BRANCH - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (op_mode1),
+            .op_mode2               (op_mode2),
+            .done                   (branch_done),
+            .res                    (branch_res),
+            .tar_addr               (ex_tar_addr),
+            .need_jmp               (ex_need_jmp)
+);
+
+
 
 
 

@@ -52,6 +52,7 @@ module IF(
     (
         .clk(clk),
         .rst(rst),
+        .ex_stall(EX_block),
         .EX_rst(EX_rst),
         .ins(ins),
         .IF_pip_reg(IF_pip_reg)

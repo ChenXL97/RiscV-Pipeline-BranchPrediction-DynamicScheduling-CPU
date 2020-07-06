@@ -70,7 +70,7 @@ reg         [3:0]                       store_cnt;
 
 
 
-DATA_BRAM data_bram(
+DATA_Bram data_bram(
     .addra              (addr),
     .clka               (clk),
     .dina               (din),

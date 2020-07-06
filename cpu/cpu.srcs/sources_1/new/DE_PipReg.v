@@ -15,6 +15,7 @@ module DE_PipReg(
     input clk,
     input rst,
     input EX_rst,
+    input ex_stall,
     input predict_is_taken,
     input [31:0] pc,
     input [31:0] predict_pc,
@@ -24,13 +25,15 @@ module DE_PipReg(
     
     always@(posedge clk or posedge rst or posedge EX_rst)
         if(rst || EX_rst)
-            DE_pip_reg<=0;
-        else 
-            begin   
-                DE_pip_reg = de_out;
-                DE_pip_reg[`PREDICT] = predict_is_taken;
-                DE_pip_reg[`OPC] = pc;
-                DE_pip_reg[`PPC] = predict_pc;
-            end
+            DE_pip_reg <= 0;
+        else if(ex_stall) begin
+            DE_pip_reg <= DE_pip_reg;
+        end
+        else begin   
+            DE_pip_reg <= de_out;
+            DE_pip_reg[`PREDICT] <= predict_is_taken;
+            DE_pip_reg[`OPC] <= pc;
+            DE_pip_reg[`PPC] <= predict_pc;
+        end
 
 endmodule

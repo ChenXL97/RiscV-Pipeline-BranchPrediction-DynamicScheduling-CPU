@@ -11,9 +11,9 @@ echo "Please update the PATH and LD_LIBRARY_PATH variables below, before executi
 exit
 
 if [ -z "$PATH" ]; then
-  PATH=C:/Xilinx/SDK/2018.1/bin;C:/Xilinx/Vivado/2018.1/ids_lite/ISE/bin/nt64;C:/Xilinx/Vivado/2018.1/ids_lite/ISE/lib/nt64:C:/Xilinx/Vivado/2018.1/bin
+  PATH=F:/Vivado_work/SDK/2018.1/bin;F:/Vivado_work/Vivado/2018.1/ids_lite/ISE/bin/nt64;F:/Vivado_work/Vivado/2018.1/ids_lite/ISE/lib/nt64:F:/Vivado_work/Vivado/2018.1/bin
 else
-  PATH=C:/Xilinx/SDK/2018.1/bin;C:/Xilinx/Vivado/2018.1/ids_lite/ISE/bin/nt64;C:/Xilinx/Vivado/2018.1/ids_lite/ISE/lib/nt64:C:/Xilinx/Vivado/2018.1/bin:$PATH
+  PATH=F:/Vivado_work/SDK/2018.1/bin;F:/Vivado_work/Vivado/2018.1/ids_lite/ISE/bin/nt64;F:/Vivado_work/Vivado/2018.1/ids_lite/ISE/lib/nt64:F:/Vivado_work/Vivado/2018.1/bin:$PATH
 fi
 export PATH
 
@@ -24,7 +24,7 @@ else
 fi
 export LD_LIBRARY_PATH
 
-HD_PWD='C:/Users/Administrator/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1'
+HD_PWD='E:/CodeFactory/RV-052B/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1'
 cd "$HD_PWD"
 
 HD_LOG=runme.log

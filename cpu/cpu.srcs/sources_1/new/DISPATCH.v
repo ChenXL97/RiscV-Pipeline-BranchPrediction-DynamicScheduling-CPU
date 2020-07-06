@@ -27,19 +27,31 @@ module DISPATCH(
     input  [`ROB_ITEM_INDEX] DE_pip_reg_i,
     input [31:0] MEM_result_i,
     input [`ROB_ITEM_INDEX] MEM_pip_reg_i,
-    
+    input [31:0] de_cur_pc,
+    input ex_stall,
     
     output [31:0]reg_A_o,
     output [31:0]reg_B_o,
     output [31:0]imm32_o,
     output [4:0]opcode_o,
-    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o
+    output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
+    output reg [31:0] dis_cur_pc
     
     //Select Unit to calculate
 //    output  EX_ADD_selected_o,
 //    output  EX_BRANCH_selected_o,
 //    output  EX_LS_RAM_selected_o
     );
+
+
+always @ (posedge clk_i) begin
+    if(!rst_i) begin
+        dis_cur_pc <= de_cur_pc;
+    end 
+    else begin
+        dis_cur_pc <= 'd0;
+    end
+end
 
 
 wire [31:0] imm_value_w = DE_pip_reg_i[`IMM];
@@ -103,6 +115,7 @@ DISPATCH_PipReg DISPATCH_PipReg
     .clk_i(clk_i),
     .rst_i(rst_i),
     .DE_PipReg_i(DE_pip_reg_i),
+    .ex_stall(ex_stall),
     .DISPATCH_pipreg_o(DISPATCH_pip_reg_w)
 
 );
