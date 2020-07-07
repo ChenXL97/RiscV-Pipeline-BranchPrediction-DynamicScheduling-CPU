@@ -8,12 +8,12 @@
 				"label": ""
 			},
 			{
-				"line": 116,
+				"line": 117,
 				"column": 58,
 				"label": ""
 			},
 			{
-				"line": 148,
+				"line": 151,
 				"column": 55,
 				"label": ""
 			}
@@ -23,7 +23,7 @@
 		"path": "$ROOTPATH$\\EX.v",
 		"bookmarks": [
 			{
-				"line": 212,
+				"line": 236,
 				"column": 26,
 				"label": ""
 			}

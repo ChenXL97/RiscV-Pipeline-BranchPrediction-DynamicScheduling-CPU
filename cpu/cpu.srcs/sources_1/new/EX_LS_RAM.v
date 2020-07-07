@@ -218,7 +218,7 @@ always @ (posedge clk) begin
                     // set extra loading flag for half_word loading
                     // half_word_extra is set as 2
                     'b11: begin
-                        load_cnt <= 'd1;
+                        load_cnt <= 'd2;
                         half_word_extra <= 'd2;    
                     end
                     default: begin
@@ -234,22 +234,22 @@ always @ (posedge clk) begin
                     // set extra loading flag for word loading
                     // half_word_extra is set as different value
                     'b00: begin
-                        load_cnt <= 'd0;
+                        load_cnt <= 'd1;
                         half_word_extra <= 'd0;    
                     end
 
                     'b01: begin
-                        load_cnt <= 'd1;
+                        load_cnt <= 'd2;
                         half_word_extra <= 'd3;
                     end
 
                     'b10: begin
-                        load_cnt <= 'd1;
+                        load_cnt <= 'd2;
                         half_word_extra <= 'd4;
                     end
 
                     'b11: begin
-                        load_cnt <= 'd1;
+                        load_cnt <= 'd2;
                         half_word_extra <= 'd5;
                     end
 

@@ -23,6 +23,7 @@ module DE(
     input [31:0] EX_ins_pc,
     input [31:0] EX_result_pc,
     input ex_stall,
+    input ex_flush,
     // output
     output predict_is_taken,
     output [31:0] predict_pc,
@@ -34,7 +35,7 @@ module DE(
     wire [`ROB_ITEM_INDEX] de_out;
     Decoder Decoder(
         .clk(clk),
-        .rst(rst),
+        .rst(rst | ex_flush),
         .ins(IF_pip_reg),
         .de_out(de_out)
         );
@@ -59,7 +60,7 @@ module DE(
     //DE_PipReg
     DE_PipReg DE_PipReg(
         .clk(clk),
-        .rst(rst),
+        .rst(rst | ex_flush),
         .EX_rst(EX_rst),
         .ex_stall(ex_stall),
         .predict_is_taken(predict_is_taken),
@@ -96,7 +97,7 @@ module DE(
 	assign right_imm = de_ins_mem[test_pc-2][`IMM];
 
 	always @ (posedge clk) begin
-		if(!rst) begin
+		if(!rst && !ex_flush) begin
             if(!ex_stall)
                 de_cur_pc <= pc;
             else

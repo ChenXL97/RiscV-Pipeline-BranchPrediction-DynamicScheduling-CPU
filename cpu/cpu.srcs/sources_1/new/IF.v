@@ -30,6 +30,7 @@ module IF(
     (
         .clk(clk),
         .rst(rst),
+        .EX_rst(EX_rst),
         .EX_block(EX_block),
         .op({EX_write_pc,BTB_write_pc}),
         .EX_addr(EX_addr),

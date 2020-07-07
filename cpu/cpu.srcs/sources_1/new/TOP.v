@@ -64,6 +64,8 @@ wire        [31:0]              de_cur_pc;
 /* dispatch */
 wire        [31:0]              dis_cur_pc;
 wire        [4:0]               dis_rd;
+wire                            dis_forward_a;
+wire                            dis_forward_b;
 
 
 
@@ -90,10 +92,10 @@ wire        [4:0]               dis_rd;
     (
         .clk(clk),
         .rst(rst),
-        .EX_rst(EX_rst),
+        .EX_rst(ex_flush),
         .EX_block(ex_stall),
         .EX_write_pc(EX_update),
-        .EX_addr(EX_result_pc),
+        .EX_addr(ex_tar_addr),
         .BTB_write_pc(predict_is_taken),
         .BTB_addr(predict_pc),
         .pc(pc),
@@ -111,7 +113,6 @@ wire        [4:0]               dis_rd;
     (
         .clk(clk),
         .rst(rst),
-        .EX_rst(EX_rst),
         .ex_stall(ex_stall),
         .IF_pip_reg(IF_pip_reg),
         .pc(pc),
@@ -120,7 +121,9 @@ wire        [4:0]               dis_rd;
         .predict_is_taken(predict_is_taken),
         .predict_pc(predict_pc),
         .DE_pip_reg(DE_pip_reg),
-        .de_cur_pc(de_cur_pc)
+        .de_cur_pc(de_cur_pc),
+        .EX_rst(ex_flush),
+        .ex_flush(ex_flush)
     );
 
 //#####################################################
@@ -156,7 +159,8 @@ wire        [4:0]               dis_rd;
         .dis_rd(dis_rd),
         .ex_rd(ex_rd),
         .ex_done(ex_done),
-        .ex_res(ex_res)
+        .ex_res(ex_res),
+        .ex_flush(ex_flush)
    );
 
 
@@ -170,6 +174,7 @@ EX ex (
     .op2                    (reg_B_w),
     .imm_data               (imm32_w),
     .dis_cur_pc             (dis_cur_pc),
+    .imm_use                (DISPATCH_pip_reg_w[`IMMUSE]),
     .dis_rd                 (dis_rd),
     .op_mode1               (DISPATCH_pip_reg_w[`OP1]),
     .op_mode2               (DISPATCH_pip_reg_w[`OP2]),
@@ -181,6 +186,8 @@ EX ex (
     .ex_stall                   (ex_stall),
     .ex_flush                   (ex_flush),
     .ex_rd                      (ex_rd)
+    // dis_forward_a               (dis_forward_a),
+    // dis_forward_b               (dis_forward_b)
 );
 
 
