@@ -65,6 +65,7 @@ reg         [31:0]                      imm_data_r;
 reg         [31:0]                      op1_r;
 reg         [31:0]                      op2_r;
 reg         [31:0]                      ex_cur_pc;
+reg         [31:0]                      dis_cur_pc_r;
 
 
 // wire between sub module
@@ -88,6 +89,13 @@ reg         [3:0]                       stall_clk;
 
 
 assign ex_done = add_done | logic_done | ram_done | branch_done;
+
+
+
+always @ (posedge clk) begin
+    dis_cur_pc_r <= dis_cur_pc;
+end
+
 
 
 
@@ -126,8 +134,10 @@ end
 
 always @ (posedge clk) begin
     if(!rst) begin
-        if(func_part != 'd0 && ex_cur_pc != dis_cur_pc)
-            ex_cur_pc <= dis_cur_pc;
+        if(ex_cur_pc != dis_cur_pc_r && func_part != 'd0) begin
+            ex_cur_pc <= dis_cur_pc_r;
+        end
+        
         else 
             ex_cur_pc <= ex_cur_pc;
     end
@@ -141,12 +151,12 @@ end
 always @ (*) begin
     if(!rst) begin
         // current inst is valid and not running 
-        if(dis_cur_pc != ex_cur_pc) begin
+        if(dis_cur_pc_r != ex_cur_pc) begin
             func_start = func_part;
         end
 
         // current inst is running
-        else if(func_busy == 'd1) begin
+        if(func_busy == 'd1) begin
             if(trick)
                 func_start = 'd0;
             else 
