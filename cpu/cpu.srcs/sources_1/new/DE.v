@@ -97,7 +97,10 @@ module DE(
 
 	always @ (posedge clk) begin
 		if(!rst) begin
-			de_cur_pc <= pc;
+            if(!ex_stall)
+                de_cur_pc <= pc;
+            else
+                de_cur_pc <= de_cur_pc;
 		end
 		else begin
 			de_cur_pc <= 'd0;

@@ -84,62 +84,120 @@ DATA_Bram data_bram(
 
 
 /* set initial controling signal */
-always @ (posedge clk) begin
+// always @ (posedge clk) begin
+//     if(!rst) begin
+//         if(load_cnt == 'd0 || store_cnt == 'd0) begin
+//             ram_en <= 'd0;
+//             wea <= 'd0;
+//         end
+
+//         else if(start) begin
+//             case (op_mode1)
+//             // load data 
+//             'b00: begin
+//                 wea <= 'd0;
+
+//                 if(load_cnt == 'd0) begin
+//                     ram_en <= 'd0;
+//                 end
+//                 else begin
+//                     ram_en <= 'd1;
+//                 end
+//             end     
+
+//             // store data
+//             'b01: begin
+//                 ram_en <= 'd1;
+
+//                 if(store_cnt == 'd0) begin
+//                     ram_en <= 'd0;
+//                     wea <= 'd0;
+//                 end
+//                 else begin
+//                     ram_en <= 'd1;
+//                     wea <= 'd1;
+//                 end
+//             end
+
+//             default: begin
+//                 wea <= wea;
+//                 ram_en <= ram_en;
+//             end
+
+//             endcase
+//         end
+
+//         else begin
+//             wea <= wea;
+//             ram_en <= ram_en;
+//         end
+
+//     end
+
+//     else begin
+//         ram_en <= 'd0;
+//         wea <= 'd0;
+//     end
+// end
+
+
+
+
+always @ (*) begin
     if(!rst) begin
         if(load_cnt == 'd0 || store_cnt == 'd0) begin
-            ram_en <= 'd0;
-            wea <= 'd0;
+            ram_en = 'd0;
+            wea = 'd0;
         end
 
         else if(start) begin
             case (op_mode1)
             // load data 
             'b00: begin
-                wea <= 'd0;
+                wea = 'd0;
 
                 if(load_cnt == 'd0) begin
-                    ram_en <= 'd0;
+                    ram_en = 'd0;
                 end
                 else begin
-                    ram_en <= 'd1;
+                    ram_en = 'd1;
                 end
             end     
 
             // store data
             'b01: begin
-                ram_en <= 'd1;
+                ram_en = 'd1;
 
                 if(store_cnt == 'd0) begin
-                    ram_en <= 'd0;
-                    wea <= 'd0;
+                    ram_en = 'd0;
+                    wea = 'd0;
                 end
                 else begin
-                    ram_en <= 'd1;
-                    wea <= 'd1;
+                    ram_en = 'd1;
+                    wea = 'd1;
                 end
             end
 
             default: begin
-                wea <= wea;
-                ram_en <= ram_en;
+                wea = wea;
+                ram_en = ram_en;
             end
 
             endcase
         end
 
         else begin
-            wea <= wea;
-            ram_en <= ram_en;
+            wea = wea;
+            ram_en = ram_en;
         end
 
     end
 
     else begin
-        ram_en <= 'd0;
-        wea <= 'd0;
+        ram_en = 'd0;
+        wea = 'd0;
     end
 end
-
 
 
 
@@ -160,7 +218,7 @@ always @ (posedge clk) begin
                     // set extra loading flag for half_word loading
                     // half_word_extra is set as 2
                     'b11: begin
-                        load_cnt <= 'd2;
+                        load_cnt <= 'd1;
                         half_word_extra <= 'd2;    
                     end
                     default: begin
@@ -176,22 +234,22 @@ always @ (posedge clk) begin
                     // set extra loading flag for word loading
                     // half_word_extra is set as different value
                     'b00: begin
-                        load_cnt <= 'd1;
+                        load_cnt <= 'd0;
                         half_word_extra <= 'd0;    
                     end
 
                     'b01: begin
-                        load_cnt <= 'd2;
+                        load_cnt <= 'd1;
                         half_word_extra <= 'd3;
                     end
 
                     'b10: begin
-                        load_cnt <= 'd2;
+                        load_cnt <= 'd1;
                         half_word_extra <= 'd4;
                     end
 
                     'b11: begin
-                        load_cnt <= 'd2;
+                        load_cnt <= 'd1;
                         half_word_extra <= 'd5;
                     end
 
@@ -204,7 +262,7 @@ always @ (posedge clk) begin
 
                 // read byte
                 else if (op_mode2 == 'b000 || op_mode2 == 'b001) begin
-                    load_cnt <= 'd1;
+                    load_cnt <= 'd0;
                     half_word_extra <= 'd0;
                 end
                 

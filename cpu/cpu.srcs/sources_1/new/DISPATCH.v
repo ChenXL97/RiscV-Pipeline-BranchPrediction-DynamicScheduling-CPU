@@ -50,7 +50,10 @@ module DISPATCH(
 
 always @ (posedge clk_i) begin
     if(!rst_i) begin
-        dis_cur_pc <= de_cur_pc;
+        if(!ex_stall)
+            dis_cur_pc <= de_cur_pc;
+        else
+            dis_cur_pc <= dis_cur_pc;
     end 
     else begin
         dis_cur_pc <= 'd0;
@@ -120,7 +123,9 @@ DISPATCH_PipReg DISPATCH_PipReg
     .rst_i(rst_i),
     .DE_PipReg_i(DE_pip_reg_i),
     .ex_stall(ex_stall),
-    .DISPATCH_pipreg_o(DISPATCH_pip_reg_w)
+    .DISPATCH_pipreg_o(DISPATCH_pip_reg_w),
+    .imm_value_r(imm32_o),
+    .imm_value_w(imm_value_w)
 
 );
 
@@ -129,25 +134,8 @@ DISPATCH_PipReg DISPATCH_PipReg
 
 
 
-//assign EX_ADD_selected_o = EX_ADD_selected_w;
-//assign EX_BRANCH_selected_o = EX_BRANCH_selected_w;
-//assign EX_LS_RAM_selected_o = EX_LS_RAM_selected_w;
-
-// Abundunt code, maybe useful in future.
-//Dispatcher Dispatcher
-//(
-//    .clk_i(clk_i),
-//    .rst_i(rst_i),
-//    .DE_PipReg_i(DE_pip_reg_i),
-//    .EX_ADD_selected_o(EX_ADD_selected_w),
-//    .EX_BRANCH_selected_o(EX_BRANCH_selected_w),
-//    .EX_LS_RAM_selected_o(EX_LS_RAM_selected_w)
-//);
-
-
 assign reg_A_o = dispatch_ra_value_w;
 assign reg_B_o = dispatch_rb_value_w;
 assign DISPATCH_pip_reg_o = DISPATCH_pip_reg_w;
-assign imm32_o = imm_value_w;
 assign opcode_o = opcode_w;
 endmodule

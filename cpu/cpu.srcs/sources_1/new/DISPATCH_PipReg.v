@@ -25,7 +25,9 @@ module DISPATCH_PipReg(
 	input rst_i,
     input [`ROB_ITEM_INDEX] DE_PipReg_i,
     input ex_stall,
-    output reg[`ROB_ITEM_INDEX] DISPATCH_pipreg_o
+    input [31:0]imm_value_w,
+    output reg [`ROB_ITEM_INDEX] DISPATCH_pipreg_o,
+    output reg [31:0] imm_value_r
     );
 
 
@@ -40,6 +42,17 @@ always @ (posedge clk_i or posedge rst_i) begin
         DISPATCH_pipreg_o<=DE_PipReg_i;
     end
 end
+
+always @ (posedge clk_i or posedge rst_i) begin
+    if(rst_i)
+        imm_value_r<=0;
+    else if(ex_stall)
+        imm_value_r <= imm_value_r;
+    else begin   
+        imm_value_r <= imm_value_w;
+    end
+end
+
 
 
 endmodule

@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="36750001fs"></ZoomEndTime>
-      <Cursor1Time time="44000000fs"></Cursor1Time>
+      <ZoomEndTime time="33500001fs"></ZoomEndTime>
+      <Cursor1Time time="8000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="178"></NameColumnWidth>
-      <ValueColumnWidth column_width="90"></ValueColumnWidth>
+      <ValueColumnWidth column_width="127"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="33" />
+   <WVObjectSize size="39" />
    <wvobject fp_name="/TOP/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
@@ -28,11 +28,6 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/pc" type="array">
-      <obj_property name="ElementShortName">pc[31:0]</obj_property>
-      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/IF_pip_reg" type="array">
       <obj_property name="ElementShortName">IF_pip_reg[31:0]</obj_property>
       <obj_property name="ObjectShortName">IF_pip_reg[31:0]</obj_property>
@@ -40,18 +35,6 @@
    <wvobject fp_name="/TOP/DE_pip_reg" type="array">
       <obj_property name="ElementShortName">DE_pip_reg[167:0]</obj_property>
       <obj_property name="ObjectShortName">DE_pip_reg[167:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/reg_A_w" type="array">
-      <obj_property name="ElementShortName">reg_A_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">reg_A_w[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/reg_B_w" type="array">
-      <obj_property name="ElementShortName">reg_B_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">reg_B_w[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/imm32_w" type="array">
-      <obj_property name="ElementShortName">imm32_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">imm32_w[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DISPATCH_pip_reg_w" type="array">
       <obj_property name="ElementShortName">DISPATCH_pip_reg_w[167:0]</obj_property>
@@ -69,6 +52,54 @@
       <obj_property name="ElementShortName">ins[31:0]</obj_property>
       <obj_property name="ObjectShortName">ins[31:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/ex/op2_r" type="array">
+      <obj_property name="ElementShortName">op2_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2_r[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/op1_r" type="array">
+      <obj_property name="ElementShortName">op1_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_r[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/imm_data_r" type="array">
+      <obj_property name="ElementShortName">imm_data_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_data_r[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/imm_data" type="array">
+      <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DE/de_cur_pc" type="array">
+      <obj_property name="ElementShortName">de_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">de_cur_pc[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/dis_cur_pc" type="array">
+      <obj_property name="ElementShortName">dis_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dis_cur_pc[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/ex_cur_pc" type="array">
+      <obj_property name="ElementShortName">ex_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ex_cur_pc[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/func_working" type="array">
+      <obj_property name="ElementShortName">func_working[14:0]</obj_property>
+      <obj_property name="ObjectShortName">func_working[14:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/ex/func_part" type="array">
       <obj_property name="ElementShortName">func_part[14:0]</obj_property>
       <obj_property name="ObjectShortName">func_part[14:0]</obj_property>
@@ -76,14 +107,6 @@
    <wvobject fp_name="/TOP/ex/func_start" type="array">
       <obj_property name="ElementShortName">func_start[14:0]</obj_property>
       <obj_property name="ObjectShortName">func_start[14:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/func_working" type="array">
-      <obj_property name="ElementShortName">func_working[14:0]</obj_property>
-      <obj_property name="ObjectShortName">func_working[14:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/dis_cur_pc" type="array">
-      <obj_property name="ElementShortName">dis_cur_pc[31:0]</obj_property>
-      <obj_property name="ObjectShortName">dis_cur_pc[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/ex/func_busy" type="logic">
       <obj_property name="ElementShortName">func_busy</obj_property>
@@ -101,38 +124,6 @@
       <obj_property name="ElementShortName">ex_res[31:0]</obj_property>
       <obj_property name="ObjectShortName">ex_res[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r1_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r1_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r1_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r2_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r2_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r2_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r3_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r3_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r3_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r4_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r4_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r4_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r5_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/addr" type="array">
-      <obj_property name="ElementShortName">addr[9:0]</obj_property>
-      <obj_property name="ObjectShortName">addr[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/raddr" type="array">
-      <obj_property name="ElementShortName">raddr[9:0]</obj_property>
-      <obj_property name="ObjectShortName">raddr[9:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/instant_addr" type="array">
-      <obj_property name="ElementShortName">instant_addr[9:0]</obj_property>
-      <obj_property name="ObjectShortName">instant_addr[9:0]</obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/ex/data_ram/op1" type="array">
       <obj_property name="ElementShortName">op1[31:0]</obj_property>
       <obj_property name="ObjectShortName">op1[31:0]</obj_property>
@@ -145,12 +136,48 @@
       <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
       <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/res" type="array">
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/addr" type="array">
+      <obj_property name="ElementShortName">addr[9:0]</obj_property>
+      <obj_property name="ObjectShortName">addr[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/raddr" type="array">
+      <obj_property name="ElementShortName">raddr[9:0]</obj_property>
+      <obj_property name="ObjectShortName">raddr[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/half_word_extra" type="array">
+      <obj_property name="ElementShortName">half_word_extra[2:0]</obj_property>
+      <obj_property name="ObjectShortName">half_word_extra[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/dout_f" type="array">
+      <obj_property name="ElementShortName">dout_f[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout_f[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/dout" type="array">
+      <obj_property name="ElementShortName">dout[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dout[31:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/ex/data_ram/ram_en" type="logic">
       <obj_property name="ElementShortName">ram_en</obj_property>
       <obj_property name="ObjectShortName">ram_en</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/start" type="logic">
-      <obj_property name="ElementShortName">start</obj_property>
-      <obj_property name="ObjectShortName">start</obj_property>
+   <wvobject fp_name="/TOP/ex/data_ram/wea" type="logic">
+      <obj_property name="ElementShortName">wea</obj_property>
+      <obj_property name="ObjectShortName">wea</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/load_cnt" type="array">
+      <obj_property name="ElementShortName">load_cnt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">load_cnt[3:0]</obj_property>
    </wvobject>
 </wave_config>

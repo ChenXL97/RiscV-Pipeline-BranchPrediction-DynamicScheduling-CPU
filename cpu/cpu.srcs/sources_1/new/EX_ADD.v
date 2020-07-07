@@ -84,78 +84,159 @@ adder_suber addsub_no_u_1(
 
 
 
-always @ (posedge clk) begin
+// always @ (posedge clk) begin
+//     if(!rst) begin
+//         case (use_part)
+//         'b10: begin
+//             if(start) begin
+//                 u1_en <= 'd1;
+//                 u0_en <= 'd0;
+//                 u0_add <= u0_add;
+//                 // sub
+//                 if(op_mode2[2] == 'b1) begin
+//                     u1_add <= 'd0;
+//                 end
+//                 else begin
+//                     u1_add <= 'd1;
+//                 end
+//             end
+//             else if(u1_run_cnter == 'd0) begin
+//                 u1_en <= 'd0;
+//                 u1_add <= u1_add;
+//                 u1_add <= u1_add;
+//                 u0_add <= u0_add;
+//             end
+//             else begin
+//                 u1_en <= u1_en;
+//                 u0_en <= u0_en;
+//                 u0_add <= u0_add;
+//                 u1_add <= u1_add;
+//             end
+//         end
+
+//         'b01: begin
+//             if(start) begin
+//                 u0_en <= 'b1;
+//                 u1_en <= u1_en;
+//                 u1_add <= u1_add;
+//                 // sub
+//                 if(op_mode2[2] == 'b1) begin
+//                     u0_add <= 'd0;
+//                 end
+//                 else begin
+//                     u0_add <= 'd1;
+//                 end
+//             end
+//             else if(u0_run_cnter == 'd0) begin
+//                 u0_en <= 'd0;
+//                 u0_add <= u0_add;
+//                 u1_add <= u1_add;
+//                 u1_en <= u1_en;
+//             end
+//             else begin
+//                 u0_en <= u0_en;
+//                 u0_add <= u0_add;
+//                 u1_add <= u1_add;
+//                 u1_en <= u1_en;
+//             end
+//         end
+
+//         default: begin
+//             u1_en <= 'b0;
+//             u1_add <= 'b1;
+//             u0_en <= 'd0;
+//             u0_add <= 'b1;
+//         end
+//         endcase
+//     end   
+//     else begin
+//         u1_en <= 'd0;
+//         u1_add <= 'd1;
+//         u0_en <= 'd0;
+//         u0_add <= 'd1;
+//     end
+// end
+
+
+
+
+always @ (*) begin
     if(!rst) begin
         case (use_part)
         'b10: begin
             if(start) begin
-                u1_en <= 'd1;
-                u0_en <= 'd0;
-                u0_add <= u0_add;
+                u1_en = 'd1;
+                u0_en = 'd0;
+                u0_add = u0_add;
                 // sub
                 if(op_mode2[2] == 'b1) begin
-                    u1_add <= 'd0;
+                    u1_add = 'd0;
                 end
                 else begin
-                    u1_add <= 'd1;
+                    u1_add = 'd1;
                 end
             end
             else if(u1_run_cnter == 'd0) begin
-                u1_en <= 'd0;
-                u1_add <= u1_add;
-                u1_add <= u1_add;
-                u0_add <= u0_add;
+                u1_en = 'd0;
+                u1_add = u1_add;
+                u1_add = u1_add;
+                u0_add = u0_add;
             end
             else begin
-                u1_en <= u1_en;
-                u0_en <= u0_en;
-                u0_add <= u0_add;
-                u1_add <= u1_add;
+                u1_en = u1_en;
+                u0_en = u0_en;
+                u0_add = u0_add;
+                u1_add = u1_add;
             end
         end
 
         'b01: begin
             if(start) begin
-                u0_en <= 'b1;
-                u1_en <= u1_en;
-                u1_add <= u1_add;
+                u0_en = 'b1;
+                u1_en = u1_en;
+                u1_add = u1_add;
                 // sub
                 if(op_mode2[2] == 'b1) begin
-                    u0_add <= 'd0;
+                    u0_add = 'd0;
                 end
                 else begin
-                    u0_add <= 'd1;
+                    u0_add = 'd1;
                 end
             end
             else if(u0_run_cnter == 'd0) begin
-                u0_en <= 'd0;
-                u0_add <= u0_add;
-                u1_add <= u1_add;
-                u1_en <= u1_en;
+                u0_en = 'd0;
+                u0_add = u0_add;
+                u1_add = u1_add;
+                u1_en = u1_en;
             end
             else begin
-                u0_en <= u0_en;
-                u0_add <= u0_add;
-                u1_add <= u1_add;
-                u1_en <= u1_en;
+                u0_en = u0_en;
+                u0_add = u0_add;
+                u1_add = u1_add;
+                u1_en = u1_en;
             end
         end
 
         default: begin
-            u1_en <= 'b0;
-            u1_add <= 'b1;
-            u0_en <= 'd0;
-            u0_add <= 'b1;
+            u1_en = 'b0;
+            u1_add = 'b1;
+            u0_en = 'd0;
+            u0_add = 'b1;
         end
         endcase
     end   
     else begin
-        u1_en <= 'd0;
-        u1_add <= 'd1;
-        u0_en <= 'd0;
-        u0_add <= 'd1;
+        u1_en = 'd0;
+        u1_add = 'd1;
+        u0_en = 'd0;
+        u0_add = 'd1;
     end
 end
+
+
+
+
+
 
 
 

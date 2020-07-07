@@ -61,6 +61,10 @@ module EX(
 reg         [14:0]                      func_start;
 reg         [14:0]                      func_working;
 reg                                     func_busy;
+reg         [31:0]                      imm_data_r;
+reg         [31:0]                      op1_r;
+reg         [31:0]                      op2_r;
+reg         [31:0]                      ex_cur_pc;
 
 
 // wire between sub module
@@ -78,7 +82,7 @@ wire        [31:0]                      branch_res;
 
 reg         [1:0]                       use_part;
 reg                                     trick;
-
+reg         [3:0]                       stall_clk;
 
 
 
@@ -92,31 +96,27 @@ assign ex_done = add_done | logic_done | ram_done | branch_done;
 always @ (posedge clk) begin
     if(!rst) begin
         // current inst is valid and not running 
-        if(func_part != 'd0 && func_busy == 'd0) begin
-            // func_start <= func_part;
+        if(func_part != 'd0 && func_start != 0) begin
             func_working <= func_part;
             ex_rd <= dis_rd;
             trick <= 'd1;
         end
 
         // current inst is running
-        else if(func_part != 'd0 && func_busy == 'd1) begin
-            // func_start <= 'd0;
+        else if(func_busy == 'd1) begin
             func_working <= func_working;
             ex_rd <= ex_rd;
             trick <= 'd0;
         end
 
         else begin
-            // func_start <= 'd0;
-            func_working <= func_working;
+            func_working <= 'd0;
             ex_rd <= ex_rd;
             trick <= 'd0;
         end
     end
 
     else begin
-        // func_start <= 'd0;
         func_working <= 'd0;
         ex_rd <= 'd0;
         trick <= 'd0;
@@ -124,43 +124,87 @@ always @ (posedge clk) begin
 end
 
 
+always @ (posedge clk) begin
+    if(!rst) begin
+        if(func_part != 'd0 && ex_cur_pc != dis_cur_pc)
+            ex_cur_pc <= dis_cur_pc;
+        else 
+            ex_cur_pc <= ex_cur_pc;
+    end
+    else begin
+        ex_cur_pc <= 32'hffff_ffff;
+    end
+end
 
-// always @ (posedge clk) begin
-//     if(!rst) begin
-//         // current inst is valid and not running 
-//         if(func_part != 'd0 && func_busy == 'd0) begin
-//             func_start <= func_part;
-//         end
-
-//         // current inst is running
-//         else if(func_part != 'd0 && func_busy == 'd1) begin
-//             func_start <= 'd0;
-//         end
-
-//         else begin
-//             func_start <= 'd0;
-//         end
-//     end
-
-//     else begin
-//         func_start <= 'd0;
-//     end
-// end
 
 
 always @ (*) begin
     if(!rst) begin
-        if(func_start != 'd0 && func_busy == 'd0) begin
-            func_busy = 'd1;
+        // current inst is valid and not running 
+        if(dis_cur_pc != ex_cur_pc) begin
             func_start = func_part;
         end
 
         // current inst is running
         else if(func_busy == 'd1) begin
-            if(trick == 'd1)
+            if(trick)
                 func_start = 'd0;
             else 
                 func_start = func_start;
+        end
+
+        else begin
+            func_start = 'd0;
+        end
+    end
+
+    else begin
+        func_start = 'd0;
+    end
+end
+
+
+always @ (*) begin
+    if(!rst) begin
+        // current inst is valid and not running 
+        if(func_part != 'd0 && func_busy == 'd0) begin
+            imm_data_r = imm_data;
+            op1_r = op1;
+            op2_r = op2;
+        end
+
+        // current inst is running
+        else if(ex_done) begin
+            imm_data_r = 'd0;
+            op1_r = 'd0;
+            op2_r = 'd0;
+        end
+
+        else begin
+            imm_data_r = imm_data_r;
+            op1_r = op1_r;
+            op2_r = op2_r;
+        end
+    end
+
+    else begin
+        imm_data_r = 'd0;
+        op1_r = 'd0;
+        op2_r = 'd0;
+    end
+end
+
+
+
+always @ (*) begin
+    if(!rst) begin
+        // current inst is not running
+        if(func_part != 'd0 && func_busy == 'd0) begin
+            func_busy = 'd1;
+        end
+
+        // current inst is running
+        else if(func_busy == 'd1) begin
 
             if(ex_done) begin
                 func_busy = 'd0;
@@ -172,13 +216,11 @@ always @ (*) begin
 
         else begin
             func_busy = func_busy;
-            func_start = func_start;
         end
     end
 
     else begin
         func_busy = 'd0;
-        func_start = 'd0;
     end
 end
 
@@ -194,10 +236,10 @@ always @ (*) begin
         // while some inst cannot done in 1 clk and stall the whole pipeline
         else begin
             // add & sub need multiple clk
-            if(func_working[`ADD - `OFFSET] && func_busy) begin
+            if(func_part[`ADD - `OFFSET] && func_busy) begin
                 ex_stall = 'd1;
             end
-            else if (func_working[`RAM - `OFFSET] && func_busy) begin
+            else if (func_part[`RAM - `OFFSET] && func_busy) begin
                 ex_stall = 'd1;
             end
             else begin
@@ -209,8 +251,6 @@ always @ (*) begin
         ex_stall = 'd0;
     end
 end
-
-
 
 
 
@@ -250,8 +290,8 @@ end
 LOGIC logic(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1),
-            .op2                    (op2),
+            .op1                    (op1_r),
+            .op2                    (op2_r),
             .start                  (func_start[`LOGIC - `OFFSET]),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -263,8 +303,8 @@ LOGIC logic(
 ADD_SUB add_sub(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1),
-            .op2                    (op2),
+            .op1                    (op1_r),
+            .op2                    (op2_r),
             .start                  (func_start[`ADD - `OFFSET]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
@@ -278,9 +318,9 @@ ADD_SUB add_sub(
 RAM data_ram(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1),
-            .op2                    (op2),
-            .imm_data               (imm_data),
+            .op1                    (op1_r),
+            .op2                    (op2_r),
+            .imm_data               (imm_data_r),
             .start                  (func_start[`RAM - `OFFSET]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
@@ -294,9 +334,9 @@ RAM data_ram(
 BRANCH branch(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1),
-            .op2                    (op2),
-            .imm_data               (imm_data),
+            .op1                    (op1_r),
+            .op2                    (op2_r),
+            .imm_data               (imm_data_r),
             .cur_pc                 (dis_cur_pc),
             .start                  (func_start[`BRANCH - `OFFSET]),
             .use_part               (2'b01),
