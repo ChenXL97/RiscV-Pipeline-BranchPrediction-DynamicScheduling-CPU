@@ -11,13 +11,13 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="34210608fs"></ZoomEndTime>
-      <Cursor1Time time="8000000fs"></Cursor1Time>
+      <ZoomStartTime time="5143624fs"></ZoomStartTime>
+      <ZoomEndTime time="40287249fs"></ZoomEndTime>
+      <Cursor1Time time="26000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="178"></NameColumnWidth>
-      <ValueColumnWidth column_width="123"></ValueColumnWidth>
+      <ValueColumnWidth column_width="119"></ValueColumnWidth>
    </column_width_setting>
    <WVObjectSize size="40" />
    <wvobject fp_name="/TOP/clk" type="logic">

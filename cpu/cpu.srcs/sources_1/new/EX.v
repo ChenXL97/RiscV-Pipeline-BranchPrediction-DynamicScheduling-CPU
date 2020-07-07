@@ -151,7 +151,7 @@ end
 always @ (*) begin
     if(!rst) begin
         // current inst is valid and not running 
-        if(dis_cur_pc_r != ex_cur_pc) begin
+        if(dis_cur_pc_r != ex_cur_pc && func_part != 'd0) begin
             func_start = func_part;
         end
 
