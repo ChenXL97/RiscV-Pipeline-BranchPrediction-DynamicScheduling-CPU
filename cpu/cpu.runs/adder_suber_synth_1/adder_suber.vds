@@ -2,13 +2,13 @@
 # Vivado v2018.1 (64-bit)
 # SW Build 2188600 on Wed Apr  4 18:40:38 MDT 2018
 # IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
-# Start of session at: Mon Jul  6 23:04:00 2020
-# Process ID: 13456
-# Current directory: E:/CodeFactory/RV-052B/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1
+# Start of session at: Tue Jul  7 14:30:44 2020
+# Process ID: 6124
+# Current directory: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1
 # Command line: vivado.exe -log adder_suber.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source adder_suber.tcl
-# Log file: E:/CodeFactory/RV-052B/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1/adder_suber.vds
-# Journal file: E:/CodeFactory/RV-052B/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1\vivado.jou
+# Log file: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1/adder_suber.vds
+# Journal file: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/adder_suber_synth_1\vivado.jou
 #-----------------------------------------------------------
 source adder_suber.tcl -notrace
 INFO: [IP_Flow 19-4838] Using cached IP synthesis design for IP adder_suber, cache-ID = 190f22fa284b17b4.
-INFO: [Common 17-206] Exiting Vivado at Mon Jul  6 23:04:09 2020...
+INFO: [Common 17-206] Exiting Vivado at Tue Jul  7 14:30:52 2020...
