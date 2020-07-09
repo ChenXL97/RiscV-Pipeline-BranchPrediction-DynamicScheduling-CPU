@@ -1,10 +1,10 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
--- Date        : Tue Jul  7 08:23:55 2020
+-- Date        : Tue Jul  7 08:23:54 2020
 -- Host        : DESKTOP-P4UPRAE running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim
---               C:/Users/Administrator/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/ip/DATA_Bram/DATA_Bram_sim_netlist.vhdl
+-- Command     : write_vhdl -force -mode funcsim -rename_top DATA_Bram -prefix
+--               DATA_Bram_ DATA_Bram_sim_netlist.vhdl
 -- Design      : DATA_Bram
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
@@ -24,8 +24,6 @@ entity DATA_Bram_blk_mem_gen_prim_wrapper_init is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_prim_wrapper_init : entity is "blk_mem_gen_prim_wrapper_init";
 end DATA_Bram_blk_mem_gen_prim_wrapper_init;
 
 architecture STRUCTURE of DATA_Bram_blk_mem_gen_prim_wrapper_init is
@@ -308,8 +306,6 @@ entity DATA_Bram_blk_mem_gen_prim_width is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end DATA_Bram_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of DATA_Bram_blk_mem_gen_prim_width is
@@ -339,8 +335,6 @@ entity DATA_Bram_blk_mem_gen_generic_cstr is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end DATA_Bram_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of DATA_Bram_blk_mem_gen_generic_cstr is
@@ -370,8 +364,6 @@ entity DATA_Bram_blk_mem_gen_top is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end DATA_Bram_blk_mem_gen_top;
 
 architecture STRUCTURE of DATA_Bram_blk_mem_gen_top is
@@ -401,8 +393,6 @@ entity DATA_Bram_blk_mem_gen_v8_4_1_synth is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_v8_4_1_synth : entity is "blk_mem_gen_v8_4_1_synth";
 end DATA_Bram_blk_mem_gen_v8_4_1_synth;
 
 architecture STRUCTURE of DATA_Bram_blk_mem_gen_v8_4_1_synth is
@@ -634,8 +624,6 @@ entity DATA_Bram_blk_mem_gen_v8_4_1 is
   attribute C_WRITE_WIDTH_B of DATA_Bram_blk_mem_gen_v8_4_1 : entity is 8;
   attribute C_XDEVICEFAMILY : string;
   attribute C_XDEVICEFAMILY of DATA_Bram_blk_mem_gen_v8_4_1 : entity is "kintexu";
-  attribute ORIG_REF_NAME : string;
-  attribute ORIG_REF_NAME of DATA_Bram_blk_mem_gen_v8_4_1 : entity is "blk_mem_gen_v8_4_1";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of DATA_Bram_blk_mem_gen_v8_4_1 : entity is "yes";
 end DATA_Bram_blk_mem_gen_v8_4_1;

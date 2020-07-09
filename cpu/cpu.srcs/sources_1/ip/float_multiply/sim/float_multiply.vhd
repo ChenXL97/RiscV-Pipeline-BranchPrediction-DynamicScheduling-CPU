@@ -59,7 +59,10 @@ USE floating_point_v7_1_6.floating_point_v7_1_6;
 ENTITY float_multiply IS
   PORT (
     aclk : IN STD_LOGIC;
+<<<<<<< HEAD
     aresetn : IN STD_LOGIC;
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     s_axis_a_tvalid : IN STD_LOGIC;
     s_axis_a_tready : OUT STD_LOGIC;
     s_axis_a_tdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -193,8 +196,11 @@ ARCHITECTURE float_multiply_arch OF float_multiply IS
   ATTRIBUTE X_INTERFACE_INFO OF s_axis_a_tready: SIGNAL IS "xilinx.com:interface:axis:1.0 S_AXIS_A TREADY";
   ATTRIBUTE X_INTERFACE_PARAMETER OF s_axis_a_tvalid: SIGNAL IS "XIL_INTERFACENAME S_AXIS_A, TDATA_NUM_BYTES 4, TDEST_WIDTH 0, TID_WIDTH 0, TUSER_WIDTH 0, HAS_TREADY 1, HAS_TSTRB 0, HAS_TKEEP 0, HAS_TLAST 0, FREQ_HZ 100000000, PHASE 0.000, LAYERED_METADATA undef";
   ATTRIBUTE X_INTERFACE_INFO OF s_axis_a_tvalid: SIGNAL IS "xilinx.com:interface:axis:1.0 S_AXIS_A TVALID";
+<<<<<<< HEAD
   ATTRIBUTE X_INTERFACE_PARAMETER OF aresetn: SIGNAL IS "XIL_INTERFACENAME aresetn_intf, POLARITY ACTIVE_LOW";
   ATTRIBUTE X_INTERFACE_INFO OF aresetn: SIGNAL IS "xilinx.com:signal:reset:1.0 aresetn_intf RST";
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   ATTRIBUTE X_INTERFACE_PARAMETER OF aclk: SIGNAL IS "XIL_INTERFACENAME aclk_intf, ASSOCIATED_BUSIF S_AXIS_OPERATION:M_AXIS_RESULT:S_AXIS_C:S_AXIS_B:S_AXIS_A, ASSOCIATED_RESET aresetn, ASSOCIATED_CLKEN aclken, FREQ_HZ 10000000, PHASE 0.000";
   ATTRIBUTE X_INTERFACE_INFO OF aclk: SIGNAL IS "xilinx.com:signal:clock:1.0 aclk_intf CLK";
 BEGIN
@@ -228,7 +234,11 @@ BEGIN
       C_RESULT_WIDTH => 32,
       C_RESULT_FRACTION_WIDTH => 24,
       C_COMPARE_OPERATION => 8,
+<<<<<<< HEAD
       C_LATENCY => 1,
+=======
+      C_LATENCY => 3,
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       C_OPTIMIZATION => 1,
       C_MULT_USAGE => 2,
       C_BRAM_USAGE => 0,
@@ -243,7 +253,11 @@ BEGIN
       C_HAS_ACCUM_OVERFLOW => 0,
       C_HAS_ACCUM_INPUT_OVERFLOW => 0,
       C_HAS_ACLKEN => 0,
+<<<<<<< HEAD
       C_HAS_ARESETN => 1,
+=======
+      C_HAS_ARESETN => 0,
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       C_THROTTLE_SCHEME => 1,
       C_HAS_A_TUSER => 0,
       C_HAS_A_TLAST => 0,
@@ -274,7 +288,11 @@ BEGIN
     PORT MAP (
       aclk => aclk,
       aclken => '1',
+<<<<<<< HEAD
       aresetn => aresetn,
+=======
+      aresetn => '1',
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       s_axis_a_tvalid => s_axis_a_tvalid,
       s_axis_a_tready => s_axis_a_tready,
       s_axis_a_tdata => s_axis_a_tdata,

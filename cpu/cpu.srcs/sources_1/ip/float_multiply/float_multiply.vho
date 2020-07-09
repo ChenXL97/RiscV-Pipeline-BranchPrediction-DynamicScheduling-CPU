@@ -55,7 +55,10 @@
 COMPONENT float_multiply
   PORT (
     aclk : IN STD_LOGIC;
+<<<<<<< HEAD
     aresetn : IN STD_LOGIC;
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     s_axis_a_tvalid : IN STD_LOGIC;
     s_axis_a_tready : OUT STD_LOGIC;
     s_axis_a_tdata : IN STD_LOGIC_VECTOR(31 DOWNTO 0);
@@ -76,7 +79,10 @@ END COMPONENT;
 your_instance_name : float_multiply
   PORT MAP (
     aclk => aclk,
+<<<<<<< HEAD
     aresetn => aresetn,
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     s_axis_a_tvalid => s_axis_a_tvalid,
     s_axis_a_tready => s_axis_a_tready,
     s_axis_a_tdata => s_axis_a_tdata,

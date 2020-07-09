@@ -85,7 +85,11 @@ architecture tb of tb_float_addsub is
   constant CLOCK_PERIOD : time := 100 ns;
   constant T_HOLD       : time := 10 ns;
   constant T_STROBE     : time := CLOCK_PERIOD - (1 ns);
+<<<<<<< HEAD
   constant DUT_DELAY    : time := CLOCK_PERIOD * 1;
+=======
+  constant DUT_DELAY    : time := CLOCK_PERIOD * 8;
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
 
   -----------------------------------------------------------------------
   -- Testbench types and signals
@@ -96,7 +100,11 @@ architecture tb of tb_float_addsub is
                        phase_single,         -- run a single operation, and wait for the result
                        phase_consecutive,    -- run a consecutive series of 100 operations with incrementing data
                        phase_axi_handshake,  -- demonstrate the use and effect of AXI handshaking signals
+<<<<<<< HEAD
                        phase_aresetn,        -- demonstrate the use of synchronous reset
+=======
+                       phase_aclken,         -- demonstrate the use of clock enable
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
                        phase_special         -- demonstrate the use of special floating-point values
                        );
   signal sim_phase : sim_phase_t := phase_init;
@@ -363,26 +371,42 @@ architecture tb of tb_float_addsub is
 
   -- Global signals
   signal aclk                    : std_logic := '0';  -- the master clock
+<<<<<<< HEAD
   signal aresetn                 : std_logic := '1';  -- synchronous active low reset
 
   -- A operand slave channel signals
   signal s_axis_a_tvalid         : std_logic := '0';  -- payload is valid
   signal s_axis_a_tready         : std_logic := '1';  -- slave is ready
+=======
+  signal aclken                  : std_logic := '1';  -- clock enable
+
+  -- A operand slave channel signals
+  signal s_axis_a_tvalid         : std_logic := '0';  -- payload is valid
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   signal s_axis_a_tdata          : std_logic_vector(31 downto 0) := (others => '0');  -- data payload
 
   -- B operand slave channel signals
   signal s_axis_b_tvalid         : std_logic := '0';  -- payload is valid
+<<<<<<< HEAD
   signal s_axis_b_tready         : std_logic := '1';  -- slave is ready
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   signal s_axis_b_tdata          : std_logic_vector(31 downto 0) := (others => '0');  -- data payload
 
   -- Operation slave channel signals
   signal s_axis_operation_tvalid : std_logic := '0';  -- payload is valid
+<<<<<<< HEAD
   signal s_axis_operation_tready : std_logic := '1';  -- slave is ready
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   signal s_axis_operation_tdata  : std_logic_vector(7 downto 0) := op_to_opcode(add);  -- data payload
 
   -- Result master channel signals
   signal m_axis_result_tvalid    : std_logic := '0';
+<<<<<<< HEAD
   signal m_axis_result_tready    : std_logic := '1';
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   signal m_axis_result_tdata     : std_logic_vector(31 downto 0) := (others => '0');  -- data payload
 
   -----------------------------------------------------------------------
@@ -428,6 +452,7 @@ begin
     port map (
       -- Global signals
       aclk                    => aclk,
+<<<<<<< HEAD
       aresetn                 => aresetn,
     -- AXI4-Stream slave channel for operand A
       s_axis_a_tvalid         => s_axis_a_tvalid,
@@ -444,6 +469,20 @@ begin
       -- AXI4-Stream master channel for output result
       m_axis_result_tvalid    => m_axis_result_tvalid,
       m_axis_result_tready    => m_axis_result_tready,
+=======
+      aclken                  => aclken,
+    -- AXI4-Stream slave channel for operand A
+      s_axis_a_tvalid         => s_axis_a_tvalid,
+      s_axis_a_tdata          => s_axis_a_tdata,
+      -- AXI4-Stream slave channel for operand B
+      s_axis_b_tvalid         => s_axis_b_tvalid,
+      s_axis_b_tdata          => s_axis_b_tdata,
+      -- AXI4-Stream slave channel for operation control information
+      s_axis_operation_tvalid => s_axis_operation_tvalid,
+      s_axis_operation_tdata  => s_axis_operation_tdata,
+      -- AXI4-Stream master channel for output result
+      m_axis_result_tvalid    => m_axis_result_tvalid,
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       m_axis_result_tdata     => m_axis_result_tdata
       );
 
@@ -488,11 +527,19 @@ begin
 
     -- Run the same consecutive series of 100 operations, while demonstrating use and effect of AXI handshaking signals
     sim_phase <= phase_axi_handshake;
+<<<<<<< HEAD
     wait for 142 * CLOCK_PERIOD;
 
     -- Start a consecutive series of operations, aborting it partway through using reset
     sim_phase <= phase_aresetn;
     wait for 12 * CLOCK_PERIOD;
+=======
+    wait for 132 * CLOCK_PERIOD;
+
+    -- Run a consecutive series of 10 operations, while demonstrating the use of clock enable
+    sim_phase <= phase_aclken;
+    wait for 17 * CLOCK_PERIOD;
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
 
 
     -- Run operations that demonstrate the use of special floating-point values (+/- zero, +/- infinity, Not a Number)
@@ -511,8 +558,12 @@ begin
   -----------------------------------------------------------------------
   -- Generate inputs on the A operand slave channel
   -- This process also drives:
+<<<<<<< HEAD
   -- + global synchronous reset input
   -- + RESULT master channel TREADY input
+=======
+  -- + global clock enable input
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   -----------------------------------------------------------------------
 
   stimuli_a : process
@@ -527,11 +578,15 @@ begin
       abort := false;
       loop
         wait until rising_edge(aclk);
+<<<<<<< HEAD
         if aresetn = '0' then
           abort := true;
           exit;
         end if;
         exit when s_axis_a_tready = '1';
+=======
+        exit when aclken = '1';
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       end loop;
       wait for T_HOLD;
       s_axis_a_tvalid <= '0';
@@ -561,7 +616,10 @@ begin
         drive_a_single(tdata => tdata,
                        abort => abort);
 
+<<<<<<< HEAD
         exit count_loop when abort;  -- abort all transactions if reset occurred
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
         ip_count := ip_count + 1;
         exit count_loop when ip_count >= count;
         -- Increment data for next iteration
@@ -609,6 +667,7 @@ begin
     wait for 15 * CLOCK_PERIOD;
     -- 20 normal consecutive transactions
     drive_a(3.1, normal, 20, 0.1);
+<<<<<<< HEAD
     -- Apply backpressure (not ready for result) for 10 clock cycles, then release
     m_axis_result_tready <= '0', '1' after 10 * CLOCK_PERIOD;
   -- 50 normal consecutive transactions
@@ -623,6 +682,18 @@ begin
     -- Note that aresetn must be asserted for at least 2 clock cycles (see core datasheet for details).
     aresetn <= '0' after 6 * CLOCK_PERIOD, '1' after 8 * CLOCK_PERIOD;
     drive_a(0.1, normal, 10, 0.1);
+=======
+  -- 50 normal consecutive transactions
+  drive_a(5.1, normal, 50, 0.1);
+    -- Wait for simulation control to signal the next phase
+    wait until sim_phase = phase_aclken;
+    wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
+
+    -- 10 normal consecutive transactions, but hold clock enable low for 5 cycles partway through
+    aclken <= '0' after 4 * CLOCK_PERIOD, '1' after 9 * CLOCK_PERIOD;
+    drive_a(0.1, normal, 10, 0.1);
+
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     -- Wait for simulation control to signal the next phase
     wait until sim_phase = phase_special;
     wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
@@ -698,11 +769,15 @@ begin
       abort := false;
       loop
         wait until rising_edge(aclk);
+<<<<<<< HEAD
         if aresetn = '0' then
           abort := true;
           exit;
         end if;
         exit when s_axis_b_tready = '1';
+=======
+        exit when aclken = '1';
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       end loop;
       wait for T_HOLD;
       s_axis_b_tvalid <= '0';
@@ -731,7 +806,10 @@ begin
         -- Drive AXI transaction
         drive_b_single(tdata => tdata,
                        abort => abort);
+<<<<<<< HEAD
         exit count_loop when abort;  -- abort all transactions if reset occurred
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
         ip_count := ip_count + 1;
         exit count_loop when ip_count >= count;
         -- Increment data for next iteration
@@ -780,12 +858,21 @@ begin
     drive_b(-0.05, normal, 49, -0.05);
 
     -- Wait for simulation control to signal the next phase
+<<<<<<< HEAD
     wait until sim_phase = phase_aresetn;
     wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
 
     -- Start 10 normal consecutive transactions, but abort them partway through by asserting aresetn (active low)
     -- Reset is driven by the stimuli_a process
     drive_b( 2.5, normal, 10, -0.05);
+=======
+    wait until sim_phase = phase_aclken;
+    wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
+
+    -- 10 normal consecutive transactions, but hold clock enable low for 5 cycles partway through
+    -- Clock enable is driven by the stimuli_a process
+    drive_b(2.5, normal, 10, -0.05);
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
 
     -- Wait for simulation control to signal the next phase
     wait until sim_phase = phase_special;
@@ -874,8 +961,12 @@ begin
         s_axis_operation_tdata  <= opcode;
         wait_loop : loop
           wait until rising_edge(aclk);
+<<<<<<< HEAD
           exit count_loop when aresetn = '0';  -- abort all transactions if reset occurs
           exit when s_axis_operation_tready = '1';
+=======
+        exit when aclken = '1';
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
         end loop wait_loop;
         ip_count := ip_count + 1;
         exit count_loop when ip_count >= count;
@@ -924,11 +1015,19 @@ begin
     drive_operation(subtract, 50);
 
     -- Wait for simulation control to signal the next phase
+<<<<<<< HEAD
     wait until sim_phase = phase_aresetn;
     wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
 
     -- Start 10 normal consecutive transactions, but abort them partway through by asserting aresetn (active low)
     -- Reset is driven by the stimuli_a process
+=======
+    wait until sim_phase = phase_aclken;
+    wait for T_HOLD;  -- drive inputs T_HOLD after the rising edge of the clock
+
+    -- 10 normal consecutive transactions, but hold clock enable low for 5 cycles partway through
+    -- Clock enable is driven by the stimuli_a process
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     drive_operation(add, 10);
 
     -- Wait for simulation control to signal the next phase
@@ -957,10 +1056,13 @@ begin
 
   check_outputs : process
     variable check_ok : boolean := true;
+<<<<<<< HEAD
     -- Previous values of RESULT master channel signals
     variable result_tvalid_prev : std_logic := '0';
     variable result_tready_prev : std_logic := '1';
     variable result_tdata_prev  : std_logic_vector(31 downto 0) := (others => '0');
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   begin
 
     -- Check outputs T_STROBE time after rising edge of clock
@@ -971,14 +1073,20 @@ begin
     -- which would make this demonstration testbench unwieldy.
     -- Instead, check the protocol of the RESULT master channel:
     -- check that the payload is valid (not X) when TVALID is high
+<<<<<<< HEAD
     -- and check that the payload does not change while TVALID is high until TREADY goes high
 
     if m_axis_result_tvalid = '1' and aresetn = '1' then
+=======
+
+    if m_axis_result_tvalid = '1' and aclken = '1' then
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
       if is_x(m_axis_result_tdata) then
         report "ERROR: m_axis_result_tdata is invalid when m_axis_result_tvalid is high" severity error;
         check_ok := false;
       end if;
 
+<<<<<<< HEAD
       if result_tvalid_prev = '1' and result_tready_prev = '0' then  -- payload must be the same as last cycle
         if m_axis_result_tdata /= result_tdata_prev then
           report "ERROR: m_axis_result_tdata changed while m_axis_result_tvalid was high and m_axis_result_tready was low" severity error;
@@ -986,11 +1094,14 @@ begin
         end if;
       end if;
 
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
     end if;
 
     assert check_ok
       report "ERROR: terminating test with failures." severity failure;
 
+<<<<<<< HEAD
     -- Record payload values for checking next clock cycle
     if check_ok then
       result_tvalid_prev := m_axis_result_tvalid;
@@ -998,6 +1109,8 @@ begin
       result_tdata_prev  := m_axis_result_tdata;
     end if;
 
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   end process check_outputs;
 
 

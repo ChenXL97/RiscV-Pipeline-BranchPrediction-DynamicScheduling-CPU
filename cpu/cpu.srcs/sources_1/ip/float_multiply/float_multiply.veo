@@ -56,7 +56,10 @@
 //----------- Begin Cut here for INSTANTIATION Template ---// INST_TAG
 float_multiply your_instance_name (
   .aclk(aclk),                                  // input wire aclk
+<<<<<<< HEAD
   .aresetn(aresetn),                            // input wire aresetn
+=======
+>>>>>>> 7efb616aa4314a56fc9e0252a985cc1698016784
   .s_axis_a_tvalid(s_axis_a_tvalid),            // input wire s_axis_a_tvalid
   .s_axis_a_tready(s_axis_a_tready),            // output wire s_axis_a_tready
   .s_axis_a_tdata(s_axis_a_tdata),              // input wire [31 : 0] s_axis_a_tdata
