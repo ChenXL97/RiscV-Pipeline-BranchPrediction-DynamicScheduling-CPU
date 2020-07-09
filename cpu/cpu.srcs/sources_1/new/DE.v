@@ -104,7 +104,7 @@ module DE(
                 de_cur_pc <= de_cur_pc;
 		end
 		else begin
-			de_cur_pc <= 'd0;
+			de_cur_pc <= 32'bx;
 		end
 	end
 	

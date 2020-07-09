@@ -57,7 +57,7 @@ module EX(
     output      reg     [4:0]           ex_rd
     );
 
-assign ex_flush = ex_need_jmp;
+// assign ex_flush = ex_need_jmp;
 
 
 reg         [14:0]                      func_start;
@@ -85,6 +85,17 @@ wire                                    branch_done;
 wire        [31:0]                      branch_res;
 wire        [31:0]                      add_extra_data;
 wire        [31:0]                      logic_extra_data;
+wire                                    fadd_done;
+wire        [31:0]                      fadd_res;
+wire                                    int_float_done;
+wire        [31:0]                      int_float_res;
+wire                                    fcmp_done;
+wire        [31:0]                      fcmp_res;
+wire                                    fmul_done;
+wire        [31:0]                      fmul_res;
+
+
+
 
 
 assign add_extra_data = imm_use ? imm_data : op2;
@@ -101,12 +112,16 @@ reg         [3:0]                       stall_clk;
 
 
 
-assign ex_done = add_done | logic_done | ram_done | branch_done;
+assign ex_done = add_done | logic_done | ram_done | branch_done
+                | fadd_done | int_float_done | fcmp_done | fmul_done ;
+
+
+// assign ex_done = add_done | logic_done | ram_done | branch_done;
 
 
 
 always @ (posedge clk) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         dis_cur_pc_r <= dis_cur_pc;
         reg_a <= op1;
         reg_b <= op2;
@@ -126,7 +141,7 @@ end
 /* parts' control signal */
 // start signal only keeps positive for 1 clk
 always @ (posedge clk) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         // current inst is valid and not running 
         if(func_part != 'd0 && func_start != 0) begin
             func_working <= func_part;
@@ -157,8 +172,8 @@ end
 
 
 always @ (posedge clk) begin
-    if(!rst && !ex_flush) begin
-        if(ex_cur_pc != dis_cur_pc && ex_done) begin
+    if(!rst) begin
+        if(ex_cur_pc != dis_cur_pc && !ex_stall && !ex_flush) begin
             ex_cur_pc <= dis_cur_pc;
         end
         
@@ -166,14 +181,14 @@ always @ (posedge clk) begin
             ex_cur_pc <= ex_cur_pc;
     end
     else begin
-        ex_cur_pc <= 32'h0;
+        ex_cur_pc <= 32'd116;
     end
 end
 
 
 
 always @ (*) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         // current inst is valid and not running 
         if(dis_cur_pc_r != dis_cur_pc && func_part != 'd0) begin
             func_start = func_part;
@@ -199,7 +214,7 @@ end
 
 
 always @ (posedge clk) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         // current inst is valid and not running 
         if(dis_cur_pc_r != dis_cur_pc && func_part != 'd0) begin
             imm_data_r <= imm_data;
@@ -231,7 +246,7 @@ end
 
 
 always @ (*) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         // current inst is not running
         if(func_part != 'd0 && func_busy == 'd0) begin
             func_busy = 'd1;
@@ -260,7 +275,7 @@ end
 
 
 always @ (*) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         // when inst is done, keep fetching
         if(ex_done) begin
             ex_stall = 'd0;
@@ -279,6 +294,18 @@ always @ (*) begin
             else if (func_part[`BRANCH - `OFFSET] && func_busy) begin
                 ex_stall = 'd1;
             end
+            else if (func_part[`FADD - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
+            else if (func_part[`FMUL - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
+            else if (func_part[`FCMP - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
+            else if (func_part[`FSP - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
             else begin
                 ex_stall = 'd0;
             end
@@ -294,7 +321,7 @@ end
 
 /* choosing output res */
 always @ (*) begin
-    if(!rst && !ex_flush) begin
+    if(!rst) begin
         if(add_done) begin
             ex_res = add_res;
         end
@@ -309,6 +336,22 @@ always @ (*) begin
 
         else if (branch_done) begin
             ex_res = branch_res;
+        end
+
+        else if (fadd_done) begin
+            ex_res = fadd_res;
+        end
+
+        else if (int_float_done) begin
+            ex_res = int_float_res;
+        end
+
+        else if (fcmp_done) begin
+            ex_res = fcmp_res;
+        end
+
+        else if (fmul_done) begin
+            ex_res = fmul_res;
         end
 
         else begin
@@ -327,7 +370,7 @@ end
 LOGIC logic(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1_r),
+            .op1                    (op1),
             .op2                    (logic_extra_data),
             .start                  (func_start[`LOGIC - `OFFSET]),
             .op_mode1               (op_mode1),
@@ -355,8 +398,8 @@ ADD_SUB add_sub(
 RAM data_ram(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (op1_r),
-            .op2                    (op2_r),
+            .op1                    (op1),
+            .op2                    (op2),
             .imm_data               (imm_data),
             .start                  (func_start[`RAM - `OFFSET]),
             .use_part               (2'b01),
@@ -371,8 +414,8 @@ RAM data_ram(
 BRANCH branch(
             .clk                    (clk),
             .rst                    (rst),
-            .op1                    (reg_a),
-            .op2                    (reg_b),
+            .op1                    (op1),
+            .op2                    (op2),
             .imm_data               (imm_data + 'd4),
             .cur_pc                 (ex_cur_pc),
             .start                  (func_start[`BRANCH - `OFFSET]),
@@ -382,7 +425,61 @@ BRANCH branch(
             .done                   (branch_done),
             .res                    (branch_res),
             .tar_addr               (ex_tar_addr),
-            .need_jmp               (ex_need_jmp)
+            .need_jmp               (ex_flush)
+);
+
+
+
+
+FADD_SUB fadd_sub(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (op2),
+            .start                  (func_start[`FADD - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (op_mode1),
+            .op_mode2               (op_mode2),
+            .done                   (fadd_done),
+            .res                    (fadd_res)
+);
+
+INT_FLOAT int_float(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .start                  (func_start[`FSP - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (op_mode1),
+            .op_mode2               (op_mode2),
+            .done                   (int_float_done),
+            .res                    (int_float_res)
+);
+
+FCMP fcmp(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (op2),
+            .start                  (func_start[`FCMP - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (2'b0),
+            .op_mode2               (3'b0),
+            .done                   (fcmp_done),
+            .res                    (fcmp_res)
+);
+
+FMUL fmul(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (op2),
+            .start                  (func_start[`FMUL - `OFFSET]),
+            .use_part               (2'b01),
+            .op_mode1               (2'b0),
+            .op_mode2               (3'b0),
+            .done                   (fmul_done),
+            .res                    (fmul_res)
 );
 
 

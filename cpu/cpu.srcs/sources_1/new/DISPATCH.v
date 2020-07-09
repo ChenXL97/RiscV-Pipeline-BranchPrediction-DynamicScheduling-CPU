@@ -31,8 +31,8 @@ module DISPATCH(
     input ex_stall,
     input ex_flush,
     
-    output reg [31:0]reg_A_o,
-    output reg [31:0]reg_B_o,
+    output  [31:0]reg_A_o,
+    output  [31:0]reg_B_o,
     output [31:0]imm32_o,
     output [4:0]opcode_o,
     output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
@@ -47,6 +47,12 @@ module DISPATCH(
 //    output  EX_BRANCH_selected_o,
 //    output  EX_LS_RAM_selected_o
     );
+
+
+
+reg [31:0] reg_A_tmp;
+reg [31:0] reg_B_tmp;
+
 
 
 always @ (posedge clk_i) begin
@@ -126,8 +132,12 @@ DISPATCH_PipReg DISPATCH_PipReg
     .ex_stall(ex_stall),
     .DISPATCH_pipreg_o(DISPATCH_pip_reg_w),
     .imm_value_r(imm32_o),
-    .imm_value_w(imm_value_w)
-
+    .imm_value_w(imm_value_w),
+    .reg_a(reg_A_tmp),
+    .reg_b(reg_B_tmp),
+    .ex_flush(ex_flush),
+    .reg_a_o(reg_A_o),
+    .reg_b_o(reg_B_o)
 );
 
 
@@ -138,21 +148,22 @@ reg forward_b;
 
 
 
-always @ (*) begin
+always @ (negedge clk_i) begin
     if(!rst_i && !ex_flush) begin
-        if((ex_rd == dispatch_ra_index_w)
-            || forward_a  && ex_rd != 'd0) begin
-            reg_A_o = ex_res;
+
+         if((ex_rd == dispatch_ra_index_w
+            || forward_a)  && ex_rd != 'd0) begin
+            reg_A_tmp = ex_res;
         end
-        else if (ex_stall) begin
-            reg_A_o = reg_A_o;
-        end
+          else  if (ex_stall) begin
+                reg_A_tmp = reg_A_tmp;
+            end 
         else begin
-            reg_A_o = dispatch_ra_value_w;
+            reg_A_tmp = dispatch_ra_value_w;
         end
     end
     else begin
-        reg_A_o = 'd0;
+        reg_A_tmp = 'd0;
     end
 end
 
@@ -163,7 +174,7 @@ always @ (posedge clk_i) begin
         if(ex_rd == dispatch_ra_index_w && ex_rd != 'd0 && ex_done) begin
             forward_a <= 'd1;
         end
-        else if (ex_stall) begin
+        else if (ex_rd == dispatch_ra_index_w && ex_stall) begin
             forward_a <= forward_a;
         end
         else begin
@@ -181,7 +192,7 @@ always @ (posedge clk_i) begin
         if(ex_rd == dispatch_rb_index_w && ex_rd != 'd0 && ex_done) begin
             forward_b <= 'd1;
         end
-        else if (ex_stall) begin
+        else if (ex_rd == dispatch_rb_index_w && ex_stall) begin
             forward_b <= forward_b;
         end
         else begin
@@ -201,17 +212,17 @@ end
 always @ (*) begin
     if(!rst_i && !ex_flush) begin
         if(ex_rd == dispatch_rb_index_w || forward_b && ex_rd != 'd0) begin
-            reg_B_o = ex_res;
+            reg_B_tmp = ex_res;
         end
         else if (ex_stall) begin
-            reg_B_o <= reg_B_o;
+            reg_B_tmp <= reg_B_tmp;
         end
         else begin
-            reg_B_o = dispatch_rb_value_w;
+            reg_B_tmp = dispatch_rb_value_w;
         end
     end
     else begin
-        reg_B_o = 'd0;
+        reg_B_tmp = 'd0;
     end
 end
 

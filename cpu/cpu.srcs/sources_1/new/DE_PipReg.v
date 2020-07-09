@@ -23,9 +23,9 @@ module DE_PipReg(
     output reg [`ROB_ITEM_INDEX] DE_pip_reg
     );
     
-    always@(posedge clk or posedge rst or posedge EX_rst)
+    always@(posedge clk)
         if(rst || EX_rst)
-            DE_pip_reg <= 0;
+            DE_pip_reg <= 32'hx;
         else if(ex_stall) begin
             DE_pip_reg <= DE_pip_reg;
         end

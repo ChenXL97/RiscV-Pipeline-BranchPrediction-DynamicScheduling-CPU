@@ -32,5 +32,7 @@
 `define IMMUSE 165
 `define RSS 166
 `define PREDICT 167
+`define FLOAT_INI_DELAY 3'd5
+`define FLOAT_DELAY 3'd4
 
 `endif

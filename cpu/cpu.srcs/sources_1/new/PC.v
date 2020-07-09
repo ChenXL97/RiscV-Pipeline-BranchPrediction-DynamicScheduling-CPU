@@ -25,7 +25,7 @@ module PC(
     
   always@(posedge clk or posedge rst)
           if(rst)
-              pc<=0;
+              pc<='d116;
           else if (EX_rst) begin
               pc <= EX_addr;
           end
