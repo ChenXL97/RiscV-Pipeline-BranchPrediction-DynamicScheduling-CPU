@@ -1,9 +1,9 @@
-ADDI 1 zero t0	  ##func1入口,生成一个整数1
+ADDI 1 zero t0	  ##func1入口,生成一个整数1. //t0: x5
 FCVT t0 t0			将整数1转化成浮点数1
-FEQ t0 a0 t1		浮点数1与输入值n相比，结果为整数1/0
+FEQ t0 a0 t1		浮点数1与输入值n相比，结果为整数1/0. //a0: x10.  t1: x6
 BEQ 8 zero t1  		若为0即不相等，则跳转
 ADDI 0 t0 a0		把浮点数1放在返回值寄存器a0中
-JALR 0 ra zero		返回父函数
+JALR 0 ra zero		返回父函数		//ra: x1
 SW 0 sp a0			准备调用func1函数,将参数存入栈指针中
 FSUB a0 t0 a0		计算子函数的参数n-1
 ADDI -8 sp sp		准备调用func1函数,栈指针前移
@@ -27,8 +27,8 @@ ADDI 1 t0 t0		t0 = t0 + 1
 BLT -20 t0 a0 		如果 i < n 则继续循环
 ADDI 0 t2 a0 		把t2放到a0
 JALR 0 ra zero		返回父函数
-ADDI 1023 zero sp //main函数入口，栈指针初始化
-LW 0 zero s0		读取外设的输入，放在s0
+ADDI 1023 zero sp //main函数入口，栈指针初始化 sp:x2
+LW 0 zero s0		读取外设的输入，放在s0 //s0: x8
 SW 1 zero s0		s0输出到外设
 FCVT s0 a0			整数n转化为浮点数n，作为func1参数
 JAL -136 ra			跳转到func1入口

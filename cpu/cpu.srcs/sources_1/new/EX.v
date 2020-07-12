@@ -36,6 +36,8 @@ module EX(
     input       [1:0]                   op_mode1,
     input       [2:0]                   op_mode2,
     input       [4:0]                   dis_rd,
+    input  BTB_is_taken,
+    input [31:0] BTB_predict_pc,
 
     output                              ex_done,
 
@@ -46,14 +48,14 @@ module EX(
 
     //  jmp info signal 
     output      [31:0]                  ex_tar_addr,
-    output                              ex_need_jmp,
 
     // set stall when some inst needs multiply clks
     output      reg                     ex_stall,
     
     // set flush when branch inst need jmp
-    output                              ex_flush,
+    output       reg                       ex_flush,
     output      reg     [4:0]           ex_rd,
+    output  ex_need_jump,
     output reg [31:0] ex_cur_pc,
 
     // Tell BTB is brannch
@@ -73,11 +75,13 @@ reg         [31:0]                      dis_cur_pc_r;
 reg         [31:0]                      reg_a;
 reg         [31:0]                      reg_b;
 reg         [31:0]                      reg_imm;
-
+reg         BTB_is_taken_r;
+reg [31:0] BTB_predict_pc_r;
 
 
 
 // wire between sub module
+wire ex_flush_w;
 wire                                    logic_done;
 wire        [31:0]                      logic_res;
 wire                                    add_done;
@@ -96,6 +100,7 @@ wire                                    fcmp_done;
 wire        [31:0]                      fcmp_res;
 wire                                    fmul_done;
 wire        [31:0]                      fmul_res;
+
 
 assign ex_is_branch = branch_done;
 
@@ -123,6 +128,8 @@ assign ex_done = add_done | logic_done | ram_done | branch_done
 
 
 
+
+
 always @ (posedge clk) begin
     if(!rst) begin
         dis_cur_pc_r <= dis_cur_pc;
@@ -139,7 +146,39 @@ always @ (posedge clk) begin
 end
 
 
+always @(posedge clk ) begin
+if (ex_stall) begin
+    BTB_is_taken_r <= BTB_is_taken_r;
+    BTB_predict_pc_r <=BTB_predict_pc_r;
+end
+else begin
+    BTB_is_taken_r <= BTB_is_taken;
+    BTB_predict_pc_r<=BTB_predict_pc;
+end
+end
 
+always @(negedge clk) begin
+    if (ex_done)
+        begin
+            if ( ex_need_jump ^BTB_is_taken_r)
+                ex_flush<=1'b1;
+            else if (ex_need_jump == 1'b1 && BTB_is_taken_r ==1'b1)
+                begin
+                    if (BTB_predict_pc_r!=ex_tar_addr)
+                        ex_flush<=1'b1;
+                    else begin
+                        ex_flush<=1'b0;
+                    end
+                end
+            else begin
+                ex_flush<=1'b0;
+            end
+        end
+    else begin
+        ex_flush<=1'b0;
+    end
+end
+    //ex_flush <= ex_done?  ex_need_jump^BTB_is_taken_r ? 1 : BTB_predict_pc_r==branch_res :0;
 
 /* parts' control signal */
 // start signal only keeps positive for 1 clk
@@ -429,7 +468,7 @@ BRANCH branch(
             .done                   (branch_done),
             .res                    (branch_res),
             .tar_addr               (ex_tar_addr),
-            .need_jmp               (ex_flush)
+            .need_jmp               (ex_need_jump)
 );
 
 

@@ -14,6 +14,7 @@ module Decoder(
     input clk,
     input rst,
     input [31:0] ins,
+    input BTB_is_taken,
     output reg [167:0] de_out //TODO    
     );
     
@@ -25,7 +26,7 @@ module Decoder(
         de_out[`RS1] = ins[19:15];
         de_out[`RS2] = ins[24:20];
         de_out[`DST] = ins[11:7];
-    
+        de_out[`PREDICT] = BTB_is_taken;
         //assign values to IMMUSE, PART, OP1, OP2 and IMM
         case(ins[5:2])
             // 1 RAM £º Ins 1-10

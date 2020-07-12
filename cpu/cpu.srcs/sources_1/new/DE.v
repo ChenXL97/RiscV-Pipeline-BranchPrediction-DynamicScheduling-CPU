@@ -18,6 +18,7 @@ module DE(
     //IF input
     input [31:0] IF_pip_reg,
     input [31:0] pc,
+    input BTB_is_taken,
     //EX input
     input EX_update,
     input [31:0] EX_ins_pc,
@@ -26,7 +27,7 @@ module DE(
     input ex_flush,
     // output
     output predict_is_taken,
-    output [31:0] predict_pc,
+    input [31:0] predict_pc,
     output [`ROB_ITEM_INDEX] DE_pip_reg,
     output reg [31:0] de_cur_pc
     );
@@ -36,6 +37,7 @@ module DE(
     Decoder Decoder(
         .clk(clk),
         .rst(rst | ex_flush),
+        .BTB_is_taken(BTB_is_taken),
         .ins(IF_pip_reg),
         .de_out(de_out)
         );

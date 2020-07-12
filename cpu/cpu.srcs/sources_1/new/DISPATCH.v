@@ -30,18 +30,20 @@ module DISPATCH(
     input [31:0] de_cur_pc,
     input ex_stall,
     input ex_flush,
+
     
     output  [31:0]reg_A_o,
     output  [31:0]reg_B_o,
     output [31:0]imm32_o,
     output [4:0]opcode_o,
     output [`ROB_ITEM_INDEX]DISPATCH_pip_reg_o,
+    output reg [31:0]btb_predict_pc,
     output reg [31:0] dis_cur_pc,
     output reg [4:0] dis_rd,
     input [4:0] ex_rd,
     input ex_done,
-    input [31:0] ex_res
-    
+    input [31:0] ex_res,
+    output reg BTB_is_taken
     //Select Unit to calculate
 //    output  EX_ADD_selected_o,
 //    output  EX_BRANCH_selected_o,
@@ -122,6 +124,30 @@ end
 
 //end
 
+
+
+//BTB
+//wire BTB_is_taken_w = DE_pip_reg_i[`PREDICT];
+always @ (posedge clk_i) begin
+    
+end
+
+always @ (posedge clk_i) begin
+    if(!rst_i && !ex_flush) begin
+        if(ex_stall) begin
+            BTB_is_taken <= BTB_is_taken;
+            btb_predict_pc <=btb_predict_pc;
+        end
+        else begin
+            BTB_is_taken <= DE_pip_reg_i[`PREDICT];
+            btb_predict_pc<=DE_pip_reg_i[`PPC];
+        end
+    end
+    else begin
+        BTB_is_taken <= 'd0;
+        btb_predict_pc<=32'd9999;
+    end
+end
 
 
 DISPATCH_PipReg DISPATCH_PipReg

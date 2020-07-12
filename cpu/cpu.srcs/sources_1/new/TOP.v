@@ -88,7 +88,8 @@ wire                            dis_forward_b;
         wire [31:0]EX_result_pc;  //Corresponding PC from EX
         wire [31:0]ex_cur_pc_w;
         wire ex_is_branch_w;
-    
+        wire BTB_is_taken_w;
+        wire [31:0] btb_predict_pc_w;
         //IF module, including PC, InsMem, IF_PipReg
     IF IF
     (
@@ -100,10 +101,13 @@ wire                            dis_forward_b;
         .EX_write_pc(EX_update),
         .EX_addr(ex_tar_addr),
         .EX_is_branch(ex_is_branch_w),
+        .ex_need_jump(ex_need_jmp),
 //        .BTB_write_pc(predict_is_taken),
 //        .BTB_addr(predict_pc),
         .pc(pc),
-        .IF_pip_reg(IF_pip_reg)
+        .IF_pip_reg(IF_pip_reg),
+        .BTB_is_taken(BTB_is_taken_w),
+        .btb_predict_pc(btb_predict_pc_w)
 
     );
 
@@ -119,11 +123,12 @@ wire                            dis_forward_b;
         .rst(rst),
         .ex_stall(ex_stall),
         .IF_pip_reg(IF_pip_reg),
+        .BTB_is_taken(BTB_is_taken_w),
         .pc(pc),
         .EX_update(EX_update),
         .EX_result_pc(EX_result_pc),
         .predict_is_taken(predict_is_taken),
-        .predict_pc(predict_pc),
+        .predict_pc(btb_predict_pc_w),
         .DE_pip_reg(DE_pip_reg),
         .de_cur_pc(de_cur_pc),
         .EX_rst(ex_flush),
@@ -142,6 +147,8 @@ wire                            dis_forward_b;
     wire [`ROB_ITEM_INDEX] EX_pip_reg_w;
     wire [`ROB_ITEM_INDEX] MEM_pip_reg_w;
     wire [31:0]MEM_result_w;
+    wire BTB_dis_ex;
+    wire [31:0]BTB_pc_dis_ex;
     DISPATCH DIAPATCH
     (
         .clk_i(clk),
@@ -164,7 +171,9 @@ wire                            dis_forward_b;
         .ex_rd(ex_rd),
         .ex_done(ex_done),
         .ex_res(ex_res),
-        .ex_flush(ex_flush)
+        .ex_flush(ex_flush),
+        .BTB_is_taken(BTB_dis_ex),
+        .btb_predict_pc(BTB_pc_dis_ex)
    );
 
 
@@ -186,12 +195,14 @@ EX ex (
     .ex_done                   (ex_done),
     .ex_res                    (ex_res),
     .ex_tar_addr               (ex_tar_addr),
-    .ex_need_jmp               (ex_need_jmp),
     .ex_stall                   (ex_stall),
     .ex_flush                   (ex_flush),
     .ex_rd                      (ex_rd),
     .ex_cur_pc            (ex_cur_pc_w),
-    .ex_is_branch          (ex_is_branch_w)
+    .ex_is_branch          (ex_is_branch_w),
+    .ex_need_jump           (ex_need_jmp),
+    .BTB_is_taken(BTB_dis_ex),
+    .BTB_predict_pc(BTB_pc_dis_ex)
     // dis_forward_a               (dis_forward_a),
     // dis_forward_b               (dis_forward_b)
 );
