@@ -38,3 +38,13 @@ cpu/cpu.xpr
 cpu/cpu.xpr
 测试指令/~$斐波那契数列.xlsx
 测试指令/~$指令实例.xlsx
+*.rst
+*.dcp
+cpu/cpu.runs/fcmper_synth_1/__synthesis_is_complete__
+cpu/cpu.runs/fcmper_synth_1/dont_touch.xdc
+cpu/cpu.runs/fcmper_synth_1/fcmper.vds
+cpu/cpu.runs/fcmper_synth_1/htr.txt
+cpu/cpu.runs/fcmper_synth_1/ISEWrap.js
+cpu/cpu.runs/fcmper_synth_1/ISEWrap.sh
+cpu/cpu.runs/fcmper_synth_1/rundef.js
+cpu/cpu.runs/fcmper_synth_1/runme.sh

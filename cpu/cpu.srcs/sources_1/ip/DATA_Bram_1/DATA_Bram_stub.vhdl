@@ -3,8 +3,8 @@
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
 -- Date        : Wed Jul  8 07:43:47 2020
 -- Host        : Mark-Wen running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               C:/Users/310-w/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/ip/DATA_Bram_1/DATA_Bram_stub.vhdl
+-- Command     : write_vhdl -force -mode synth_stub -rename_top DATA_Bram -prefix
+--               DATA_Bram_ DATA_Bram_stub.vhdl
 -- Design      : DATA_Bram
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xcku115-flvd1517-1L-i

@@ -86,6 +86,8 @@ wire                            dis_forward_b;
         wire EX_block; //1 when EX need to be stalled
         wire EX_update;  //1 when EX need to write PC
         wire [31:0]EX_result_pc;  //Corresponding PC from EX
+        wire [31:0]ex_cur_pc_w;
+        wire ex_is_branch_w;
     
         //IF module, including PC, InsMem, IF_PipReg
     IF IF
@@ -93,11 +95,13 @@ wire                            dis_forward_b;
         .clk(clk),
         .rst(rst),
         .EX_rst(ex_flush),
+        .EX_pc_i(ex_cur_pc_w),
         .EX_block(ex_stall),
         .EX_write_pc(EX_update),
         .EX_addr(ex_tar_addr),
-        .BTB_write_pc(predict_is_taken),
-        .BTB_addr(predict_pc),
+        .EX_is_branch(ex_is_branch_w),
+//        .BTB_write_pc(predict_is_taken),
+//        .BTB_addr(predict_pc),
         .pc(pc),
         .IF_pip_reg(IF_pip_reg)
 
@@ -185,7 +189,9 @@ EX ex (
     .ex_need_jmp               (ex_need_jmp),
     .ex_stall                   (ex_stall),
     .ex_flush                   (ex_flush),
-    .ex_rd                      (ex_rd)
+    .ex_rd                      (ex_rd),
+    .ex_cur_pc            (ex_cur_pc_w),
+    .ex_is_branch          (ex_is_branch_w)
     // dis_forward_a               (dis_forward_a),
     // dis_forward_b               (dis_forward_b)
 );

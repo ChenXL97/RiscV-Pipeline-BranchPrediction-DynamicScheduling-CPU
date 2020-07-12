@@ -11,22 +11,68 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
+
+
+
 module BTB(
     input clk,
-    input rst,
-    input DE_is_branch, 
-    input [31:0] de_out_pc, 
-    input EX_update, 
+    input rst, 
+    input [31:0] cur_pc, 
+    input EX_is_branch, //is a branch instruction
+    input EX_branch_taken, //branch is taken or not
     input [31:0] EX_ins_pc, 
     input [31:0] EX_result_pc,
-    output reg predict_is_taken,
+
+    // output
+    output reg btb_taken,
     output reg [31:0] predict_pc
     );
+//localparam BTBW = 5;
+reg [31:0] btb [31:0];
+
     
-    initial begin
-        predict_is_taken <= 0;
-        predict_pc <= 0;
+    
+reg [1:0] counter [31:0];
+reg [5-1:0]entry;
+
+wire [5-1:0]set_tb_entry;
+assign set_tb_entry = EX_ins_pc[5+2-1:2];
+
+always @(posedge clk or posedge rst)
+    if(rst)
+         for(entry=0; entry < 32; entry=entry+1) // reset BTB entries
+            counter[entry] <= 2'b00;
+    else if(EX_is_branch && EX_branch_taken && counter[set_tb_entry] != 2'b11) begin
+         counter[set_tb_entry] <= counter[set_tb_entry] + 2'b01;
     end
-    
-    
+    else if(EX_is_branch && !EX_branch_taken && counter[set_tb_entry] != 2'b00) begin
+         counter[set_tb_entry] <= counter[set_tb_entry] - 2'b01;
+    end
+
+always @(posedge clk or posedge rst) begin
+    if (rst) begin
+        // reset
+        for (entry=0; entry<32; entry=entry+1)
+            btb[entry] <=32'd9999;
+    end
+    else if (EX_is_branch) begin
+        btb[set_tb_entry] <= EX_result_pc;
+    end
+end
+
+always @(posedge clk or posedge rst) begin
+    if (rst) begin
+        btb_taken<=0;// reset
+    end
+    else  begin
+        btb_taken <= counter[set_tb_entry][1]; //Take high bit for BOOL
+    end
+end
+
+always @(posedge clk or posedge rst)
+    if(rst)
+        predict_pc<=32'd9999;
+    else
+        predict_pc <= btb[set_tb_entry];
+   
 endmodule

@@ -53,12 +53,14 @@ module EX(
     
     // set flush when branch inst need jmp
     output                              ex_flush,
+    output      reg     [4:0]           ex_rd,
+    output reg [31:0] ex_cur_pc,
 
-    output      reg     [4:0]           ex_rd
+    // Tell BTB is brannch
+    output ex_is_branch
     );
 
 // assign ex_flush = ex_need_jmp;
-
 
 reg         [14:0]                      func_start;
 reg         [14:0]                      func_working;
@@ -66,11 +68,12 @@ reg                                     func_busy;
 reg         [31:0]                      imm_data_r;
 reg         [31:0]                      op1_r;
 reg         [31:0]                      op2_r;
-reg         [31:0]                      ex_cur_pc;
+//reg         [31:0]                      ex_cur_pc;
 reg         [31:0]                      dis_cur_pc_r;
 reg         [31:0]                      reg_a;
 reg         [31:0]                      reg_b;
 reg         [31:0]                      reg_imm;
+
 
 
 
@@ -94,7 +97,7 @@ wire        [31:0]                      fcmp_res;
 wire                                    fmul_done;
 wire        [31:0]                      fmul_res;
 
-
+assign ex_is_branch = branch_done;
 
 
 
@@ -363,6 +366,7 @@ always @ (*) begin
         ex_res = 'd0;
     end
 end
+
 
 
 

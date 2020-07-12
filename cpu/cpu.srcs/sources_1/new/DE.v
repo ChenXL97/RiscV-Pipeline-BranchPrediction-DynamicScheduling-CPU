@@ -45,17 +45,17 @@ module DE(
     wire DE_is_branch;
     wire [31:0] de_out_pc;
 
-    BTB BTB(
-        .clk(clk),
-        .rst(rst),
-        .DE_is_branch(DE_is_branch), 
-        .de_out_pc(de_out_pc), 
-        .EX_update(EX_update), 
-        .EX_ins_pc(EX_ins_pc), 
-        .EX_result_pc(EX_result_pc), 
-        .predict_is_taken(predict_is_taken),
-        .predict_pc(predict_pc)
-        );
+//    BTB BTB(
+//        .clk(clk),
+//        .rst(rst),
+//        .DE_is_branch(DE_is_branch), 
+//        .de_out_pc(de_out_pc), 
+//        .EX_update(EX_update), 
+//        .EX_ins_pc(EX_ins_pc), 
+//        .EX_result_pc(EX_result_pc), 
+//        .predict_is_taken(predict_is_taken),
+//        .predict_pc(predict_pc)
+//        );
         
     //DE_PipReg
     DE_PipReg DE_PipReg(

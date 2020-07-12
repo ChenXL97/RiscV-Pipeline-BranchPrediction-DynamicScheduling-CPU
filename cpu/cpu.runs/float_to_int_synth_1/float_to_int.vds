@@ -1,0 +1,14 @@
+#-----------------------------------------------------------
+# Vivado v2018.1 (64-bit)
+# SW Build 2188600 on Wed Apr  4 18:40:38 MDT 2018
+# IP Build 2185939 on Wed Apr  4 20:55:05 MDT 2018
+# Start of session at: Sun Jul 12 10:25:46 2020
+# Process ID: 6004
+# Current directory: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/float_to_int_synth_1
+# Command line: vivado.exe -log float_to_int.vds -product Vivado -mode batch -messageDb vivado.pb -notrace -source float_to_int.tcl
+# Log file: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/float_to_int_synth_1/float_to_int.vds
+# Journal file: Z:/Documents/GitHub/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.runs/float_to_int_synth_1\vivado.jou
+#-----------------------------------------------------------
+source float_to_int.tcl -notrace
+INFO: [IP_Flow 19-4838] Using cached IP synthesis design for IP float_to_int, cache-ID = abb894066625ce59.
+INFO: [Common 17-206] Exiting Vivado at Sun Jul 12 10:25:54 2020...

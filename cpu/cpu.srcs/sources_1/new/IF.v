@@ -16,15 +16,22 @@ module IF(
     // EX input
     input EX_block,
     input EX_rst,
-    input EX_write_pc, 
+    
+    //BTB update
+    input [31:0]EX_pc_i,
+    input EX_write_pc,  //taken or not
     input [31:0]EX_addr,
-    // BTB input
-    input BTB_write_pc, 
-    input [31:0]BTB_addr, 
+    input EX_is_branch,
+    
+
     output [31:0] pc,
     output [31:0] IF_pip_reg
     );
 
+    // BTB input
+    wire BTB_write_pc;
+    wire [31:0]BTB_addr;
+    
     //pc
     PC PC
     (
@@ -58,6 +65,19 @@ module IF(
         .ins(ins),
         .IF_pip_reg(IF_pip_reg)
     );
-    
+   
+    BTB BTB(
+    .clk(clk),
+    .rst(rst),
+    .cur_pc(pc), 
+    .EX_is_branch(EX_is_branch),
+    .EX_branch_taken(EX_rst), 
+    .EX_ins_pc(EX_pc_i), 
+    .EX_result_pc(EX_addr), 
+
+    //output
+    .btb_taken(BTB_write_pc),
+    .predict_pc(BTB_addr)
+    );
     
 endmodule

@@ -17,6 +17,7 @@ module PC(
     input [1:0]op,  //Indicate which value to write in PC. 
                         //The priority is : EX > BTB > PC+4. 
                         //2'b1x represents EX write, 2'b01 represents BTB write, 2'b00 represents PC+4.
+    input prepc_is_in_BTB,
     input [31:0] EX_addr,
     input [31:0] BTB_addr,
     input EX_rst,
@@ -31,6 +32,9 @@ module PC(
           end
           else if (EX_block) begin
               pc <= pc;
+          end
+          else if  (prepc_is_in_BTB) begin
+              pc <= BTB_addr;
           end
           else begin
               pc <= pc + 'd4;

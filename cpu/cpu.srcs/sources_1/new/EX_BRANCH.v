@@ -161,7 +161,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -173,7 +173,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -185,7 +185,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -197,7 +197,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -209,7 +209,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -221,7 +221,7 @@ always @ (posedge clk) begin
                     end
                     else begin
                         need_jmp <= 'd0;
-                        tar_addr <= 'd0;
+                        tar_addr <= imm_data + cur_pc;
                     end
                 end
 
@@ -240,7 +240,7 @@ always @ (posedge clk) begin
                     need_jmp <= 'd1;
                 end
                 else begin
-                    tar_addr <= 'd0;
+                    tar_addr <= imm_data + cur_pc;
                     need_jmp <= 'd0;
                 end
             end

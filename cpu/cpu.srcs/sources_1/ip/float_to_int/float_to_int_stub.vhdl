@@ -1,10 +1,10 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
--- Date        : Wed Jul  8 00:19:38 2020
+-- Date        : Wed Jul  8 00:19:37 2020
 -- Host        : Mark-Wen running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               c:/Users/310-w/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/ip/float_to_int/float_to_int_stub.vhdl
+-- Command     : write_vhdl -force -mode synth_stub -rename_top float_to_int -prefix
+--               float_to_int_ float_to_int_stub.vhdl
 -- Design      : float_to_int
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xcku115-flvd1517-1L-i

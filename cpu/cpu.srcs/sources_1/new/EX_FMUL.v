@@ -59,7 +59,7 @@ initial begin
     #3 aresetn=1;
 end
 
-float_multiply float_multiply_u(
+floating_multiply float_multiply_u(
         .aclk                       (clk),
         .aresetn                    (1'b1),
         .s_axis_a_tvalid            (1'b1),
