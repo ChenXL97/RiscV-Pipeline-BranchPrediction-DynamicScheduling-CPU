@@ -1,0 +1,21 @@
+sp=1020
+s0=RAM[0] = 3
+RAM[1]=s0 =1
+a0 = float(s0)
+jump pc = 0, ra=136
+t0=1
+t0 = float(t0)
+t1 = (t0==a0?)
+jump to 指令7 because 0==t1,
+RAM[sp]=a0 //sp=1020 a0=float(3)
+a0=a0-t0 = 2
+sp = sp-8 = 1012
+RAM[1012+4] = ra = 136 //返回地址
+ra = 0
+t0=1
+t0 = float(t0)
+t1=(t0==a0?) //a0=2
+jump to 指令7 because 0==t1
+RAM[sp]=a0 //sp=1012 a0=float(2)
+a0=a0-t0 = 1
+sp = 
