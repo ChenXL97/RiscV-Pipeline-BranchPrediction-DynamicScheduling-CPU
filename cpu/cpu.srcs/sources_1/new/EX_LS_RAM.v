@@ -53,7 +53,7 @@ module RAM(
 );
 
 
-reg         [9:0]                       out_addr;
+reg         [11:0]                       out_addr;
 reg         [9:0]                       addr_0;
 reg         [9:0]                       addr_1;
 reg         [9:0]                       addr_2;
@@ -93,7 +93,7 @@ reg         [3:0]                       store_cnt;
 
 
 
-four_body_ram ram_0(
+four_body_bram_sp ram_0(
     .addra              (addr_0),
     .clka               (clk),
     .dina               (din_0),
@@ -313,7 +313,7 @@ always @ (*) begin
             'b000: begin
                 case (out_addr[1:0])
                 'b00: begin
-                    addr_0 = out_addr;
+                    addr_0 = out_addr[11:2];
                     addr_1 = 'd0;
                     addr_2 = 'd0;
                     addr_3 = 'd0;
@@ -321,7 +321,7 @@ always @ (*) begin
 
                 'b01: begin
                     addr_0 = 'd0;
-                    addr_1 = out_addr;
+                    addr_1 = out_addr[11:2];
                     addr_2 = 'd0;
                     addr_3 = 'd0;
                 end
@@ -329,7 +329,7 @@ always @ (*) begin
                 'b10: begin
                     addr_0 = 'd0;
                     addr_1 = 'd0;
-                    addr_2 = out_addr;
+                    addr_2 = out_addr[11:2];
                     addr_3 = 'd0;
                 end
 
@@ -337,7 +337,7 @@ always @ (*) begin
                     addr_0 = 'd0;
                     addr_1 = 'd0;
                     addr_2 = 'd0;
-                    addr_3 = out_addr;
+                    addr_3 = out_addr[11:2];
                 end
 
                 endcase
@@ -371,7 +371,7 @@ always @ (*) begin
 end
 
 
-assign dout = (op_mode2 == 'b100) ? {dout_3, dout_2, dout_1, dout_0} :
+assign res = (op_mode2 == 'b100) ? {dout_3, dout_2, dout_1, dout_0} :
                 (out_addr[1:0] == 'b00) ? {24'b0, dout_0} :
                 (out_addr[1:0] == 'b01) ? {24'b0, dout_1} :
                 (out_addr[1:0] == 'b10) ? {24'b0, dout_2} :
