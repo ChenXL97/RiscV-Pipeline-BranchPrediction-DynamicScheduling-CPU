@@ -92,7 +92,7 @@ reg         [3:0]                       store_cnt;
 
 
 
-four_body_bram_sp ram_0(
+four_body_bram_0 ram_0(
     .addra              (addr_0),
     .clka               (clk),
     .dina               (din_0),
@@ -102,7 +102,7 @@ four_body_bram_sp ram_0(
 );
 
 
-four_body_ram ram_1(
+four_body_bram_1 ram_1(
     .addra              (addr_1),
     .clka               (clk),
     .dina               (din_1),
@@ -112,7 +112,7 @@ four_body_ram ram_1(
 );
 
 
-four_body_ram ram_2(
+four_body_bram_2 ram_2(
     .addra              (addr_2),
     .clka               (clk),
     .dina               (din_2),
@@ -122,7 +122,7 @@ four_body_ram ram_2(
 );
 
 
-four_body_ram ram_3(
+four_body_bram_3 ram_3(
     .addra              (addr_3),
     .clka               (clk),
     .dina               (din_3),

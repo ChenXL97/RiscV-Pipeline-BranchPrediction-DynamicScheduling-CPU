@@ -157,8 +157,6 @@ wire                            dis_forward_b;
         .de_cur_pc(de_cur_pc),
         
         //input from MEM_result for WB
-        .MEM_result_i(MEM_result_w),
-        .MEM_pip_reg_i(MEM_pip_reg_w),
         .ex_stall(ex_stall),
                 
         //output EX_pip_reg_o,
