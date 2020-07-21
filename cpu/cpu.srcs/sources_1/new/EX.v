@@ -84,6 +84,8 @@ reg [31:0] BTB_predict_pc_r;
 wire ex_flush_w;
 wire                                    logic_done;
 wire        [31:0]                      logic_res;
+wire                                    shift_done;
+wire        [31:0]                      shift_res;
 wire                                    add_done;
 wire        [31:0]                      add_res;
 wire                                    ram_done;
@@ -92,6 +94,7 @@ wire                                    branch_done;
 wire        [31:0]                      branch_res;
 wire        [31:0]                      add_extra_data;
 wire        [31:0]                      logic_extra_data;
+wire        [31:0]                      shift_extra_data;
 wire                                    fadd_done;
 wire        [31:0]                      fadd_res;
 wire                                    int_float_done;
@@ -108,6 +111,8 @@ assign ex_is_branch = branch_done;
 
 assign add_extra_data = imm_use ? imm_data : op2;
 assign logic_extra_data = imm_use ? imm_data : op2;
+assign shift_extra_data = imm_use ? imm_data : op2;
+
 
 
 
@@ -121,7 +126,8 @@ reg         [3:0]                       stall_clk;
 
 
 assign ex_done = add_done | logic_done | ram_done | branch_done
-                | fadd_done | int_float_done | fcmp_done | fmul_done ;
+                | fadd_done | int_float_done | fcmp_done | fmul_done
+                | shift_done ;
 
 
 // assign ex_done = add_done | logic_done | ram_done | branch_done;
@@ -396,6 +402,10 @@ always @ (*) begin
             ex_res = fmul_res;
         end
 
+        else if (shift_done) begin
+            ex_res = shift_res;
+        end
+
         else begin
             ex_res = ex_res;
         end
@@ -420,6 +430,19 @@ LOGIC logic(
             .op_mode2               (op_mode2),
             .done                   (logic_done),
             .res                    (logic_res)
+);
+
+
+SHIFT shift(
+            .clk                    (clk),
+            .rst                    (rst),
+            .op1                    (op1),
+            .op2                    (shift_extra_data),
+            .start                  (func_start[`SHIFT - `OFFSET]),
+            .op_mode1               (op_mode1),
+            .op_mode2               (op_mode2),
+            .done                   (shift_done),
+            .res                    (shift_res)
 );
 
 
@@ -524,10 +547,6 @@ FMUL fmul(
             .done                   (fmul_done),
             .res                    (fmul_res)
 );
-
-
-
-
 
       
 endmodule

@@ -25,8 +25,6 @@ module DISPATCH(
     input clk_i,
     input rst_i,
     input  [`ROB_ITEM_INDEX] DE_pip_reg_i,
-    input [31:0] MEM_result_i,
-    input [`ROB_ITEM_INDEX] MEM_pip_reg_i,
     input [31:0] de_cur_pc,
     input ex_stall,
     input ex_flush,
@@ -44,10 +42,6 @@ module DISPATCH(
     input ex_done,
     input [31:0] ex_res,
     output reg BTB_is_taken
-    //Select Unit to calculate
-//    output  EX_ADD_selected_o,
-//    output  EX_BRANCH_selected_o,
-//    output  EX_LS_RAM_selected_o
     );
 
 
@@ -79,8 +73,6 @@ wire [31:0] imm_value_w = DE_pip_reg_i[`IMM];
 wire [4:0] dispatch_ra_index_w = DE_pip_reg_i[`RS1];
 wire [4:0] dispatch_rb_index_w = DE_pip_reg_i[`RS2];
 wire [4:0] opcode_w = DE_pip_reg_i[`OP1_2];
-wire [4:0] pipe_rd_wb_w = MEM_pip_reg_i[`DST]; // data forwarding & write back
-wire [31:0] pipe_result_wb_w = MEM_result_i; //write back signal
 
 
 wire [31:0] dispatch_ra_value_w;

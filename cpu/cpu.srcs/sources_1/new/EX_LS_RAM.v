@@ -19,13 +19,12 @@
 
 
 
-/* **********2020 07 20****************************************
+/* ***********************2020 07 20*******************************
     change original ram to four-body ram consisted by four
     bram generator, each owns 8 bit bandwidth and 1024 storage
     depth. This module not only control these bram, but also
     translate outer linear addr to inner-bram non-linear addr
-                               modified by winters
-*************************************************************** */
+*************************modified by winters********************* */
 
 module RAM(
     input                               clk,

@@ -3,7 +3,7 @@
 <!--                                                         -->
 <!-- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.   -->
 
-<Project Version="7" Minor="36" Path="E:/CodeFactory/RV-052B/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.xpr">
+<Project Version="7" Minor="36" Path="C:/Users/Administrator/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.xpr">
   <DefaultLaunch Dir="$PRUNDIR"/>
   <Configuration>
     <Option Name="Id" Val="a9d2f976c2f549159a45449a6b2af095"/>
@@ -31,20 +31,20 @@
     <Option Name="EnableBDX" Val="FALSE"/>
     <Option Name="DSAVendor" Val="xilinx"/>
     <Option Name="DSANumComputeUnits" Val="60"/>
-    <Option Name="WTXSimLaunchSim" Val="555"/>
+    <Option Name="WTXSimLaunchSim" Val="556"/>
     <Option Name="WTModelSimLaunchSim" Val="0"/>
     <Option Name="WTQuestaLaunchSim" Val="0"/>
     <Option Name="WTIesLaunchSim" Val="0"/>
     <Option Name="WTVcsLaunchSim" Val="0"/>
     <Option Name="WTRivieraLaunchSim" Val="0"/>
     <Option Name="WTActivehdlLaunchSim" Val="0"/>
-    <Option Name="WTXSimExportSim" Val="50"/>
-    <Option Name="WTModelSimExportSim" Val="50"/>
-    <Option Name="WTQuestaExportSim" Val="50"/>
-    <Option Name="WTIesExportSim" Val="50"/>
-    <Option Name="WTVcsExportSim" Val="50"/>
-    <Option Name="WTRivieraExportSim" Val="50"/>
-    <Option Name="WTActivehdlExportSim" Val="50"/>
+    <Option Name="WTXSimExportSim" Val="51"/>
+    <Option Name="WTModelSimExportSim" Val="51"/>
+    <Option Name="WTQuestaExportSim" Val="51"/>
+    <Option Name="WTIesExportSim" Val="51"/>
+    <Option Name="WTVcsExportSim" Val="51"/>
+    <Option Name="WTRivieraExportSim" Val="51"/>
+    <Option Name="WTActivehdlExportSim" Val="51"/>
     <Option Name="GenerateIPUpgradeLog" Val="TRUE"/>
     <Option Name="XSimRadix" Val="hex"/>
     <Option Name="XSimTimeUnit" Val="ns"/>
@@ -166,6 +166,13 @@
           <Attr Name="UsedIn" Val="simulation"/>
         </FileInfo>
       </File>
+      <File Path="$PSRCDIR/sources_1/new/EX_SHIFT.v">
+        <FileInfo>
+          <Attr Name="UsedIn" Val="synthesis"/>
+          <Attr Name="UsedIn" Val="implementation"/>
+          <Attr Name="UsedIn" Val="simulation"/>
+        </FileInfo>
+      </File>
       <File Path="$PSRCDIR/sources_1/new/IF.v">
         <FileInfo>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -265,14 +272,6 @@
         </FileInfo>
       </File>
       <File Path="$PSRCDIR/sources_1/new/EX_RINFO.v">
-        <FileInfo>
-          <Attr Name="AutoDisabled" Val="1"/>
-          <Attr Name="UsedIn" Val="synthesis"/>
-          <Attr Name="UsedIn" Val="implementation"/>
-          <Attr Name="UsedIn" Val="simulation"/>
-        </FileInfo>
-      </File>
-      <File Path="$PSRCDIR/sources_1/new/EX_SHIFT.v">
         <FileInfo>
           <Attr Name="AutoDisabled" Val="1"/>
           <Attr Name="UsedIn" Val="synthesis"/>
@@ -587,9 +586,7 @@
     </Run>
     <Run Id="four_body_bram_sp_synth_1" Type="Ft3:Synth" SrcSet="four_body_bram_sp" Part="xcku115-flvd1517-1L-i" ConstrsSet="four_body_bram_sp" Description="Vivado Synthesis Defaults" WriteIncrSynthDcp="false" Dir="$PRUNDIR/four_body_bram_sp_synth_1" IncludeInArchive="true">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018">
-          <Desc>Vivado Synthesis Defaults</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Synthesis Defaults" Flow="Vivado Synthesis 2018"/>
         <Step Id="synth_design"/>
       </Strategy>
       <GeneratedRun Dir="$PRUNDIR" File="gen_run.xml"/>
@@ -742,9 +739,7 @@
     </Run>
     <Run Id="four_body_bram_sp_impl_1" Type="Ft2:EntireDesign" Part="xcku115-flvd1517-1L-i" ConstrsSet="four_body_bram_sp" Description="Default settings for Implementation." WriteIncrSynthDcp="false" SynthRun="four_body_bram_sp_synth_1" IncludeInArchive="false">
       <Strategy Version="1" Minor="2">
-        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018">
-          <Desc>Default settings for Implementation.</Desc>
-        </StratHandle>
+        <StratHandle Name="Vivado Implementation Defaults" Flow="Vivado Implementation 2018"/>
         <Step Id="init_design"/>
         <Step Id="opt_design"/>
         <Step Id="power_opt_design"/>
