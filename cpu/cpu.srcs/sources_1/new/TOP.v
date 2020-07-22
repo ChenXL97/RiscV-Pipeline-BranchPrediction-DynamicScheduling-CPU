@@ -90,11 +90,15 @@ wire                            dis_forward_b;
         wire ex_is_branch_w;
         wire BTB_is_taken_w;
         wire [31:0] btb_predict_pc_w;
+        wire revert_jump;
+        wire [31:0] revert_addr;
         //IF module, including PC, InsMem, IF_PipReg
     IF IF
     (
         .clk(clk),
         .rst(rst),
+        .revert_jump(revert_jump),
+        .revert_addr(revert_addr),
         .EX_rst(ex_flush),
         .EX_pc_i(ex_cur_pc_w),
         .EX_block(ex_stall),
@@ -200,7 +204,9 @@ EX ex (
     .ex_is_branch          (ex_is_branch_w),
     .ex_need_jump           (ex_need_jmp),
     .BTB_is_taken(BTB_dis_ex),
-    .BTB_predict_pc(BTB_pc_dis_ex)
+    .BTB_predict_pc(BTB_pc_dis_ex),
+    .revert_jump(revert_jump),
+    .revert_addr(revert_addr)
     // dis_forward_a               (dis_forward_a),
     // dis_forward_b               (dis_forward_b)
 );

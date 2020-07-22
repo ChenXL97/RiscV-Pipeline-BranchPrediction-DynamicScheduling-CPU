@@ -83,7 +83,6 @@ module DE(
 	wire [31:0] imm;
 	wire [31:0] right_imm;
 	initial begin
-	#5
 	$readmemb("test_file/de_output_fb.txt",de_ins_mem);
 	$display("%b",de_ins_mem[0]);
 	

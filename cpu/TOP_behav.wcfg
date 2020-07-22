@@ -11,181 +11,308 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="24894833333fs"></ZoomStartTime>
-      <ZoomEndTime time="25021033334fs"></ZoomEndTime>
-      <Cursor1Time time="25000000000fs"></Cursor1Time>
+      <ZoomStartTime time="67040000fs"></ZoomStartTime>
+      <ZoomEndTime time="553540001fs"></ZoomEndTime>
+      <Cursor1Time time="16000000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="193"></NameColumnWidth>
-      <ValueColumnWidth column_width="151"></ValueColumnWidth>
+      <NameColumnWidth column_width="175"></NameColumnWidth>
+      <ValueColumnWidth column_width="101"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="42" />
+   <WVObjectSize size="54" />
+   <wave_markers>
+      <marker time="172000000" label="" />
+      <marker time="7630667000" label="" />
+      <marker time="8026000000" label="" />
+      <marker time="7066200000" label="" />
+      <marker time="7128000000" label="" />
+      <marker time="7184000000" label="" />
+   </wave_markers>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/clk_i" type="logic">
       <obj_property name="ElementShortName">clk_i</obj_property>
       <obj_property name="ObjectShortName">clk_i</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/rst_i" type="logic">
-      <obj_property name="ElementShortName">rst_i</obj_property>
-      <obj_property name="ObjectShortName">rst_i</obj_property>
+   <wvobject fp_name="/TOP/IF/PC/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/rd0_value_i" type="array">
-      <obj_property name="ElementShortName">rd0_value_i[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rd0_value_i[31:0]</obj_property>
+   <wvobject fp_name="/TOP/ex/dis_cur_pc" type="array">
+      <obj_property name="ElementShortName">dis_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">dis_cur_pc[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/rd0_i" type="array">
-      <obj_property name="ElementShortName">rd0_i[4:0]</obj_property>
-      <obj_property name="ObjectShortName">rd0_i[4:0]</obj_property>
+   <wvobject fp_name="/TOP/ex_cur_pc_w" type="array">
+      <obj_property name="ElementShortName">ex_cur_pc_w[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ex_cur_pc_w[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/ra0_i" type="array">
-      <obj_property name="ElementShortName">ra0_i[4:0]</obj_property>
-      <obj_property name="ObjectShortName">ra0_i[4:0]</obj_property>
+   <wvobject fp_name="/TOP/ex/func_start" type="array">
+      <obj_property name="ElementShortName">func_start[14:0]</obj_property>
+      <obj_property name="ObjectShortName">func_start[14:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/rb0_i" type="array">
-      <obj_property name="ElementShortName">rb0_i[4:0]</obj_property>
-      <obj_property name="ObjectShortName">rb0_i[4:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/ex_done" type="logic">
-      <obj_property name="ElementShortName">ex_done</obj_property>
-      <obj_property name="ObjectShortName">ex_done</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/ra0_value_o" type="array">
-      <obj_property name="ElementShortName">ra0_value_o[31:0]</obj_property>
-      <obj_property name="ObjectShortName">ra0_value_o[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/rb0_value_o" type="array">
-      <obj_property name="ElementShortName">rb0_value_o[31:0]</obj_property>
-      <obj_property name="ObjectShortName">rb0_value_o[31:0]</obj_property>
+   <wvobject fp_name="/TOP/ex/func_busy" type="logic">
+      <obj_property name="ElementShortName">func_busy</obj_property>
+      <obj_property name="ObjectShortName">func_busy</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r1_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r1_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r1_q [31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      <obj_property name="label">ra</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r2_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r2_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r2_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r3_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r3_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r3_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r4_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r4_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r4_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r5_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r6_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r7_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r8_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r8_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r8_q [31:0]</obj_property>
+      <obj_property name="label">sp</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r9_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r9_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r9_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r10_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r10_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r10_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r11_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r11_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r11_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r12_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r12_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r12_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r13_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r13_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r13_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r14_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r14_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r14_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r15_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r15_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r15_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r16_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r16_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r16_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r17_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r17_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r17_q [31:0]</obj_property>
+      <obj_property name="label">s1</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r18_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r18_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r18_q [31:0]</obj_property>
+      <obj_property name="label">s2</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r19_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r19_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r19_q [31:0]</obj_property>
+      <obj_property name="label">s3</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r20_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r20_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r20_q [31:0]</obj_property>
+      <obj_property name="label">s4</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r21_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r21_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r21_q [31:0]</obj_property>
+      <obj_property name="label">s5</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r22_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r22_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r22_q [31:0]</obj_property>
+      <obj_property name="label">s6</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r23_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r23_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r23_q [31:0]</obj_property>
+      <obj_property name="label">s7</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r24_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r24_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r24_q [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r10_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r10_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r10_q [31:0]</obj_property>
+      <obj_property name="label">a0</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r25_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r25_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r25_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r26_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r26_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r26_q [31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r27_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r27_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r27_q [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r7_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
+      <obj_property name="label">t2</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r28_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
       <obj_property name="ElementShortName">\REGFILE.reg_r28_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r28_q [31:0]</obj_property>
+      <obj_property name="label">t3</obj_property>
+      <obj_property name="Radix">ASCIIRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r29_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r11_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r11_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r11_q [31:0]</obj_property>
+      <obj_property name="label">a1</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r30_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r30_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r30_q [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r12_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r12_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r12_q [31:0]</obj_property>
+      <obj_property name="label">a2</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r31_q " type="array">
-      <obj_property name="ElementShortName">\REGFILE.reg_r31_q [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.reg_r31_q [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r5_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
+      <obj_property name="label">t0</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.ra0_value_r " type="array">
-      <obj_property name="ElementShortName">\REGFILE.ra0_value_r [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.ra0_value_r [31:0]</obj_property>
+   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.reg_r6_q " type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
+      <obj_property name="label">t1</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/DIAPATCH/REG_FILES/\REGFILE.rb0_value_r " type="array">
-      <obj_property name="ElementShortName">\REGFILE.rb0_value_r [31:0]</obj_property>
-      <obj_property name="ObjectShortName">\REGFILE.rb0_value_r [31:0]</obj_property>
+   <wvobject fp_name="/TOP/ex/add_sub/start" type="logic">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+      <obj_property name="label">add_start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/res" type="array">
+      <obj_property name="DisplayName">label</obj_property>
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+      <obj_property name="label">add_res</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/shift/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/shift/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/shift/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/revert_jump" type="logic">
+      <obj_property name="ElementShortName">revert_jump</obj_property>
+      <obj_property name="ObjectShortName">revert_jump</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex_cur_pc_w" type="array">
+      <obj_property name="ElementShortName">ex_cur_pc_w[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ex_cur_pc_w[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DISPATCH_pip_reg_w" type="array">
+      <obj_property name="ElementShortName">DISPATCH_pip_reg_w[167:0]</obj_property>
+      <obj_property name="ObjectShortName">DISPATCH_pip_reg_w[167:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/out_addr" type="array">
+      <obj_property name="ElementShortName">out_addr[11:0]</obj_property>
+      <obj_property name="ObjectShortName">out_addr[11:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/addr_0" type="array">
+      <obj_property name="ElementShortName">addr_0[9:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_0[9:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/addr_1" type="array">
+      <obj_property name="ElementShortName">addr_1[9:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_1[9:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/addr_2" type="array">
+      <obj_property name="ElementShortName">addr_2[9:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_2[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/addr_3" type="array">
+      <obj_property name="ElementShortName">addr_3[9:0]</obj_property>
+      <obj_property name="ObjectShortName">addr_3[9:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/op_mode1" type="array">
+      <obj_property name="ElementShortName">op_mode1[1:0]</obj_property>
+      <obj_property name="ObjectShortName">op_mode1[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/op_mode2" type="array">
+      <obj_property name="ElementShortName">op_mode2[2:0]</obj_property>
+      <obj_property name="ObjectShortName">op_mode2[2:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/res" type="array">
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/res" type="array">
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/dout_0" type="array">
+      <obj_property name="ElementShortName">dout_0[7:0]</obj_property>
+      <obj_property name="ObjectShortName">dout_0[7:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/ram_en" type="logic">
+      <obj_property name="ElementShortName">ram_en</obj_property>
+      <obj_property name="ObjectShortName">ram_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/forward_a" type="logic">
+      <obj_property name="ElementShortName">forward_a</obj_property>
+      <obj_property name="ObjectShortName">forward_a</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/forward_b" type="logic">
+      <obj_property name="ElementShortName">forward_b</obj_property>
+      <obj_property name="ObjectShortName">forward_b</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/dispatch_ra_index_w" type="array">
+      <obj_property name="ElementShortName">dispatch_ra_index_w[4:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatch_ra_index_w[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/dispatch_rb_index_w" type="array">
+      <obj_property name="ElementShortName">dispatch_rb_index_w[4:0]</obj_property>
+      <obj_property name="ObjectShortName">dispatch_rb_index_w[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/reg_A_o" type="array">
+      <obj_property name="ElementShortName">reg_A_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_A_o[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/reg_B_o" type="array">
+      <obj_property name="ElementShortName">reg_B_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_B_o[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/reg_A_tmp" type="array">
+      <obj_property name="ElementShortName">reg_A_tmp[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_A_tmp[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DIAPATCH/reg_B_tmp" type="array">
+      <obj_property name="ElementShortName">reg_B_tmp[31:0]</obj_property>
+      <obj_property name="ObjectShortName">reg_B_tmp[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex_tar_addr" type="array">
+      <obj_property name="ElementShortName">ex_tar_addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ex_tar_addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/imm32_w" type="array">
+      <obj_property name="ElementShortName">imm32_w[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm32_w[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
 </wave_config>

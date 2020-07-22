@@ -25,7 +25,6 @@ module SHIFT(
 	// op2 represents shift amounts, occupy lowest 5 bit of op2
     input       [31:0]                  op1,
     input       [31:0]                  op2,
-	input		[31:0]					imm_data,
 
     // give one clk postive signal, then start this module
     input                               start,
@@ -60,7 +59,7 @@ always @ (posedge clk) begin
 
 			// SLLI
 			else if (op_mode1 == 'b10 && op_mode2 == 'b000) begin
-				res <= op1 << imm_data;
+				res <= op1 << op2;
 			end
 
 			// SRLI
@@ -175,7 +174,7 @@ always @ (posedge clk) begin
 			end
 
 			else if ( op_mode1 == 'b10 && op_mode2 == 'b100 ) begin
-				case (imm_data)
+				case (op2)
 				'd0: begin
 					res <= op1;
 				end

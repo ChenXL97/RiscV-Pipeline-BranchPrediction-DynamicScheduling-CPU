@@ -187,6 +187,24 @@ end
 
 
 
+always @ (*) begin
+    if(!rst_i && !ex_flush) begin
+        if((ex_rd == dispatch_rb_index_w || forward_b) && ex_rd != 'd0) begin
+            reg_B_tmp = ex_res;
+        end
+        else if (ex_stall) begin
+            reg_B_tmp <= reg_B_tmp;
+        end
+        else begin
+            reg_B_tmp = dispatch_rb_value_w;
+        end
+    end
+    else begin
+        reg_B_tmp = 'd0;
+    end
+end
+
+
 always @ (posedge clk_i) begin
     if(!rst_i && !ex_flush) begin
         if(ex_rd == dispatch_ra_index_w && ex_rd != 'd0 && ex_done) begin
@@ -225,24 +243,6 @@ end
 
 
 
-
-
-always @ (*) begin
-    if(!rst_i && !ex_flush) begin
-        if(ex_rd == dispatch_rb_index_w || forward_b && ex_rd != 'd0) begin
-            reg_B_tmp = ex_res;
-        end
-        else if (ex_stall) begin
-            reg_B_tmp <= reg_B_tmp;
-        end
-        else begin
-            reg_B_tmp = dispatch_rb_value_w;
-        end
-    end
-    else begin
-        reg_B_tmp = 'd0;
-    end
-end
 
 
 

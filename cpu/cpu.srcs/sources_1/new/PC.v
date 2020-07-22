@@ -14,9 +14,10 @@ module PC(
     input clk,
     input rst,
     input EX_block,
-    input [1:0]op,  //Indicate which value to write in PC. 
-                        //The priority is : EX > BTB > PC+4. 
-                        //2'b1x represents EX write, 2'b01 represents BTB write, 2'b00 represents PC+4.
+    input [2:0]op,  //Indicate which value to write in PC. 
+                        //The priority is : RE > EX > BTB > PC+4. 
+                        //3'b1xx revert jump 3'b01x represents EX write, 3'b01 represents BTB write, 3'b00 represents PC+4.
+    input [31:0] revert_addr,
     input BTB_write_pc,
     input [31:0] EX_addr,
     input [31:0] BTB_addr,
@@ -27,7 +28,9 @@ module PC(
     
   always@(posedge clk or posedge rst)
           if(rst)
-              pc<='d116;
+              pc<= `INIT_PC;
+          else if (op[2])
+              pc <= revert_addr;
           else if (EX_rst && op[1]) begin
               pc <= EX_addr;
           end

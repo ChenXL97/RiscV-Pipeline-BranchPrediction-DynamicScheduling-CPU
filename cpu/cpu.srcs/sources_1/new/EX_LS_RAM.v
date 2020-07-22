@@ -47,7 +47,7 @@ module RAM(
     input       [2:0]                   op_mode2,
 
     output      reg                             done,
-    output      [31:0]                           res
+    output     [31:0]                           res
 
 );
 
@@ -297,19 +297,19 @@ end
 // set din
 always @ (*) begin
     if(!rst) begin
-        if(ram_en) begin
-            out_addr = op1 + imm_data;
+        if(1) begin
+            out_addr = op1  + imm_data;
             case (op_mode2)
             // operation on word
             'b100: begin
-                addr_0 = out_addr;
-                addr_1 = out_addr;
-                addr_2 = out_addr;
-                addr_3 = out_addr;
+                addr_0 = out_addr[11:2];
+                addr_1 = out_addr[11:2];
+                addr_2 = out_addr[11:2];
+                addr_3 = out_addr[11:2];
             end
 
             // operation on byte
-            'b000: begin
+            'b001: begin
                 case (out_addr[1:0])
                 'b00: begin
                     addr_0 = out_addr[11:2];

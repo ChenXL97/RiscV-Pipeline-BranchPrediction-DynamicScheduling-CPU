@@ -1,11 +1,11 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
--- Date        : Mon Jul 20 20:32:10 2020
--- Host        : DESKTOP-P4UPRAE running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode funcsim -rename_top four_body_bram_0 -prefix
---               four_body_bram_0_ four_body_ram_sim_netlist.vhdl
--- Design      : four_body_ram
+-- Date        : Wed Jul 22 02:43:54 2020
+-- Host        : RY8KKAV9KZ34APT running 64-bit major release  (build 9200)
+-- Command     : write_vhdl -force -mode funcsim
+--               D:/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/ip/four_body_bram_0/four_body_bram_0_sim_netlist.vhdl
+-- Design      : four_body_bram_0
 -- Purpose     : This VHDL netlist is a functional simulation representation of the design and should not be modified or
 --               synthesized. This netlist cannot be used for SDF annotated simulation.
 -- Device      : xcku115-flvd1517-1L-i
@@ -14,7 +14,7 @@ library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 library UNISIM;
 use UNISIM.VCOMPONENTS.ALL;
-entity four_body_bram_0_blk_mem_gen_prim_wrapper is
+entity four_body_bram_0_blk_mem_gen_prim_wrapper_init is
   port (
     douta : out STD_LOGIC_VECTOR ( 7 downto 0 );
     clka : in STD_LOGIC;
@@ -24,9 +24,11 @@ entity four_body_bram_0_blk_mem_gen_prim_wrapper is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
-end four_body_bram_0_blk_mem_gen_prim_wrapper;
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_prim_wrapper_init : entity is "blk_mem_gen_prim_wrapper_init";
+end four_body_bram_0_blk_mem_gen_prim_wrapper_init;
 
-architecture STRUCTURE of four_body_bram_0_blk_mem_gen_prim_wrapper is
+architecture STRUCTURE of four_body_bram_0_blk_mem_gen_prim_wrapper_init is
   signal \DEVICE_8SERIES.NO_BMM_INFO.SP.SIMPLE_PRIM18.ram_n_32\ : STD_LOGIC;
   signal \DEVICE_8SERIES.NO_BMM_INFO.SP.SIMPLE_PRIM18.ram_n_33\ : STD_LOGIC;
   signal \DEVICE_8SERIES.NO_BMM_INFO.SP.SIMPLE_PRIM18.ram_n_34\ : STD_LOGIC;
@@ -63,44 +65,44 @@ begin
       INITP_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
       INITP_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
       INITP_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_00 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_01 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_02 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_03 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_04 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_05 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_06 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_07 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_08 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_09 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0A => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0B => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0C => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0D => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0E => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_0F => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_10 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_11 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_12 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_13 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_14 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_15 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_16 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_17 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_18 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_19 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1A => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1B => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1C => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1D => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1E => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_1F => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_20 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_21 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_22 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_23 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_24 => X"0000000000000000000000000000000000000000000000000000000000000000",
-      INIT_25 => X"0000000000000000000000000000000000000000000000000000000000000000",
+      INIT_00 => X"0000000000000609000007080000060F060F060F06010609060E070906010000",
+      INIT_01 => X"06030702060F060D0000060706050708060D0000000007000704000006020609",
+      INIT_02 => X"06050605060C060F060500000603060F07030000060500000601060507000605",
+      INIT_03 => X"060C060906050706060E060507000601070500000702060407020605060F0604",
+      INIT_04 => X"0702060606040605060400000703060200000000060107050603060300000608",
+      INIT_05 => X"0202010F010B010701030100000C00080004000006090601060E0000060D060D",
+      INIT_06 => X"060D0606050E05090505040E04090404030D03090305020F020D020B02080205",
+      INIT_07 => X"0D020C0E0C0A0C020B0B0B060A0F0A09090F09090901080A0804070C07070702",
+      INIT_08 => X"0409030F0306020F02090204010D0109000C00050F0F0F030E0B0E040D0F0D09",
+      INIT_09 => X"060F060F060F060100000608020007040605020007030409060F060906030000",
+      INIT_0A => X"0608060F06050605020C0605060E070200000000060F060F060F070906080000",
+      INIT_0B => X"07070609060E050207040200060906090601060E07050703070307030000060E",
+      INIT_0C => X"06020608070406030704060107040605060C0605060F07090605020006090000",
+      INIT_0D => X"060F06050605060E060306090601060907030607060106090608060506050000",
+      INIT_0E => X"0000070406040706020C060602000704060E06010200060906030200060E060E",
+      INIT_0F => X"0604020E0704060F0603060E060F060507030703060C06030200070402000603",
+      INIT_10 => X"060107060705070307020200070306040000070407040608060C060D060C0606",
+      INIT_11 => X"0200020E06050603020006040200000006040200060106030701020007050702",
+      INIT_12 => X"060506030605070406010605000006030605060F060106050605070607040703",
+      INIT_13 => X"060507030703020D0704060E02000704020C0608060906050000060506030601",
+      INIT_14 => X"0702060F0604070606050702020C060D07040200060F060400000702060E0702",
+      INIT_15 => X"060E0608060507030702070407090605060606050604060407030604020C0607",
+      INIT_16 => X"0200060506010604070206050702060506040609060902000702020C0702060D",
+      INIT_17 => X"0702060C060502000200060E060106090700060C070607020605070007050200",
+      INIT_18 => X"0703060D06080200020006020704060F07040605060807030704070406090607",
+      INIT_19 => X"020002000703060F060507040702060902000609060502000704060E060F0605",
+      INIT_1A => X"060F060507030609060E0706060E07040605050502000603060E0702060E0700",
+      INIT_1B => X"0606060E07040200060E06050603020006010608060C0604060307030704060E",
+      INIT_1C => X"0605060907000200070407010704060906090603020007040300030507020602",
+      INIT_1D => X"0200070702000200060E060D06090601070207050604060F060C060F02000700",
+      INIT_1E => X"070502000602020007050200020007040703060D0703020C0703060906050703",
+      INIT_1F => X"060706050603060C0200060407030704060E060F070507040604060907030602",
+      INIT_20 => X"060606050705040507090702060E0608060406050609060E0605060307000609",
+      INIT_21 => X"07000705060E060C02000707060407020605060506050605060C0200060E0702",
+      INIT_22 => X"090D090B09090906080F08080801070A0703060D050E0500040B040406050603",
+      INIT_23 => X"0A0508060601030E010D00080D0E0B0D090A070F050C0401020000010D0C0C05",
+      INIT_24 => X"0D070A0F080B0600030C01030F070D080B04090307000502020E000D0E0A0C0D",
+      INIT_25 => X"00000000000000000000070C050A0300000F0E060C0009060708040F02080F0E",
       INIT_26 => X"0000000000000000000000000000000000000000000000000000000000000000",
       INIT_27 => X"0000000000000000000000000000000000000000000000000000000000000000",
       INIT_28 => X"0000000000000000000000000000000000000000000000000000000000000000",
@@ -228,11 +230,13 @@ entity four_body_bram_0_blk_mem_gen_prim_width is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_prim_width : entity is "blk_mem_gen_prim_width";
 end four_body_bram_0_blk_mem_gen_prim_width;
 
 architecture STRUCTURE of four_body_bram_0_blk_mem_gen_prim_width is
 begin
-\prim_noinit.ram\: entity work.four_body_bram_0_blk_mem_gen_prim_wrapper
+\prim_init.ram\: entity work.four_body_bram_0_blk_mem_gen_prim_wrapper_init
      port map (
       addra(9 downto 0) => addra(9 downto 0),
       clka => clka,
@@ -257,6 +261,8 @@ entity four_body_bram_0_blk_mem_gen_generic_cstr is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_generic_cstr : entity is "blk_mem_gen_generic_cstr";
 end four_body_bram_0_blk_mem_gen_generic_cstr;
 
 architecture STRUCTURE of four_body_bram_0_blk_mem_gen_generic_cstr is
@@ -286,6 +292,8 @@ entity four_body_bram_0_blk_mem_gen_top is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_top : entity is "blk_mem_gen_top";
 end four_body_bram_0_blk_mem_gen_top;
 
 architecture STRUCTURE of four_body_bram_0_blk_mem_gen_top is
@@ -315,6 +323,8 @@ entity four_body_bram_0_blk_mem_gen_v8_4_1_synth is
     dina : in STD_LOGIC_VECTOR ( 7 downto 0 );
     wea : in STD_LOGIC_VECTOR ( 0 to 0 )
   );
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_v8_4_1_synth : entity is "blk_mem_gen_v8_4_1_synth";
 end four_body_bram_0_blk_mem_gen_v8_4_1_synth;
 
 architecture STRUCTURE of four_body_bram_0_blk_mem_gen_v8_4_1_synth is
@@ -483,13 +493,13 @@ entity four_body_bram_0_blk_mem_gen_v8_4_1 is
   attribute C_INITB_VAL : string;
   attribute C_INITB_VAL of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "0";
   attribute C_INIT_FILE : string;
-  attribute C_INIT_FILE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "four_body_ram.mem";
+  attribute C_INIT_FILE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "four_body_bram_0.mem";
   attribute C_INIT_FILE_NAME : string;
-  attribute C_INIT_FILE_NAME of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "no_coe_file_loaded";
+  attribute C_INIT_FILE_NAME of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "four_body_bram_0.mif";
   attribute C_INTERFACE_TYPE : integer;
   attribute C_INTERFACE_TYPE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
   attribute C_LOAD_INIT_FILE : integer;
-  attribute C_LOAD_INIT_FILE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
+  attribute C_LOAD_INIT_FILE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 1;
   attribute C_MEM_TYPE : integer;
   attribute C_MEM_TYPE of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
   attribute C_MUX_PIPELINE_STAGES : integer;
@@ -521,7 +531,7 @@ entity four_body_bram_0_blk_mem_gen_v8_4_1 is
   attribute C_USE_BYTE_WEB : integer;
   attribute C_USE_BYTE_WEB of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
   attribute C_USE_DEFAULT_DATA : integer;
-  attribute C_USE_DEFAULT_DATA of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
+  attribute C_USE_DEFAULT_DATA of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 1;
   attribute C_USE_ECC : integer;
   attribute C_USE_ECC of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 0;
   attribute C_USE_SOFTECC : integer;
@@ -546,6 +556,8 @@ entity four_body_bram_0_blk_mem_gen_v8_4_1 is
   attribute C_WRITE_WIDTH_B of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is 8;
   attribute C_XDEVICEFAMILY : string;
   attribute C_XDEVICEFAMILY of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "kintexu";
+  attribute ORIG_REF_NAME : string;
+  attribute ORIG_REF_NAME of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "blk_mem_gen_v8_4_1";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of four_body_bram_0_blk_mem_gen_v8_4_1 : entity is "yes";
 end four_body_bram_0_blk_mem_gen_v8_4_1;
@@ -644,7 +656,7 @@ entity four_body_bram_0 is
   attribute NotValidForBitStream : boolean;
   attribute NotValidForBitStream of four_body_bram_0 : entity is true;
   attribute CHECK_LICENSE_TYPE : string;
-  attribute CHECK_LICENSE_TYPE of four_body_bram_0 : entity is "four_body_ram,blk_mem_gen_v8_4_1,{}";
+  attribute CHECK_LICENSE_TYPE of four_body_bram_0 : entity is "four_body_bram_0,blk_mem_gen_v8_4_1,{}";
   attribute downgradeipidentifiedwarnings : string;
   attribute downgradeipidentifiedwarnings of four_body_bram_0 : entity is "yes";
   attribute x_core_info : string;
@@ -755,13 +767,13 @@ architecture STRUCTURE of four_body_bram_0 is
   attribute C_INITB_VAL : string;
   attribute C_INITB_VAL of U0 : label is "0";
   attribute C_INIT_FILE : string;
-  attribute C_INIT_FILE of U0 : label is "four_body_ram.mem";
+  attribute C_INIT_FILE of U0 : label is "four_body_bram_0.mem";
   attribute C_INIT_FILE_NAME : string;
-  attribute C_INIT_FILE_NAME of U0 : label is "no_coe_file_loaded";
+  attribute C_INIT_FILE_NAME of U0 : label is "four_body_bram_0.mif";
   attribute C_INTERFACE_TYPE : integer;
   attribute C_INTERFACE_TYPE of U0 : label is 0;
   attribute C_LOAD_INIT_FILE : integer;
-  attribute C_LOAD_INIT_FILE of U0 : label is 0;
+  attribute C_LOAD_INIT_FILE of U0 : label is 1;
   attribute C_MEM_TYPE : integer;
   attribute C_MEM_TYPE of U0 : label is 0;
   attribute C_MUX_PIPELINE_STAGES : integer;
@@ -793,7 +805,7 @@ architecture STRUCTURE of four_body_bram_0 is
   attribute C_USE_BYTE_WEB : integer;
   attribute C_USE_BYTE_WEB of U0 : label is 0;
   attribute C_USE_DEFAULT_DATA : integer;
-  attribute C_USE_DEFAULT_DATA of U0 : label is 0;
+  attribute C_USE_DEFAULT_DATA of U0 : label is 1;
   attribute C_USE_ECC : integer;
   attribute C_USE_ECC of U0 : label is 0;
   attribute C_USE_SOFTECC : integer;

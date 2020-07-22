@@ -30,7 +30,6 @@ module EX(
     input       [31:0]                  dis_cur_pc,
 
     input                               imm_use,
-
     input       [14:0]                  func_part,
 
     input       [1:0]                   op_mode1,
@@ -56,6 +55,8 @@ module EX(
     output       reg                       ex_flush,
     output      reg     [4:0]           ex_rd,
     output  ex_need_jump,
+    output reg revert_jump,
+    output reg [31:0] revert_addr,
     output reg [31:0] ex_cur_pc,
 
     // Tell BTB is brannch
@@ -116,7 +117,7 @@ assign shift_extra_data = imm_use ? imm_data : op2;
 
 
 
-
+reg [31:0] opc;
 
 reg         [1:0]                       use_part;
 reg                                     trick;
@@ -167,7 +168,14 @@ always @(negedge clk) begin
     if (ex_done)
         begin
             if ( ex_need_jump ^BTB_is_taken_r)
-                ex_flush<=1'b1;
+                begin
+                    ex_flush<=1'b1;
+                    if (!ex_need_jump)
+                        begin
+                            revert_jump <= 1;
+                            revert_addr <= ex_cur_pc + 4;
+                        end
+                end
             else if (ex_need_jump == 1'b1 && BTB_is_taken_r ==1'b1)
                 begin
                     if (BTB_predict_pc_r!=ex_tar_addr)
@@ -183,6 +191,10 @@ always @(negedge clk) begin
     else begin
         ex_flush<=1'b0;
     end
+end
+
+always @(posedge clk ) begin
+    revert_jump <= 0;
 end
     //ex_flush <= ex_done?  ex_need_jump^BTB_is_taken_r ? 1 : BTB_predict_pc_r==branch_res :0;
 
@@ -229,7 +241,7 @@ always @ (posedge clk) begin
             ex_cur_pc <= ex_cur_pc;
     end
     else begin
-        ex_cur_pc <= 32'd116;
+        ex_cur_pc <= `INIT_PC;
     end
 end
 
@@ -352,6 +364,9 @@ always @ (*) begin
                 ex_stall = 'd1;
             end
             else if (func_part[`FSP - `OFFSET] && func_busy) begin
+                ex_stall = 'd1;
+            end
+            else if (func_part[`SHIFT - `OFFSET] && func_busy) begin
                 ex_stall = 'd1;
             end
             else begin

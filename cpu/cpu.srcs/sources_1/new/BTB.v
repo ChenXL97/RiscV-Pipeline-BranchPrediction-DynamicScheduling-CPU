@@ -28,21 +28,21 @@ module BTB(
     output reg [31:0] predict_pc
     );
 //localparam BTBW = 5;
-reg [31:0] btb [63:0];
+reg [31:0] btb [255:0];
 
     
     
-reg [1:0] counter [63:0];
-reg [6-1:0]entry;
+reg [1:0] counter [255:0];
+reg [8-1:0]entry;
 
-wire [6-1:0]set_tb_entry;
-wire [6-1:0]tb_entry;
-assign set_tb_entry = EX_ins_pc[6+2-1:2];
-assign tb_entry = cur_pc[6+2-1:2];
+wire [8-1:0]set_tb_entry;
+wire [8-1:0]tb_entry;
+assign set_tb_entry = EX_ins_pc[8+2-1:2];
+assign tb_entry = cur_pc[8+2-1:2];
 
 always @(posedge clk or posedge rst)
     if(rst)
-         for(entry=0; entry < 64; entry=entry+1) // reset BTB entries
+         for(entry=0; entry < 256; entry=entry+1) // reset BTB entries
             counter[entry] <= 2'b00;
     else if(EX_is_branch && EX_branch_taken && counter[set_tb_entry] != 2'b11) begin
          counter[set_tb_entry] <= counter[set_tb_entry] + 2'b01;
@@ -54,7 +54,7 @@ always @(posedge clk or posedge rst)
 always @(posedge clk or posedge rst) begin
     if (rst) begin
         // reset
-        for (entry=0; entry<64; entry=entry+1)
+        for (entry=0; entry<256; entry=entry+1)
             btb[entry] <=32'd9999;
     end
     else if (EX_is_branch) begin
