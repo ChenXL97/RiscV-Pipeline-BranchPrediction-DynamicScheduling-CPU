@@ -96,7 +96,7 @@
 .strsearch1:  #pos += shift
 	add s5 s5 s4
 .strsearch2:  #while
-	bge s5 s7 .strsearch3
+	bge s5 s7 .strsearch5
 	lw t0 16 sp
 	add t0 t0 s5
 	lbu t0 0 t0

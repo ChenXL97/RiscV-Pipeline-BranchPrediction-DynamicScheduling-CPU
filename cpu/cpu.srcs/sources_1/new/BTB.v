@@ -62,7 +62,7 @@ always @(posedge clk or posedge rst) begin
     end
 end
 
-always @(posedge clk or posedge rst) begin
+always @(negedge clk or posedge rst) begin
     if (rst) begin
         btb_taken<=0;// reset
     end
@@ -71,7 +71,7 @@ always @(posedge clk or posedge rst) begin
     end
 end
 
-always @(posedge clk or posedge rst)
+always @(negedge clk or posedge rst)
     if(rst)
         predict_pc<=32'd9999;
     else
