@@ -19,9 +19,9 @@
 `timescale 1ns/100ps
 
 /* ***********************2020 07 21*******************************
-    To simplify the hardware design, all function part will be set 
-    only one time, thus one bit can indicate whether a part is busy
-    or not.
+    To simplify the hardware design, the number of each function part
+    is only one and the number of rob member is 10, thus one bit can 
+    indicate whether a part is busy or not.
 
     Global stall signal should be gen by tomasulo instead of exe. 
     Stall signal will not pause exe. When rob is full, global stall
@@ -51,12 +51,12 @@ module ROB (
 
     input       [`ROB_ITEM_INDEX]               rob_info,
     input       [31:0]                          de_cur_pc,
-
-    output      reg [31:0]                          wb_res,
-    output      reg [31:0]                          wb_addr,
-
-    output      reg [31:0]                          rd_addr_0,
-    output      reg [31:0]                          rd_addr_1
+    
+    // send to issuer
+    output      [3:0]                           end_pt,
+    output      [3:0]                           head_pt,
+    output      [9:0]                           related_busy,
+    output      [9:0]                           related
 
 );
 
@@ -87,7 +87,7 @@ reg         [31:0]                              cur_pc;
 // related to data relation check
 reg         [4:0]                               inst_dst        [9:0];
 reg         [3:0]                               related_inst    [9:0];
-reg         [9:0]                               related
+reg         [9:0]                               related;
 reg         [9:0]                               related_busy;
 reg                                             check_data_done;
 reg         [4:0]                               after_done_dcheck;
@@ -96,7 +96,6 @@ reg         [4:0]                               after_done_dcheck;
 // related to hardware relation check
 reg         [14:0]                              global_hw_use;
 reg         [9:0]                               hw_relation;  
-reg         [9:0]                               hw_relation_li;  
 reg                                             check_hw_done;
 
 
@@ -174,7 +173,7 @@ always @ (posedge clk) begin
         end
     end
     else begin
-        head_pt <= 'd0
+        head_pt <= 'd0;
     end
 end
 
@@ -189,7 +188,7 @@ always @ (posedge clk) begin
         end
     end
     else begin
-
+        end_pt <= 'd0;
     end
 end
 
@@ -212,7 +211,7 @@ always @ (*) begin
             // need to check rst1 and rst2
             // search order: from newest to oldest
             // from head_pt to end_pt
-            if(!rob_info[`IMM_USE]) begin
+            if(!rob_info[`IMMUSE]) begin
                 // 1 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
@@ -1692,6 +1691,7 @@ always @ (*) begin
     else begin
         check_data_pt = 4'hf;
         check_data_done = 'd0;
+        after_done_dcheck = 'd31;
 
         inst_dst[0] = 'd0;
         inst_dst[1] = 'd0;
@@ -1726,27 +1726,9 @@ always @ (*) begin
         related_inst[8] = 'd11;
         related_inst[9] = 'd11;
 
-        related[0] = 'd1;
-        related[1] = 'd1;
-        related[2] = 'd1;
-        related[3] = 'd1;
-        related[4] = 'd1;
-        related[5] = 'd1;
-        related[6] = 'd1;
-        related[7] = 'd1;
-        related[8] = 'd1;
-        related[9] = 'd1;
+        related = 10'd0;
 
-        related_busy[0] = 'd0;
-        related_busy[1] = 'd0;
-        related_busy[2] = 'd0;
-        related_busy[3] = 'd0;
-        related_busy[4] = 'd0;
-        related_busy[5] = 'd0;
-        related_busy[6] = 'd0;
-        related_busy[7] = 'd0;
-        related_busy[8] = 'd0;
-        related_busy[9] = 'd0;
+        related_busy = 10'd0;
     end
 end
 
@@ -1754,6 +1736,8 @@ end
 
 
 // check hardware relation
+// when a new inst come or when ex_done arrive or
+// when issue an inst
 always @ (*) begin
     if(!rst) begin
         check_hw_done = 'd0;
@@ -1761,8 +1745,6 @@ always @ (*) begin
         // new inst come
         if(last_pc != de_cur_pc && rob_info != 'd0) begin
             // check 1 part
-            hw_relation_li[head_pt] = 'd1;
-
             if(rob_info[`RAM] && global_hw_use[0] && !check_hw_done) begin
                 check_hw_done = 'd1;
                 hw_relation[head_pt] = 'd1;
@@ -1856,131 +1838,19 @@ always @ (*) begin
         end
 
         // when a inst is done in exe
-        if(ex_done) begin
-            // check 1 part
-            if(func_part_done[0] && global_hw_use[0] && 
-                !check_hw_done && hw_relation_li[0]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 2 part
-            if(func_part_done[1] && global_hw_use[1] && 
-                !check_hw_done && hw_relation_li[1]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 3 part
-            if(func_part_done[2] && global_hw_use[2] && 
-                !check_hw_done && hw_relation_li[2]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 4 part
-            if(func_part_done[3] && global_hw_use[3] && 
-                !check_hw_done && hw_relation_li[3]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 5 part
-            if(func_part_done[4] && global_hw_use[4] && 
-                !check_hw_done && hw_relation_li[4]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 6 part
-            if(func_part_done[5] && global_hw_use[5] && 
-                !check_hw_done && hw_relation_li[5]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 7 part
-            if(func_part_done[6] && global_hw_use[6] && 
-                !check_hw_done && hw_relation_li[6]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 8 part
-            if(func_part_done[7] && global_hw_use[7] && 
-                !check_hw_done && hw_relation_li[7]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 9 part
-            if(func_part_done[8] && global_hw_use[8] && 
-                !check_hw_done && hw_relation_li[8]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 10 part
-            if(func_part_done[9] && global_hw_use[9] && 
-                !check_hw_done && hw_relation_li[9]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 11 part
-            if(func_part_done[10] && global_hw_use[10] && 
-                !check_hw_done && hw_relation_li[10]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 12 part
-            if(func_part_done[11] && global_hw_use[11] && 
-                !check_hw_done && hw_relation_li[11]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 13 part
-            if(func_part_done[12] && global_hw_use[12] && 
-                !check_hw_done && hw_relation_li[12]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 14 part
-            if(func_part_done[13] && global_hw_use[13] && 
-                !check_hw_done && hw_relation_li[13]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            // check 15 part
-            if(func_part_done[14] && global_hw_use[14] && 
-                !check_hw_done && hw_relation_li[14]) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
-
-            check_hw_done = 'd0;
+        if (ex_done) begin
+            
         end
+
+
 
         // after issuing a inst
     end
     else begin
         check_hw_done = 'd0;
-        hw_relation_li = 'd0;
+        hw_relation = 10'd0;
+        global_hw_use = 15'd0; 
 
-        hw_relation[0] = 'd0;
-        hw_relation[1] = 'd0;
-        hw_relation[2] = 'd0;
-        hw_relation[3] = 'd0;
-        hw_relation[4] = 'd0;
-        hw_relation[5] = 'd0;
-        hw_relation[6] = 'd0;
-        hw_relation[7] = 'd0;
-        hw_relation[8] = 'd0;
-        hw_relation[9] = 'd0;
     end
 end
 
