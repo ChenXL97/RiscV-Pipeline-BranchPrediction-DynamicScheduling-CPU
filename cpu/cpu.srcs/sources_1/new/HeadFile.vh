@@ -35,5 +35,21 @@
 `define FLOAT_INI_DELAY 3'd5
 `define FLOAT_DELAY 3'd4
 `define INIT_PC 'd460
+`define RAM_USE 0
+`define BRANCH_USE  1
+`define SHIFT_USE  2
+`define LOGIC_USE  3
+`define CMP_USE  4
+`define ADD_USE  5
+`define MUL_USE  6
+`define DIV_USE  7
+`define SP_USE  8
+`define RINFO_USE  9
+`define FADD_USE  10
+`define FMUL_USE  11
+`define FDIV_USE  12
+`define FSP_USE  13
+`define FCMP_USE 14
+
 
 `endif

@@ -56,7 +56,30 @@ module ROB (
     output      [3:0]                           end_pt,
     output      [3:0]                           head_pt,
     output      [9:0]                           related_busy,
-    output      [9:0]                           related
+    output      [9:0]                           related,
+    output      [9:0]                           hw_relation,
+
+    // issue signal from dis-gun
+    input                                       issue_v,
+    input       [3:0]                           iss_inst,
+    input       [9:0]                           iss_flag,
+
+    // func_part input result
+    input       [31:0]                          ram_res,
+    input       [31:0]                          branch_res,
+    input       [31:0]                          shift_res,
+    input       [31:0]                          logic_res,
+    input       [31:0]                          cmp_res,
+    input       [31:0]                          add_res,
+    input       [31:0]                          mul_res,
+    input       [31:0]                          div_res,
+    input       [31:0]                          sp_res,
+    input       [31:0]                          rinfo_res,
+    input       [31:0]                          fadd_res,
+    input       [31:0]                          fmul_res,
+    input       [31:0]                          fdiv_res,
+    input       [31:0]                          fsp_res,
+    input       [31:0]                          fcmp_res
 
 );
 
@@ -66,7 +89,7 @@ module ROB (
 reg         [`ROB_ITEM_INDEX]                   rob_info_stack      [9:0];
 reg         [9:0]                               rob_busy;
 reg         [9:0]                               rob_inst_done;
-
+reg         [14:0]                              rob_hw_tar;
 
 // rob_stack_pt to and full signal
 reg         [3:0]                               end_pt;
@@ -77,6 +100,7 @@ reg                                             rob_full;
 
 // each func part map to one inst, one inst map to a rob
 reg         [3:0]                               func2rob    [14:0];
+reg         [3:0]                               done_inst;
 
 
 // related to inst pc
@@ -95,8 +119,158 @@ reg         [4:0]                               after_done_dcheck;
 
 // related to hardware relation check
 reg         [14:0]                              global_hw_use;
-reg         [9:0]                               hw_relation;  
+reg         [9:0]                               hw_relation;
 reg                                             check_hw_done;
+reg         [3:0]                               check_hw_pt;
+reg         [4:0]                               tar_func_part   [9:0];
+
+
+// combined with write back process
+reg                                             wb_v;
+reg         [31:0]                              wb_res;
+reg         [4:0]                               wd_dst;
+
+
+
+
+
+// operations on func2rob
+// operation starts when an inst is issued or 
+// when an inst is write back
+// combine a func_part with an inst
+always @ (*) begin
+    if(!rst) begin
+        if(issue_v) begin
+            if(rob_info_stack[iss_inst][`RAM])
+                func2rob[0] = iss_inst;
+            if(rob_info_stack[iss_inst][`BRANCH])
+                func2rob[1] = iss_inst;
+            if(rob_info_stack[iss_inst][`SHIFT])
+                func2rob[2] = iss_inst;
+            if(rob_info_stack[iss_inst][`LOGIC])
+                func2rob[3] = iss_inst;
+            if(rob_info_stack[iss_inst][`CMP])
+                func2rob[4] = iss_inst;
+            if(rob_info_stack[iss_inst][`ADD])
+                func2rob[5] = iss_inst;
+            if(rob_info_stack[iss_inst][`MUL])
+                func2rob[6] = iss_inst;
+            if(rob_info_stack[iss_inst][`DIV])
+                func2rob[7] = iss_inst;
+            if(rob_info_stack[iss_inst][`SP])
+                func2rob[8] = iss_inst;
+            if(rob_info_stack[iss_inst][`RINFO])
+                func2rob[9] = iss_inst;
+            if(rob_info_stack[iss_inst][`FADD])
+                func2rob[10] = iss_inst;
+            if(rob_info_stack[iss_inst][`FMUL])
+                func2rob[11] = iss_inst;
+            if(rob_info_stack[iss_inst][`FDIV])
+                func2rob[12] = iss_inst;
+            if(rob_info_stack[iss_inst][`FSP])
+                func2rob[13] = iss_inst;
+            if(rob_info_stack[iss_inst][`BRANCH])
+                func2rob[14] = iss_inst;
+        end
+    end
+    else begin
+        func2rob[0] = 'd11;
+        func2rob[1] = 'd11;
+        func2rob[2] = 'd11;
+        func2rob[3] = 'd11;
+        func2rob[4] = 'd11;
+        func2rob[5] = 'd11;
+        func2rob[6] = 'd11;
+        func2rob[7] = 'd11;
+        func2rob[8] = 'd11;
+        func2rob[9] = 'd11;
+        func2rob[10] = 'd11;
+        func2rob[11] = 'd11;
+        func2rob[12] = 'd11;
+        func2rob[13] = 'd11;
+        func2rob[14] = 'd11;
+    end
+end
+
+
+
+
+
+// set rob_inst_done flag
+always @ (*) begin
+    if(!rst) begin
+        if(ex_done) begin
+            if (func_part_done[0]) begin
+                done_inst = func2rob[0];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[1]) begin
+                done_inst = func2rob[1];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[2]) begin
+                done_inst = func2rob[2];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[3]) begin
+                done_inst = func2rob[3];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[4]) begin
+                done_inst = func2rob[4];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[5]) begin
+                done_inst = func2rob[5];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[6]) begin
+                done_inst = func2rob[6];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[7]) begin
+                done_inst = func2rob[7];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[8]) begin
+                done_inst = func2rob[8];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[9]) begin
+                done_inst = func2rob[9];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[10]) begin
+                done_inst = func2rob[10];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[11]) begin
+                done_inst = func2rob[11];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[12]) begin
+                done_inst = func2rob[12];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[13]) begin
+                done_inst = func2rob[13];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            if (func_part_done[14]) begin
+                done_inst = func2rob[14];
+                rob_inst_done[done_inst] = 'd1;
+            end
+            done_inst = 'd11;
+        end
+    end
+
+    else begin
+        done_inst = 'd11;
+        rob_inst_done = 10'b0;
+    end
+end
+
+
 
 
 
@@ -105,16 +279,18 @@ reg                                             check_hw_done;
 always @ (posedge clk) begin
     if(!rst) begin
         cur_pc <= de_cur_pc;
-        if(last_pc != de_cur_pc) begin
-            last_pc <= de_cur_pc;
-        end
-        else begin
-            last_pc <= last_pc;
-        end
+    end
+    else begin
+        cur_pc <= 32'hffff_ffff;
+    end
+end
+
+always @ (posedge clk) begin
+    if(!rst) begin
+       last_pc <= cur_pc; 
     end
     else begin
         last_pc <= 32'hffff_ffff;
-        cur_pc <= 32'hffff_ffff;
     end
 end
 
@@ -122,22 +298,75 @@ end
 
 
 // write rob when decode info is valid
+// write func_part result into rob
 always @ (posedge clk) begin
     if(!rst) begin
-        if( last_pc != de_cur_pc && rob_info != 'd0) begin
+        // let new inst in
+        if (last_pc != de_cur_pc && rob_info != 'd0) begin
             rob_info_stack[head_pt] <= rob_info;
         end
-        else begin
-            rob_info_stack[0] <= rob_info_stack[0];
-            rob_info_stack[1] <= rob_info_stack[1];
-            rob_info_stack[2] <= rob_info_stack[2];
-            rob_info_stack[3] <= rob_info_stack[3];
-            rob_info_stack[4] <= rob_info_stack[4];
-            rob_info_stack[5] <= rob_info_stack[5];
-            rob_info_stack[6] <= rob_info_stack[6];
-            rob_info_stack[7] <= rob_info_stack[7];
-            rob_info_stack[8] <= rob_info_stack[8];
-            rob_info_stack[9] <= rob_info_stack[9];
+
+        // let inst result in
+        if (ex_done) begin
+            if(func_part_done[`RAM_USE]) begin
+                rob_info_stack[end_pt][`RES] <= ram_res;
+            end
+            
+            if(func_part_done[`BRANCH_USE]) begin
+                rob_info_stack[end_pt][`RES] <= branch_res;
+            end
+
+            if(func_part_done[`SHIFT_USE]) begin
+                rob_info_stack[end_pt][`RES] <= shift_res;
+            end
+
+            if(func_part_done[`LOGIC_USE]) begin
+                rob_info_stack[end_pt][`RES] <= logic_res;
+            end
+
+            if(func_part_done[`CMP_USE]) begin
+                rob_info_stack[end_pt][`RES] <= cmp_res;
+            end
+
+            if(func_part_done[`ADD_USE]) begin
+                rob_info_stack[end_pt][`RES] <= add_res;
+            end
+
+            if(func_part_done[`MUL_USE]) begin
+                rob_info_stack[end_pt][`RES] <= mul_res;
+            end
+
+            if(func_part_done[`DIV_USE]) begin
+                rob_info_stack[end_pt][`RES] <= div_res;
+            end
+
+            if(func_part_done[`SP_USE]) begin
+                rob_info_stack[end_pt][`RES] <= sp_res;
+            end
+
+            if(func_part_done[`RINFO_USE]) begin
+                rob_info_stack[end_pt][`RES] <= rinfo_res;
+            end
+
+            if(func_part_done[`FADD_USE]) begin
+                rob_info_stack[end_pt][`RES] <= fadd_res;
+            end
+
+            if(func_part_done[`FMUL_USE]) begin
+                rob_info_stack[end_pt][`RES] <= fmul_res;
+            end
+
+            if(func_part_done[`FDIV_USE]) begin
+                rob_info_stack[end_pt][`RES] <= fdiv_res;
+            end
+
+            if(func_part_done[`FSP_USE]) begin
+                rob_info_stack[end_pt][`RES] <= fsp_res;
+            end
+
+            if(func_part_done[`FCMP_USE]) begin
+                rob_info_stack[end_pt][`RES] <= fcmp_res;
+            end
         end
     end
     else begin
@@ -160,7 +389,7 @@ end
 // control head_pt
 always @ (posedge clk) begin
     if(!rst) begin
-        if( last_pc != de_cur_pc && rob_info != 'd0) begin
+        if(last_pc != de_cur_pc && rob_info != 'd0) begin
             if(head_pt == 'd9) begin
                 head_pt <= 'd0;
             end
@@ -183,12 +412,22 @@ end
 // control end_pt
 always @ (posedge clk) begin
     if(!rst) begin
-        if(ex_done) begin
+        if(rob_inst_done[end_pt]) begin
+            wb_v <= 'd1;
+            wb_res <= rob_info_stack[end_pt][`RES];
             
+            if(end_pt == 'd9) begin
+                end_pt <= 'd0;
+            end
+            else begin
+                end_pt <= end_pt + 'd1;
+            end
         end
     end
     else begin
         end_pt <= 'd0;
+        wb_v <= 'd0;
+        wb_res <= 'd0;
     end
 end
 
@@ -196,338 +435,10 @@ end
 
 
 // check data relation
-// when new inst come or when ex_done arrive
+// when new inst come or when clk posedge arrive
+// check existed inst first
 always @ (*) begin
     if(!rst) begin
-        // new inst come
-        if(last_pc != de_cur_pc && rob_info != 'd0) begin
-            inst_dst[head_pt] = rob_info[`DST];
-            related_busy[head_pt] = 'd1;
-
-            check_data_done = 'd0;
-            check_data_pt = head_pt - 'd1;
-            
-            // inst does not use imm_data
-            // need to check rst1 and rst2
-            // search order: from newest to oldest
-            // from head_pt to end_pt
-            if(!rob_info[`IMMUSE]) begin
-                // 1 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 2 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 3 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 4 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 5 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 6 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 7 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 8 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 9 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
-                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // reset and set non-related in corresponding situation
-                check_data_done = 'd0;
-                if (related_inst[head_pt] == 'd11) begin
-                    related[head_pt] = 'd0; 
-                end
-            end
-
-            // inst uses imm_data
-            // only check rst1
-            else begin
-                // 1 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 2 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 3 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 4 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 5 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 6 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 7 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 8 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // 9 data check
-                if(related_busy[check_data_pt] && 
-                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
-                        related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
-
-                // reset and set non-related in corresponding situation
-                check_data_done = 'd0;
-                check_data_pt = 4'hf;
-                if (related_inst[head_pt] == 'd11) begin
-                    related[head_pt] = 'd0; 
-                end
-            end
-        end
-
         // when a inst is done in exe
         if(ex_done) begin
             // ram done
@@ -1687,6 +1598,336 @@ always @ (*) begin
             end
 
         end
+
+        // new inst come
+        if(last_pc != de_cur_pc && rob_info != 'd0) begin
+            inst_dst[head_pt] = rob_info[`DST];
+            related_busy[head_pt] = 'd1;
+
+            check_data_done = 'd0;
+            check_data_pt = head_pt - 'd1;
+            
+            // inst does not use imm_data
+            // need to check rst1 and rst2
+            // search order: from newest to oldest
+            // from head_pt to end_pt
+            if(!rob_info[`IMMUSE]) begin
+                // 1 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 2 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 3 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 4 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 5 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 6 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 7 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 8 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 9 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1] || 
+                    inst_dst[check_data_pt] == rob_info[`RS2]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // reset and set non-related in corresponding situation
+                check_data_done = 'd0;
+                if (related_inst[head_pt] == 'd11) begin
+                    related[head_pt] = 'd0; 
+                end
+            end
+
+            // inst uses imm_data
+            // only check rst1
+            else begin
+                // 1 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 2 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 3 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 4 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 5 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 6 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 7 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 8 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // 9 data check
+                if(related_busy[check_data_pt] && 
+                    (inst_dst[check_data_pt] == rob_info[`RS1]) && 
+                    inst_dst[check_data_pt] != 'd0 &&
+                    !check_data_done ) begin
+                        check_data_done = 'd1;
+                        related_inst[head_pt] = check_data_pt;
+                        related[head_pt] = 'd1;
+                    end
+                else begin
+                    if(check_data_pt == 'd0) 
+                        check_data_pt = 'd9;
+                    else 
+                        check_data_pt = check_data_pt - 'd1;
+                end
+
+                // reset and set non-related in corresponding situation
+                check_data_done = 'd0;
+                check_data_pt = 4'hf;
+                if (related_inst[head_pt] == 'd11) begin
+                    related[head_pt] = 'd0; 
+                end
+            end
+        end
+
     end
     else begin
         check_data_pt = 4'hf;
@@ -1735,126 +1976,3973 @@ end
 
 
 
-// check hardware relation
-// when a new inst come or when ex_done arrive or
-// when issue an inst
+// freshing global hardware and set global_hw_use
+// when an inst is issued or ex_done
+// when an inst is issued, set hw_use
+// when an inst is ex_done, free hw_use
 always @ (*) begin
     if(!rst) begin
-        check_hw_done = 'd0;
+        
+        // when an inst is issued, set hw_use
+        // and set hw_relation at the same time
+        if (issue_v) begin
+            
+            if(rob_info_stack[iss_inst][`RAM]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`RAM_USE] = 'b1;
 
-        // new inst come
-        if(last_pc != de_cur_pc && rob_info != 'd0) begin
-            // check 1 part
-            if(rob_info[`RAM] && global_hw_use[0] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] ) begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] ) begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] ) begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] ) begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] ) begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 2 part
-            if(rob_info[`BRANCH] && global_hw_use[1] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`BRANCH]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`BRANCH_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 3 part
-            if(rob_info[`SHIFT] && global_hw_use[2] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`SHIFT]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`SHIFT_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 4 part
-            if(rob_info[`LOGIC] && global_hw_use[3] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`LOGIC]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`LOGIC_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 5 part
-            if(rob_info[`CMP] && global_hw_use[4] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`CMP]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`CMP_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 6 part
-            if(rob_info[`ADD] && global_hw_use[5] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`ADD]) begin
+
+                check_hw_pt = end_pt;
+                global_hw_use[`ADD_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 7 part
-            if(rob_info[`MUL] && global_hw_use[6] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`MUL]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`MUL_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 8 part
-            if(rob_info[`DIV] && global_hw_use[7] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`DIV]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`DIV_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 9 part
-            if(rob_info[`SP] && global_hw_use[8] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`SP]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`SP_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 10 part
-            if(rob_info[`RINFO] && global_hw_use[9] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`RINFO]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`RINFO_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 11 part
-            if(rob_info[`FADD] && global_hw_use[10] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`FADD]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FADD_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 12 part
-            if(rob_info[`FMUL] && global_hw_use[11] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`FMUL]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FMUL_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 13 part
-            if(rob_info[`FDIV] && global_hw_use[12] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`FDIV]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FDIV_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 14 part
-            if(rob_info[`FSP] && global_hw_use[13] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
+            if(rob_info_stack[iss_inst][`FSP]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FSP_USE] = 'b1;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
             end
 
-            // check 15 part
-            if(rob_info[`FCMP] && global_hw_use[14] && !check_hw_done) begin
-                check_hw_done = 'd1;
-                hw_relation[head_pt] = 'd1;
-            end
+            if(rob_info_stack[iss_inst][`FCMP]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FCMP_USE] = 'b1;
 
-            check_hw_done = 'd0;
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b1;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
         end
 
-        // when a inst is done in exe
-        if (ex_done) begin
+        // ex_done signal free func_parts which means this time
+        // may free hw_relation
+        if(ex_done) begin
+
+            if(func_part_done[`RAM_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`RAM_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `RAM_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`BRANCH_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`BRANCH_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `BRANCH_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt] )begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`SHIFT_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`SHIFT_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `SHIFT_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+            
+
+            if(func_part_done[`LOGIC_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`LOGIC_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `LOGIC_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`CMP_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`CMP_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `CMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`ADD_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`ADD_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `ADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`MUL_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`MUL_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `MUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`DIV_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`DIV_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `DIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`SP_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`SP_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `SP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`RINFO_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`RINFO_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `RINFO_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`FADD_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FADD_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FADD_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`FMUL_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FMUL_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FMUL_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`FDIV_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FDIV_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FDIV_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+            
+
+            if(func_part_done[`FSP_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FSP_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FSP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+
+
+            if(func_part_done[`FCMP_USE]) begin
+                check_hw_pt = end_pt;
+                global_hw_use[`FCMP_USE] = 'b0;
+
+                // inst 1
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 2
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 3
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 4
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 5
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 6
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 7
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 8
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 9
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+
+                // inst 10
+                if(tar_func_part[check_hw_pt] == `FCMP_USE && 
+                    related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
+                    hw_relation[check_hw_pt] = 'b0;
+                end
+                if(check_hw_pt == 'd9) begin
+                    check_hw_pt = 'd0;
+                end
+                else begin
+                    check_hw_pt = check_hw_pt + 'd1;
+                end
+            end
+            
             
         end
 
+        // new inst arrive
+        // set tar_func_part, hw_relation and hw_relation busy
+        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+            if(rob_info[`RAM]) begin
+                tar_func_part[head_pt] = 'd0;
+                if(global_hw_use[`RAM_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
 
+            if(rob_info[`BRANCH]) begin
+                tar_func_part[head_pt] = 'd1;
+                if(global_hw_use[`BRANCH_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
 
-        // after issuing a inst
+            if(rob_info[`SHIFT]) begin
+                tar_func_part[head_pt] = 'd2;
+                if(global_hw_use[`SHIFT_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`LOGIC]) begin
+                tar_func_part[head_pt] = 'd3;
+                if(global_hw_use[`LOGIC_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`CMP]) begin
+                tar_func_part[head_pt] = 'd4;
+                if(global_hw_use[`CMP_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`ADD]) begin
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("cnm");
+                $display("%d", head_pt);
+                tar_func_part[head_pt] = 'd5;
+                if(global_hw_use[`ADD_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`MUL]) begin
+                tar_func_part[head_pt] = 'd6;
+                if(global_hw_use[`MUL_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`DIV]) begin
+                tar_func_part[head_pt] = 'd7;
+                if(global_hw_use[`DIV_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`SP]) begin
+                tar_func_part[head_pt] = 'd8;
+                if(global_hw_use[`SP_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`RINFO]) begin
+                tar_func_part[head_pt] = 'd9;
+                if(global_hw_use[`RINFO_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`FADD]) begin
+                tar_func_part[head_pt] = 'd10;
+                if(global_hw_use[`FADD_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`FMUL]) begin
+                tar_func_part[head_pt] = 'd11;
+                if(global_hw_use[`FMUL_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`FDIV]) begin
+                tar_func_part[head_pt] = 'd12;
+                if(global_hw_use[`FDIV_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`FSP]) begin
+                tar_func_part[head_pt] = 'd13;
+                if(global_hw_use[`FSP_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+
+            if(rob_info[`FCMP]) begin
+                tar_func_part[head_pt] = 'd14;
+                if(global_hw_use[`FCMP_USE]) begin
+                    hw_relation[head_pt] = 'd1;
+                end
+                else begin
+                    hw_relation[head_pt] = 'd0;
+                end
+            end
+        end
+
     end
-    else begin
-        check_hw_done = 'd0;
-        hw_relation = 10'd0;
-        global_hw_use = 15'd0; 
 
+    else begin
+        global_hw_use = 'd0;
+        hw_relation = 10'b0;
+
+        tar_func_part[0] = 'd16;
+        tar_func_part[1] = 'd16;
+        tar_func_part[2] = 'd16;
+        tar_func_part[3] = 'd16;
+        tar_func_part[4] = 'd16;
+        tar_func_part[5] = 'd16;
+        tar_func_part[6] = 'd16;
+        tar_func_part[7] = 'd16;
+        tar_func_part[8] = 'd16;
+        tar_func_part[9] = 'd16;
     end
 end
-
-
 
 
 endmodule
