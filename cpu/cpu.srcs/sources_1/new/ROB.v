@@ -94,7 +94,8 @@ module ROB (
     // prepare data at regfile
     output      reg     [4:0]                   rs1,
     output      reg     [4:0]                   rs2,
-    output      reg                             prepare_data
+    output      reg                             prepare_rs1_en,
+    output      reg                             prepare_rs2_en
 
 );
 
@@ -8594,36 +8595,75 @@ end
 always @ (*) begin
     if(!rst) begin
         if(issue_v) begin
-            forwd_data_rs1 = 'd0;
-            forwd_data_rs2 = 'd0;
-            forwd_data_rs1_v = 'b0;
-            forwd_data_rs2_v = 'b0;
+            forwd_data_rs1 <= 'd0;
+            forwd_data_rs2 <= 'd0;
+            forwd_data_rs1_v <= 'b0;
+            forwd_data_rs2_v <= 'b0;
 
             if(forward_flag_rs1[iss_inst]) begin
-                forwd_data_rs1_v = 'b1;
-                forwd_data_rs1 = forward_data_rs1[iss_inst];
+                forwd_data_rs1_v <= 'b1;
+                forwd_data_rs1 <= forward_data_rs1[iss_inst];
             end
             if(forward_flag_rs2[iss_inst]) begin
-                forwd_data_rs2_v = 'b1;
-                forwd_data_rs2 = forward_data_rs2[iss_inst];
+                forwd_data_rs2_v <= 'b1;
+                forwd_data_rs2 <= forward_data_rs2[iss_inst];
             end
 
         end
         else begin
-            forwd_data_rs1 = 'd0;
-            forwd_data_rs2 = 'd0;
-            forwd_data_rs1_v = 'b0;
-            forwd_data_rs2_v = 'b0;
+            forwd_data_rs1 <= 'd0;
+            forwd_data_rs2 <= 'd0;
+            forwd_data_rs1_v <= 'b0;
+            forwd_data_rs2_v <= 'b0;
         end
     end
     else begin
-        forwd_data_rs1 = 'd0;
-        forwd_data_rs2 = 'd0;
-        forwd_data_rs1_v = 'b0;
-        forwd_data_rs2_v = 'b0;
+        forwd_data_rs1 <= 'd0;
+        forwd_data_rs2 <= 'd0;
+        forwd_data_rs1_v <= 'b0;
+        forwd_data_rs2_v <= 'b0;
     end
 end
 
+
+
+
+// let regfile prepare data
+always @ (*) begin
+    if(!rst) begin
+        if(issue_v) begin
+            if(forward_flag_rs1[iss_inst]) begin
+               rs1 <= 'd0;
+               prepare_rs1_en <= 'd0; 
+            end
+            else begin
+                rs1 <= rob_info_stack[iss_inst][`RS1];
+                prepare_rs1_en <= 'd1;
+            end
+
+            if(forward_flag_rs2[iss_inst]) begin
+               rs2 <= 'd0;
+               prepare_rs2_en <= 'd0; 
+            end
+            else begin
+                rs2 <= rob_info_stack[iss_inst][`RS2];
+                prepare_rs2_en <= 'd1;
+            end
+        end
+        else begin
+            prepare_rs1_en <= 'd0;
+            prepare_rs2_en <= 'd0;
+            rs1 <= 'd0;
+            rs2 <= 'd0;
+        end
+    end
+    else begin
+        rs1 <= 'd0;
+        rs2 <= 'd0;
+        prepare_rs1_en <= 'd0;
+        prepare_rs2_en <= 'd0;
+    end
+end
 
 
 
