@@ -12,14 +12,14 @@
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="44191339fs"></ZoomEndTime>
-      <Cursor1Time time="0fs"></Cursor1Time>
+      <ZoomEndTime time="52883521fs"></ZoomEndTime>
+      <Cursor1Time time="27026000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="84"></ValueColumnWidth>
+      <ValueColumnWidth column_width="76"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="25" />
+   <WVObjectSize size="28" />
    <wave_markers>
       <marker time="502656000000" label="" />
    </wave_markers>
@@ -92,10 +92,6 @@
       <obj_property name="ObjectShortName">related[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/wb_v" type="logic">
-      <obj_property name="ElementShortName">wb_v</obj_property>
-      <obj_property name="ObjectShortName">wb_v</obj_property>
-   </wvobject>
    <wvobject fp_name="/rob_top/rob/wb_inst" type="array">
       <obj_property name="ElementShortName">wb_inst[3:0]</obj_property>
       <obj_property name="ObjectShortName">wb_inst[3:0]</obj_property>
@@ -118,10 +114,6 @@
       <obj_property name="ElementShortName">forwd_data_rs2_v</obj_property>
       <obj_property name="ObjectShortName">forwd_data_rs2_v</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/prepare_data_en" type="logic">
-      <obj_property name="ElementShortName">prepare_data_en</obj_property>
-      <obj_property name="ObjectShortName">prepare_data_en</obj_property>
-   </wvobject>
    <wvobject fp_name="/rob_top/rob/rs1" type="array">
       <obj_property name="ElementShortName">rs1[4:0]</obj_property>
       <obj_property name="ObjectShortName">rs1[4:0]</obj_property>
@@ -130,6 +122,27 @@
    <wvobject fp_name="/rob_top/rob/rs2" type="array">
       <obj_property name="ElementShortName">rs2[4:0]</obj_property>
       <obj_property name="ObjectShortName">rs2[4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/rob_top/rob/prepare_rs1_en" type="logic">
+      <obj_property name="ElementShortName">prepare_rs1_en</obj_property>
+      <obj_property name="ObjectShortName">prepare_rs1_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/rob_top/rob/prepare_rs2_en" type="logic">
+      <obj_property name="ElementShortName">prepare_rs2_en</obj_property>
+      <obj_property name="ObjectShortName">prepare_rs2_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/rob_top/rob/wb_v" type="logic">
+      <obj_property name="ElementShortName">wb_v</obj_property>
+      <obj_property name="ObjectShortName">wb_v</obj_property>
+   </wvobject>
+   <wvobject fp_name="/rob_top/rob/dst" type="array">
+      <obj_property name="ElementShortName">dst[4:0]</obj_property>
+      <obj_property name="ObjectShortName">dst[4:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/rob_top/rob/wb_res" type="array">
+      <obj_property name="ElementShortName">wb_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">wb_res[31:0]</obj_property>
       <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
 </wave_config>

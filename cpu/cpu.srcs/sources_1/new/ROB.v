@@ -95,7 +95,11 @@ module ROB (
     output      reg     [4:0]                   rs1,
     output      reg     [4:0]                   rs2,
     output      reg                             prepare_rs1_en,
-    output      reg                             prepare_rs2_en
+    output      reg                             prepare_rs2_en,
+
+    // write data into regfile
+    output      reg     [4:0]                   dst,
+    output      reg     [31:0]                  wb_res
 
 );
 
@@ -8633,38 +8637,59 @@ always @ (*) begin
     if(!rst) begin
         if(issue_v) begin
             if(forward_flag_rs1[iss_inst]) begin
-               rs1 <= 'd0;
-               prepare_rs1_en <= 'd0; 
+               rs1 = 'd0;
+               prepare_rs1_en = 'd0; 
             end
             else begin
-                rs1 <= rob_info_stack[iss_inst][`RS1];
-                prepare_rs1_en <= 'd1;
+                rs1 = rob_info_stack[iss_inst][`RS1];
+                prepare_rs1_en = 'd1;
             end
 
             if(forward_flag_rs2[iss_inst]) begin
-               rs2 <= 'd0;
-               prepare_rs2_en <= 'd0; 
+               rs2 = 'd0;
+               prepare_rs2_en = 'd0; 
             end
             else begin
-                rs2 <= rob_info_stack[iss_inst][`RS2];
-                prepare_rs2_en <= 'd1;
+                rs2 = rob_info_stack[iss_inst][`RS2];
+                prepare_rs2_en = 'd1;
             end
         end
         else begin
-            prepare_rs1_en <= 'd0;
-            prepare_rs2_en <= 'd0;
-            rs1 <= 'd0;
-            rs2 <= 'd0;
+            prepare_rs1_en = 'd0;
+            prepare_rs2_en = 'd0;
+            rs1 = 'd0;
+            rs2 = 'd0;
         end
     end
     else begin
-        rs1 <= 'd0;
-        rs2 <= 'd0;
-        prepare_rs1_en <= 'd0;
-        prepare_rs2_en <= 'd0;
+        rs1 = 'd0;
+        rs2 = 'd0;
+        prepare_rs1_en = 'd0;
+        prepare_rs2_en = 'd0;
     end
 end
 
+
+
+
+
+// control write back data and dst_addr of regfile
+always @ (wb_inst) begin
+    if(!rst) begin
+        if(wb_v) begin
+            dst = rob_info_stack[wb_inst][`DST];
+            wb_res = inst_reslt[wb_inst];
+        end
+        else begin
+            dst = 'd0;
+            wb_res = 'd0;
+        end
+    end
+    else begin
+        dst = 'd0;
+        wb_res = 'd0;
+    end
+end
 
 
 endmodule
