@@ -152,6 +152,26 @@ reg         [31:0]                              forward_data_rs2     [9:0];
 
 
 
+// when rob is full, global stall
+always @ (posedge clk) begin
+    if(!rst) begin
+        if(head_pt == end_pt && related_busy[end_pt]) begin
+            rob_full <= 'd1;
+        end
+        else begin
+            rob_full <= 'd0;
+        end
+    end
+    else begin
+        rob_full <= 'd0;
+    end
+end
+assign rob_stall = rob_full;
+
+
+
+
+
 // operations on func2rob
 // operation starts when an inst is issued or 
 // when an inst is write back
