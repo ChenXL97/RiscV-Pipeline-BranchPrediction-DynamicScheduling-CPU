@@ -79,7 +79,11 @@ module ROB (
     input       [31:0]                          fmul_res,
     input       [31:0]                          fdiv_res,
     input       [31:0]                          fsp_res,
-    input       [31:0]                          fcmp_res
+    input       [31:0]                          fcmp_res,
+
+    // signal output due from write back
+    output      [3:0]                           wb_inst,
+    output                                      wb_v
 
 );
 
@@ -87,7 +91,6 @@ module ROB (
 
 // simple rob writing content
 reg         [`ROB_ITEM_INDEX]                   rob_info_stack      [9:0];
-reg         [9:0]                               rob_busy;
 reg         [9:0]                               rob_inst_done;
 reg         [14:0]                              rob_hw_tar;
 
@@ -129,6 +132,21 @@ reg         [4:0]                               tar_func_part   [9:0];
 reg                                             wb_v;
 reg         [31:0]                              wb_res;
 reg         [4:0]                               wd_dst;
+reg         [31:0]                              inst_reslt      [9:0];
+reg         [3:0]                               wb_inst;
+
+
+// combined with data forwarding
+// static relation flag
+reg         [9:0]                               forward_flag_rs1;
+reg         [9:0]                               forward_flag_rs2;
+// dynamic relation flag
+reg         [9:0]                               related_rs1;
+reg         [9:0]                               related_rs2;
+reg         [3:0]                               related_inst_rs1     [9:0];
+reg         [3:0]                               related_inst_rs2     [9:0];
+reg         [31:0]                              forward_data_rs1     [9:0];
+reg         [31:0]                              forward_data_rs2     [9:0];
 
 
 
@@ -138,6 +156,7 @@ reg         [4:0]                               wd_dst;
 // operation starts when an inst is issued or 
 // when an inst is write back
 // combine a func_part with an inst
+// when an inst is write back, free corresponding element
 always @ (*) begin
     if(!rst) begin
         if(issue_v) begin
@@ -172,6 +191,7 @@ always @ (*) begin
             if(rob_info_stack[iss_inst][`BRANCH])
                 func2rob[14] = iss_inst;
         end
+
     end
     else begin
         func2rob[0] = 'd11;
@@ -197,71 +217,78 @@ end
 
 
 // set rob_inst_done flag
-always @ (*) begin
+// when ex_done, set corresponding inst as done
+// when an inst is write back, free corresponding element
+always @ (func_part_done or wb_inst) begin
     if(!rst) begin
         if(ex_done) begin
-            if (func_part_done[0]) begin
-                done_inst = func2rob[0];
+            if (func_part_done[`RAM_USE]) begin
+                done_inst = func2rob[`RAM_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[1]) begin
-                done_inst = func2rob[1];
+            if (func_part_done[`BRANCH_USE]) begin
+                done_inst = func2rob[`BRANCH_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[2]) begin
-                done_inst = func2rob[2];
+            if (func_part_done[`SHIFT_USE]) begin
+                done_inst = func2rob[`SHIFT_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[3]) begin
-                done_inst = func2rob[3];
+            if (func_part_done[`LOGIC_USE]) begin
+                done_inst = func2rob[`LOGIC_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[4]) begin
-                done_inst = func2rob[4];
+            if (func_part_done[`CMP_USE]) begin
+                done_inst = func2rob[`CMP_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[5]) begin
-                done_inst = func2rob[5];
+            if (func_part_done[`ADD_USE]) begin
+                done_inst = func2rob[`ADD_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[6]) begin
-                done_inst = func2rob[6];
+            if (func_part_done[`MUL_USE]) begin
+                done_inst = func2rob[`MUL_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[7]) begin
-                done_inst = func2rob[7];
+            if (func_part_done[`DIV_USE]) begin
+                done_inst = func2rob[`DIV_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[8]) begin
-                done_inst = func2rob[8];
+            if (func_part_done[`SP_USE]) begin
+                done_inst = func2rob[`SP_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[9]) begin
-                done_inst = func2rob[9];
+            if (func_part_done[`RINFO_USE]) begin
+                done_inst = func2rob[`RINFO_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[10]) begin
-                done_inst = func2rob[10];
+            if (func_part_done[`FADD_USE]) begin
+                done_inst = func2rob[`FADD_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[11]) begin
-                done_inst = func2rob[11];
+            if (func_part_done[`FMUL_USE]) begin
+                done_inst = func2rob[`FMUL_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[12]) begin
-                done_inst = func2rob[12];
+            if (func_part_done[`FDIV_USE]) begin
+                done_inst = func2rob[`FDIV_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[13]) begin
-                done_inst = func2rob[13];
+            if (func_part_done[`FSP_USE]) begin
+                done_inst = func2rob[`FSP_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
-            if (func_part_done[14]) begin
-                done_inst = func2rob[14];
+            if (func_part_done[`FCMP_USE]) begin
+                done_inst = func2rob[`FCMP_USE];
                 rob_inst_done[done_inst] = 'd1;
             end
             done_inst = 'd11;
         end
+
+        if(wb_v) begin
+            rob_inst_done[wb_inst] = 'b0;
+        end
+
     end
 
     else begin
@@ -298,75 +325,11 @@ end
 
 
 // write rob when decode info is valid
-// write func_part result into rob
 always @ (posedge clk) begin
     if(!rst) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info != 'd0) begin
             rob_info_stack[head_pt] <= rob_info;
-        end
-
-        // let inst result in
-        if (ex_done) begin
-            if(func_part_done[`RAM_USE]) begin
-                rob_info_stack[end_pt][`RES] <= ram_res;
-            end
-            
-            if(func_part_done[`BRANCH_USE]) begin
-                rob_info_stack[end_pt][`RES] <= branch_res;
-            end
-
-            if(func_part_done[`SHIFT_USE]) begin
-                rob_info_stack[end_pt][`RES] <= shift_res;
-            end
-
-            if(func_part_done[`LOGIC_USE]) begin
-                rob_info_stack[end_pt][`RES] <= logic_res;
-            end
-
-            if(func_part_done[`CMP_USE]) begin
-                rob_info_stack[end_pt][`RES] <= cmp_res;
-            end
-
-            if(func_part_done[`ADD_USE]) begin
-                rob_info_stack[end_pt][`RES] <= add_res;
-            end
-
-            if(func_part_done[`MUL_USE]) begin
-                rob_info_stack[end_pt][`RES] <= mul_res;
-            end
-
-            if(func_part_done[`DIV_USE]) begin
-                rob_info_stack[end_pt][`RES] <= div_res;
-            end
-
-            if(func_part_done[`SP_USE]) begin
-                rob_info_stack[end_pt][`RES] <= sp_res;
-            end
-
-            if(func_part_done[`RINFO_USE]) begin
-                rob_info_stack[end_pt][`RES] <= rinfo_res;
-            end
-
-            if(func_part_done[`FADD_USE]) begin
-                rob_info_stack[end_pt][`RES] <= fadd_res;
-            end
-
-            if(func_part_done[`FMUL_USE]) begin
-                rob_info_stack[end_pt][`RES] <= fmul_res;
-            end
-
-            if(func_part_done[`FDIV_USE]) begin
-                rob_info_stack[end_pt][`RES] <= fdiv_res;
-            end
-
-            if(func_part_done[`FSP_USE]) begin
-                rob_info_stack[end_pt][`RES] <= fsp_res;
-            end
-
-            if(func_part_done[`FCMP_USE]) begin
-                rob_info_stack[end_pt][`RES] <= fcmp_res;
-            end
         end
     end
     else begin
@@ -380,8 +343,95 @@ always @ (posedge clk) begin
         rob_info_stack[7] <= 'd0;
         rob_info_stack[8] <= 'd0;
         rob_info_stack[9] <= 'd0;
+
     end
 end
+
+
+
+
+
+// set inst_reslt array to store inst's
+// computing result. Write when ex_done.
+always @ (func_part_done) begin
+    if(!rst) begin
+         // let inst result in
+        if (ex_done) begin
+            if(func_part_done[`RAM_USE]) begin
+                inst_reslt[end_pt] <= ram_res;
+            end
+            
+            if(func_part_done[`BRANCH_USE]) begin
+                inst_reslt[end_pt] <= branch_res;
+            end
+
+            if(func_part_done[`SHIFT_USE]) begin
+                inst_reslt[end_pt] <= shift_res;
+            end
+
+            if(func_part_done[`LOGIC_USE]) begin
+                inst_reslt[end_pt] <= logic_res;
+            end
+
+            if(func_part_done[`CMP_USE]) begin
+                inst_reslt[end_pt] <= cmp_res;
+            end
+
+            if(func_part_done[`ADD_USE]) begin
+                inst_reslt[end_pt] <= add_res;
+            end
+
+            if(func_part_done[`MUL_USE]) begin
+                inst_reslt[end_pt] <= mul_res;
+            end
+
+            if(func_part_done[`DIV_USE]) begin
+                inst_reslt[end_pt] <= div_res;
+            end
+
+            if(func_part_done[`SP_USE]) begin
+                inst_reslt[end_pt] <= sp_res;
+            end
+
+            if(func_part_done[`RINFO_USE]) begin
+                inst_reslt[end_pt] <= rinfo_res;
+            end
+
+            if(func_part_done[`FADD_USE]) begin
+                inst_reslt[end_pt] <= fadd_res;
+            end
+
+            if(func_part_done[`FMUL_USE]) begin
+                inst_reslt[end_pt] <= fmul_res;
+            end
+
+            if(func_part_done[`FDIV_USE]) begin
+                inst_reslt[end_pt] <= fdiv_res;
+            end
+
+            if(func_part_done[`FSP_USE]) begin
+                inst_reslt[end_pt] <= fsp_res;
+            end
+
+            if(func_part_done[`FCMP_USE]) begin
+                inst_reslt[end_pt] <= fcmp_res;
+            end
+        end
+    end
+    else begin
+        inst_reslt[0] = 'd0;
+        inst_reslt[1] = 'd0;
+        inst_reslt[2] = 'd0;
+        inst_reslt[3] = 'd0;
+        inst_reslt[4] = 'd0;
+        inst_reslt[5] = 'd0;
+        inst_reslt[6] = 'd0;
+        inst_reslt[7] = 'd0;
+        inst_reslt[8] = 'd0;
+        inst_reslt[9] = 'd0;
+    end
+end
+
 
 
 
@@ -409,13 +459,14 @@ end
 
 
 
-// control end_pt
+// control end_pt and wb_v
+// use this part to control write-back process
 always @ (posedge clk) begin
     if(!rst) begin
         if(rob_inst_done[end_pt]) begin
             wb_v <= 'd1;
-            wb_res <= rob_info_stack[end_pt][`RES];
-            
+            wb_res <= inst_reslt[end_pt];
+            wb_inst <= end_pt;
             if(end_pt == 'd9) begin
                 end_pt <= 'd0;
             end
@@ -423,11 +474,18 @@ always @ (posedge clk) begin
                 end_pt <= end_pt + 'd1;
             end
         end
+        else begin
+            wb_v <= 'd0;
+            wb_res <= 'd0;
+            end_pt <= end_pt;
+            wb_inst <= 'd11;
+        end
     end
     else begin
         end_pt <= 'd0;
         wb_v <= 'd0;
         wb_res <= 'd0;
+        wb_inst <= 'd11;
     end
 end
 
@@ -437,1175 +495,3236 @@ end
 // check data relation
 // when new inst come or when clk posedge arrive
 // check existed inst first
+// when an inst is write back, free element
 always @ (*) begin
     if(!rst) begin
+        // when a inst is write back, free
+        if(wb_v) begin
+            related[wb_inst] = 'd0;
+            related_inst[wb_inst] = 'd11;
+            related_busy[wb_inst] = 'd0;
+        end
+
         // when a inst is done in exe
         if(ex_done) begin
-            // ram done
+
             if(func_part_done[0]) begin
                 after_done_dcheck = func2rob[0];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
-
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // branch done
             if(func_part_done[1]) begin
                 after_done_dcheck = func2rob[1];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // shift done
             if(func_part_done[2]) begin
                 after_done_dcheck = func2rob[2];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // logic done
             if(func_part_done[3]) begin
                 after_done_dcheck = func2rob[3];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // cmp done
             if(func_part_done[4]) begin
                 after_done_dcheck = func2rob[4];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // add done
             if(func_part_done[5]) begin
                 after_done_dcheck = func2rob[5];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // mul done
             if(func_part_done[6]) begin
                 after_done_dcheck = func2rob[6];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
-            
-            // div done
+
             if(func_part_done[7]) begin
                 after_done_dcheck = func2rob[7];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // sp done
             if(func_part_done[8]) begin
                 after_done_dcheck = func2rob[8];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // rinfo done
             if(func_part_done[9]) begin
                 after_done_dcheck = func2rob[9];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // fadd done
             if(func_part_done[10]) begin
                 after_done_dcheck = func2rob[10];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // fmul done
             if(func_part_done[11]) begin
                 after_done_dcheck = func2rob[11];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // fdiv done
             if(func_part_done[12]) begin
                 after_done_dcheck = func2rob[12];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // fsp done
             if(func_part_done[13]) begin
                 after_done_dcheck = func2rob[13];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
-            // fcmp done
             if(func_part_done[14]) begin
                 after_done_dcheck = func2rob[14];
+                check_data_pt = end_pt;
 
-                check_data_pt = 'd0;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 1
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    // prepare forwarding data-flow
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd1;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 2
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd2;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 3
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd3;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 4
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd4;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 5
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd5;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 6
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd6;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 7
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd7;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 8
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
+                end
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
                 end
 
-                check_data_pt = 'd8;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
+                // check 9
+                if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
+                    related_inst_rs2[check_data_pt] == after_done_dcheck) && 
                     related_busy[check_data_pt]) begin
                     // cancel related flag
-                    related[check_data_pt] = 'd0;
+                    if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
+                        related_rs1[check_data_pt] = 'd0;
+                        forward_data_rs1[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    if(related_inst_rs2[check_data_pt] == after_done_dcheck) begin
+                        related_rs2[check_data_pt] = 'd0;
+                        forward_data_rs2[check_data_pt] = inst_reslt[after_done_dcheck];
+                    end
+                    related[check_data_pt] = related_rs1[check_data_pt] | 
+                                                related_rs2[check_data_pt];
                 end
-
-                check_data_pt = 'd9;
-                if(related_inst[check_data_pt] == after_done_dcheck && 
-                    related_busy[check_data_pt]) begin
-                    // cancel related flag
-                    related[check_data_pt] = 'd0;
+                if(check_data_pt == 'd9) begin
+                    check_data_pt = 'd0;
                 end
-
-                check_data_pt = 'd0;
+                else begin
+                    check_data_pt = check_data_pt + 'd1;
+                end
             end
 
         end
 
+
         // new inst come
-        if(last_pc != de_cur_pc && rob_info != 'd0) begin
+        if(last_pc != de_cur_pc && rob_info != 'd0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
 
+            // set zero before use
+            // no need to free when write back
+            forward_flag_rs1[head_pt] = 'd0;
+            forward_flag_rs2[head_pt] = 'd0;
+            related_rs1[head_pt] = 'b0;
+            related_rs2[head_pt] = 'b0;
+            related_inst_rs1[head_pt] = 'd11;
+            related_inst_rs2[head_pt] = 'd11;
+
             check_data_done = 'd0;
-            check_data_pt = head_pt - 'd1;
+            if(head_pt != 'd0)
+                check_data_pt = head_pt - 'd1;
+            else 
+                check_data_pt = 'd9;
             
             // inst does not use imm_data
             // need to check rst1 and rst2
@@ -1613,162 +3732,474 @@ always @ (*) begin
             // from head_pt to end_pt
             if(!rob_info[`IMMUSE]) begin
                 // 1 data check
+
+                $display("nt");
+                $display("nt");
+                $display("nt");
+                $display("%d", head_pt);
+
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 1");
+                        $display("cnm 1");
+                        $display("cnm 1");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 2 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 2");
+                        $display("cnm 2");
+                        $display("cnm 2");
+                        $display("%d", check_data_pt);
+
+                       if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 3 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 3");
+                        $display("cnm 3");
+                        $display("cnm 3");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 4 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 4");
+                        $display("cnm 4");
+                        $display("cnm 4");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 5 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0 ) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
-                    end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                        // related[head_pt] = 'd1;
 
+                        $display("cnm 5");
+                        $display("cnm 5");
+                        $display("cnm 5");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                    end
+                
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+              
                 // 6 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 6");
+                        $display("cnm 6");
+                        $display("cnm 6");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+    
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+             
 
                 // 7 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 7");
+                        $display("cnm 7");
+                        $display("cnm 7");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 8 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 8");
+                        $display("cnm 8");
+                        $display("cnm 8");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 9 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        $display("cnm 9");
+                        $display("cnm 9");
+                        $display("cnm 9");
+                        $display("%d", check_data_pt);
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
+                        if(inst_dst[check_data_pt] == rob_info[`RS2] && 
+                            !forward_flag_rs2[head_pt]) begin
+                            forward_flag_rs2[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs2[head_pt] = 'b1;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs2[head_pt] = 'b0;
+                                related_inst_rs2[head_pt] = check_data_pt;
+                                forward_data_rs2[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // reset and set non-related in corresponding situation
                 check_data_done = 'd0;
-                if (related_inst[head_pt] == 'd11) begin
-                    related[head_pt] = 'd0; 
+                // if (related_inst[head_pt] == 'd11) begin
+                //     related[head_pt] = 'd0; 
+                // end
+                if(forward_flag_rs1[head_pt] || forward_flag_rs2[head_pt]) begin
+                    related[head_pt] = 'b1;
+                end
+                else begin
+                    related[head_pt] = 'd0;
                 end
             end
 
@@ -1778,152 +4209,275 @@ always @ (*) begin
                 // 1 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 2 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 3 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 4 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 5 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 6 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 7 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 8 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // 9 data check
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1]) && 
-                    inst_dst[check_data_pt] != 'd0 &&
-                    !check_data_done ) begin
-                        check_data_done = 'd1;
+                    inst_dst[check_data_pt] != 'd0) begin
+                        check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
-                        related[head_pt] = 'd1;
+                        // related[head_pt] = 'd1;
+
+                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
+                            !forward_flag_rs1[head_pt]) begin
+                            forward_flag_rs1[head_pt] = 'b1;
+                            // related inst not done, cannot use it's value
+                            if(!rob_inst_done[check_data_pt]) begin
+                                related_rs1[head_pt] = 'b1;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                            end
+                            // related inst done, directly use it's value
+                            else begin
+                                related_rs1[head_pt] = 'b0;
+                                related_inst_rs1[head_pt] = check_data_pt;
+                                forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
+                            end
+                        end
                     end
-                else begin
-                    if(check_data_pt == 'd0) 
-                        check_data_pt = 'd9;
-                    else 
-                        check_data_pt = check_data_pt - 'd1;
-                end
+                if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
 
                 // reset and set non-related in corresponding situation
                 check_data_done = 'd0;
                 check_data_pt = 4'hf;
-                if (related_inst[head_pt] == 'd11) begin
-                    related[head_pt] = 'd0; 
+                // if (related_inst[head_pt] == 'd11) begin
+                //     related[head_pt] = 'd0; 
+                // end
+                if(forward_flag_rs1[head_pt] || forward_flag_rs2[head_pt]) begin
+                    related[head_pt] = 'b1;
+                end
+                else begin
+                    related[head_pt] = 'd0;
                 end
             end
         end
@@ -1970,6 +4524,75 @@ always @ (*) begin
         related = 10'd0;
 
         related_busy = 10'd0;
+
+        forward_flag_rs1[0] = 'd0;
+        forward_flag_rs1[1] = 'd0;
+        forward_flag_rs1[2] = 'd0;
+        forward_flag_rs1[3] = 'd0;
+        forward_flag_rs1[4] = 'd0;
+        forward_flag_rs1[5] = 'd0;
+        forward_flag_rs1[6] = 'd0;
+        forward_flag_rs1[7] = 'd0;
+        forward_flag_rs1[8] = 'd0;
+        forward_flag_rs1[9] = 'd0;
+
+        forward_flag_rs2[0] = 'd0;
+        forward_flag_rs2[1] = 'd0;
+        forward_flag_rs2[2] = 'd0;
+        forward_flag_rs2[3] = 'd0;
+        forward_flag_rs2[4] = 'd0;
+        forward_flag_rs2[5] = 'd0;
+        forward_flag_rs2[6] = 'd0;
+        forward_flag_rs2[7] = 'd0;
+        forward_flag_rs2[8] = 'd0;
+        forward_flag_rs2[9] = 'd0;
+
+        related_inst_rs1[0] = 'd11;
+        related_inst_rs1[1] = 'd11;
+        related_inst_rs1[2] = 'd11;
+        related_inst_rs1[3] = 'd11;
+        related_inst_rs1[4] = 'd11;
+        related_inst_rs1[5] = 'd11;
+        related_inst_rs1[6] = 'd11;
+        related_inst_rs1[7] = 'd11;
+        related_inst_rs1[8] = 'd11;
+        related_inst_rs1[9] = 'd11;
+
+        related_inst_rs2[0] = 'd11;
+        related_inst_rs2[1] = 'd11;
+        related_inst_rs2[2] = 'd11;
+        related_inst_rs2[3] = 'd11;
+        related_inst_rs2[4] = 'd11;
+        related_inst_rs2[5] = 'd11;
+        related_inst_rs2[6] = 'd11;
+        related_inst_rs2[7] = 'd11;
+        related_inst_rs2[8] = 'd11;
+        related_inst_rs2[9] = 'd11;
+
+        related_rs1 = 10'b0;
+        related_rs2 = 10'b0;
+
+        forward_data_rs1[0] = 'd0;
+        forward_data_rs1[1] = 'd0;
+        forward_data_rs1[2] = 'd0;
+        forward_data_rs1[3] = 'd0;
+        forward_data_rs1[4] = 'd0;
+        forward_data_rs1[5] = 'd0;
+        forward_data_rs1[6] = 'd0;
+        forward_data_rs1[7] = 'd0;
+        forward_data_rs1[8] = 'd0;
+        forward_data_rs1[9] = 'd0;
+
+        forward_data_rs2[0] = 'd0;
+        forward_data_rs2[1] = 'd0;
+        forward_data_rs2[2] = 'd0;
+        forward_data_rs2[3] = 'd0;
+        forward_data_rs2[4] = 'd0;
+        forward_data_rs2[5] = 'd0;
+        forward_data_rs2[6] = 'd0;
+        forward_data_rs2[7] = 'd0;
+        forward_data_rs2[8] = 'd0;
+        forward_data_rs2[9] = 'd0;
     end
 end
 
@@ -5814,17 +8437,6 @@ always @ (*) begin
             end
 
             if(rob_info[`ADD]) begin
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("cnm");
-                $display("%d", head_pt);
                 tar_func_part[head_pt] = 'd5;
                 if(global_hw_use[`ADD_USE]) begin
                     hw_relation[head_pt] = 'd1;

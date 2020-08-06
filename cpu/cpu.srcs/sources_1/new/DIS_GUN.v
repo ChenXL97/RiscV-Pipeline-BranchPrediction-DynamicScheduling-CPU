@@ -38,7 +38,11 @@ module ISSUSER_GUN(
 	// issue valid signal and inst-issued's number
 	output		reg								issue_v,
 	output		reg		[3:0]					iss_inst,
-	output				[9:0]					iss_flag
+	output				[9:0]					iss_flag,
+
+	// signal input from rob due from write back
+	input		[3:0]							wb_inst,
+	input										wb_v
 );
 
 
@@ -54,6 +58,7 @@ reg			[9:0]								iss_flag;
 
 // search for proper inst to issue
 // search start from end_pt to head_pt - 1
+// when an inst is write back, free an unit
 always @ (posedge clk) begin
 	if(!rst) begin
 		// initialize
@@ -202,6 +207,11 @@ always @ (posedge clk) begin
 		else
 			inst_search_pt = inst_search_pt + 'd1;
 
+		// when an inst is write back, free an unit
+		if(wb_v) begin
+			iss_flag[wb_inst] = 'd0;
+		end
+
 	end
 	else begin
 		inst_search_pt = 'd11;
@@ -225,17 +235,5 @@ always @ (*) begin
 		issue_v = 'd0;
 	end
 end
-
-
-
-
-
-
-
-
-
-
-
-
 
 endmodule
