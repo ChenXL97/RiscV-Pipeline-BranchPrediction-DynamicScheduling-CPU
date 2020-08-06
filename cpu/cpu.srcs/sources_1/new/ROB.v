@@ -83,7 +83,18 @@ module ROB (
 
     // signal output due from write back
     output      [3:0]                           wb_inst,
-    output                                      wb_v
+    output                                      wb_v,
+
+    // forward data and it's control signal
+    output      reg     [31:0]                          forwd_data_rs1,
+    output      reg     [31:0]                          forwd_data_rs2,
+    output      reg                             forwd_data_rs1_v,
+    output      reg                             forwd_data_rs2_v,
+
+    // prepare data at regfile
+    output      reg     [4:0]                   rs1,
+    output      reg     [4:0]                   rs2,
+    output      reg                             prepare_data
 
 );
 
@@ -8575,6 +8586,45 @@ always @ (*) begin
         tar_func_part[9] = 'd16;
     end
 end
+
+
+
+
+// transfer forward data to dis_gun
+always @ (*) begin
+    if(!rst) begin
+        if(issue_v) begin
+            forwd_data_rs1 = 'd0;
+            forwd_data_rs2 = 'd0;
+            forwd_data_rs1_v = 'b0;
+            forwd_data_rs2_v = 'b0;
+
+            if(forward_flag_rs1[iss_inst]) begin
+                forwd_data_rs1_v = 'b1;
+                forwd_data_rs1 = forward_data_rs1[iss_inst];
+            end
+            if(forward_flag_rs2[iss_inst]) begin
+                forwd_data_rs2_v = 'b1;
+                forwd_data_rs2 = forward_data_rs2[iss_inst];
+            end
+
+        end
+        else begin
+            forwd_data_rs1 = 'd0;
+            forwd_data_rs2 = 'd0;
+            forwd_data_rs1_v = 'b0;
+            forwd_data_rs2_v = 'b0;
+        end
+    end
+    else begin
+        forwd_data_rs1 = 'd0;
+        forwd_data_rs2 = 'd0;
+        forwd_data_rs1_v = 'b0;
+        forwd_data_rs2_v = 'b0;
+    end
+end
+
+
 
 
 endmodule

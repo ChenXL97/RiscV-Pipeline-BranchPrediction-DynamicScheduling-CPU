@@ -42,7 +42,18 @@ module ISSUSER_GUN(
 
 	// signal input from rob due from write back
 	input		[3:0]							wb_inst,
-	input										wb_v
+	input										wb_v,
+
+	// forward data, both input and output
+	input		[31:0]							forwd_data_rs1,
+	input		[31:0]							forwd_data_rs2,
+	input										forwd_data_rs1_v,
+	input										forwd_data_rs2_v,
+	output		[31:0]							forward_data_rs1_w,
+	output		[31:0]							forward_data_rs2_w,
+	output		[31:0]							forward_data_rs1_v_w,
+	output		[31:0]							forward_data_rs2_v_w
+
 );
 
 
@@ -52,6 +63,12 @@ reg			[3:0]								inst_search_pt;
 reg												check_iss_done;
 reg												issue;
 reg			[9:0]								iss_flag;
+
+reg			[31:0]								forward_data_rs1;
+reg			[31:0]								forward_data_rs2;
+reg												forward_data_rs1_v;
+reg												forward_data_rs2_v;
+
 
 
 
@@ -226,7 +243,7 @@ end
 
 
 
-
+// issue valid signal
 always @ (*) begin
 	if(!rst) begin
 		issue_v = issue;
@@ -235,5 +252,28 @@ always @ (*) begin
 		issue_v = 'd0;
 	end
 end
+
+
+
+
+// store forwarding data
+always @ (posedge clk) begin
+	if(!rst) begin
+		forward_data_rs1 <= forwd_data_rs1;
+		forward_data_rs2 <= forwd_data_rs2;
+		forward_data_rs1_v <= forwd_data_rs1_v;
+		forward_data_rs2_v <= forwd_data_rs2_v;
+	end
+	else begin
+		forward_data_rs1 <= 'd0;
+		forward_data_rs2 <= 'd0;
+		forward_data_rs1_v <= 'd0;
+		forward_data_rs2_v <= 'd0;
+	end
+end
+assign forward_data_rs1_v_w = forward_data_rs1_v;
+assign forward_data_rs1_w = forwd_data_rs1;
+assign forward_data_rs2_v_w = forward_data_rs2_v;
+assign forward_data_rs2_w = forward_data_rs2;
 
 endmodule
