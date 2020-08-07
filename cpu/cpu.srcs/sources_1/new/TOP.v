@@ -179,6 +179,105 @@ wire                            dis_forward_b;
    );
 
 
+
+/* *************************** REG_FILE *************************** */
+REG_FILE regfile(
+    .clk_i                      (clk),
+    .rst_i                      (rst),
+    .rd0_value_i                (),
+    .rd0_i                      (),
+    .ra0_i                      (),
+    .rb0_i                      (),                 
+    .wb_v                       (),
+    .ra0_value_o                (),
+    .rb0_value_o                ()
+);
+
+
+
+
+
+
+/* ************************** ROB *********************************/
+ROB rob(
+    .clk                        (),
+    .rst                        (),
+
+    // global control signal
+    .ex_flush                   (),
+    .rob_stall                  (),
+
+    // signal from exe to help dispatch
+    .ex_done                    (),
+    .func_part_done             (),
+
+    .rob_info                   (),
+    .de_cur_pc                  (),
+    
+    // send to issuer
+    .end_pt                     (),
+    .head_pt                    (),
+    .related_busy               (),
+    .related                    (),
+    .hw_relation                (),
+
+    // issue signal from dis-gun
+    .issue_v                    (),
+    .iss_inst                   (),
+    .iss_flag                   (),
+
+    // func_part input result
+    .ram_res                    (),
+    .branch_res                 (),
+    .shift_res                  (),
+    .logic_res                  (),
+    .cmp_res
+    .add_res
+    .mul_res
+    .div_res
+    .sp_res
+    .rinfo_res
+    .fadd_res
+    .fmul_res
+    .fdiv_res
+    .fsp_res
+    .fcmp_res
+
+    // signal output due from write back
+    .wb_inst
+    .wb_v
+
+    // forward data and it's control signal
+    .forwd_data_rs1
+    .forwd_data_rs2
+    .forwd_data_rs1_v
+    .forwd_data_rs2_v
+
+    // prepare data at regfile
+    .rs1
+    .rs2
+    .prepare_rs1_en
+    .prepare_rs2_en
+
+    // write data into regfile
+    .dst
+    .wb_res
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //#####################################################
 //##########   EX Module  #############################
 //#####################################################

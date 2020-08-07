@@ -106,7 +106,7 @@ end
     adder r2, r2, r3
     fadd  r7, r7, r7
     adder r3, r7, r7
-    adder r4, r7, r5
+    adder r4, r4, r4
      */
 always @ (posedge clk) begin
     if(!rst) begin
@@ -136,9 +136,9 @@ always @ (posedge clk) begin
 
         else if(cnter == 'd6) begin
             rob_info <= 'd0;
-            rob_info[`DST] <= 'd5;
+            rob_info[`DST] <= 'd4;
             rob_info[`RS1] <= 'd4;
-            rob_info[`RS2] <= 'd7;
+            rob_info[`RS2] <= 'd4;
             rob_info[`ADD] <= 'd1;
         end
 

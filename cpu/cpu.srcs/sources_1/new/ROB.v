@@ -350,7 +350,7 @@ end
 
 always @ (posedge clk) begin
     if(!rst) begin
-       last_pc <= cur_pc; 
+       last_pc <= de_cur_pc; 
     end
     else begin
         last_pc <= 32'hffff_ffff;

@@ -80,22 +80,22 @@ wire [31:0] dispatch_rb_value_w;
 wire [`ROB_ITEM_INDEX]DISPATCH_pip_reg_w;
 
 
-REG_FILES REG_FILES
-(
-    .clk_i(clk_i),
-    .rst_i(rst_i),
+// REG_FILES REG_FILES
+// (
+//     .clk_i(clk_i),
+//     .rst_i(rst_i),
 
-    // Write ports
-    .rd0_value_i(ex_res),
-    .rd0_i(ex_rd),
+//     // Write ports
+//     .rd0_value_i(ex_res),
+//     .rd0_i(ex_rd),
 
-    // Read ports
-    .ra0_i(dispatch_ra_index_w),
-    .rb0_i(dispatch_rb_index_w),
-    .ra0_value_o(dispatch_ra_value_w),
-    .rb0_value_o(dispatch_rb_value_w),
-    .ex_done(ex_done)
-);
+//     // Read ports
+//     .ra0_i(dispatch_ra_index_w),
+//     .rb0_i(dispatch_rb_index_w),
+//     .ra0_value_o(dispatch_ra_value_w),
+//     .rb0_value_o(dispatch_rb_value_w),
+//     .ex_done(ex_done)
+// );
 
 
 always @ (posedge clk_i) begin
