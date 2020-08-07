@@ -99,13 +99,15 @@ module DE(
 
 	always @ (posedge clk) begin
 		if(!rst && !ex_flush) begin
-            if(!ex_stall)
+            if(!ex_stall) begin
                 de_cur_pc <= pc;
-            else
+            end
+            else begin
                 de_cur_pc <= de_cur_pc;
+            end
 		end
 		else begin
-			de_cur_pc <= 32'bx;
+			de_cur_pc <= 32'hffff_ffff;
 		end
 	end
 	

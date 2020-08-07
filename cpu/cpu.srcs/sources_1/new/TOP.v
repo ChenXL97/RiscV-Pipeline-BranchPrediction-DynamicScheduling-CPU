@@ -102,7 +102,7 @@ wire                            rob_stall;
         .rst(rst),
         .revert_jump(revert_jump),
         .revert_addr(revert_addr),
-        .EX_rst(ex_flush),
+        .EX_rst('b0),
         .EX_pc_i(ex_cur_pc_w),
         .EX_block(rob_stall),
         .EX_write_pc(EX_update),
@@ -139,7 +139,7 @@ wire                            rob_stall;
         .DE_pip_reg(DE_pip_reg),
         .de_cur_pc(de_cur_pc),
         .EX_rst(ex_flush),
-        .ex_flush(ex_flush)
+        .ex_flush('b0)
     );
 
 //#####################################################
@@ -265,7 +265,7 @@ ROB rob(
     .ex_done                    (ex_done),
     .func_part_done             (func_part_done),
 
-    .rob_info                   (DISPATCH_pip_reg),
+    .rob_info                   (DE_pip_reg),
     .de_cur_pc                  (de_cur_pc),
     .rob_cur_pc                 (rob_cur_pc),
     

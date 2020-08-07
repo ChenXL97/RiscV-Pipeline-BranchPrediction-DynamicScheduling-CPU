@@ -433,6 +433,12 @@ always @ (posedge clk) begin
     if(!rst) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info != 'd0) begin
+            $display("nt");
+            $display("nt");
+            $display("nt");
+            $display("%d", head_pt);
+            $display("%h", rob_info);
+
             imm_data[head_pt] <= rob_info[`IMM];
             imm_use[head_pt] <= rob_info[`IMMUSE];
         end
@@ -3930,11 +3936,6 @@ always @ (*) begin
             if(!rob_info[`IMMUSE]) begin
                 // 1 data check
 
-                $display("nt");
-                $display("nt");
-                $display("nt");
-                $display("%d", head_pt);
-
                 if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
@@ -3942,11 +3943,6 @@ always @ (*) begin
                         check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
-
-                        $display("cnm 1");
-                        $display("cnm 1");
-                        $display("cnm 1");
-                        $display("%d", check_data_pt);
 
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
@@ -3993,11 +3989,6 @@ always @ (*) begin
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
 
-                        $display("cnm 2");
-                        $display("cnm 2");
-                        $display("cnm 2");
-                        $display("%d", check_data_pt);
-
                        if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
                             forward_flag_rs1[head_pt] = 'b1;
@@ -4042,11 +4033,6 @@ always @ (*) begin
                         check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
-
-                        $display("cnm 3");
-                        $display("cnm 3");
-                        $display("cnm 3");
-                        $display("%d", check_data_pt);
 
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
@@ -4093,11 +4079,6 @@ always @ (*) begin
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
 
-                        $display("cnm 4");
-                        $display("cnm 4");
-                        $display("cnm 4");
-                        $display("%d", check_data_pt);
-
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
                             forward_flag_rs1[head_pt] = 'b1;
@@ -4142,11 +4123,6 @@ always @ (*) begin
                         check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
-
-                        $display("cnm 5");
-                        $display("cnm 5");
-                        $display("cnm 5");
-                        $display("%d", check_data_pt);
 
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
@@ -4193,11 +4169,6 @@ always @ (*) begin
                         check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
-
-                        $display("cnm 6");
-                        $display("cnm 6");
-                        $display("cnm 6");
-                        $display("%d", check_data_pt);
 
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
@@ -4246,11 +4217,6 @@ always @ (*) begin
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
 
-                        $display("cnm 7");
-                        $display("cnm 7");
-                        $display("cnm 7");
-                        $display("%d", check_data_pt);
-
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
                             forward_flag_rs1[head_pt] = 'b1;
@@ -4296,11 +4262,6 @@ always @ (*) begin
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
 
-                        $display("cnm 8");
-                        $display("cnm 8");
-                        $display("cnm 8");
-                        $display("%d", check_data_pt);
-
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin
                             forward_flag_rs1[head_pt] = 'b1;
@@ -4345,11 +4306,6 @@ always @ (*) begin
                         check_data_done = 'd0;
                         related_inst[head_pt] = check_data_pt;
                         // related[head_pt] = 'd1;
-
-                        $display("cnm 9");
-                        $display("cnm 9");
-                        $display("cnm 9");
-                        $display("%d", check_data_pt);
 
                         if(inst_dst[check_data_pt] == rob_info[`RS1] && 
                             !forward_flag_rs1[head_pt]) begin

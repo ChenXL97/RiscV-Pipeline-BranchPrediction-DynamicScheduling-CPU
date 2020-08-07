@@ -3,146 +3,84 @@
    <wave_state>
    </wave_state>
    <db_ref_list>
-      <db_ref path="rob_top_behav.wdb" id="1">
+      <db_ref path="TOP_behav.wdb" id="1">
          <top_modules>
+            <top_module name="TOP" />
             <top_module name="glbl" />
-            <top_module name="rob_top" />
          </top_modules>
       </db_ref>
    </db_ref_list>
    <zoom_setting>
       <ZoomStartTime time="0fs"></ZoomStartTime>
-      <ZoomEndTime time="52883521fs"></ZoomEndTime>
-      <Cursor1Time time="27026000fs"></Cursor1Time>
+      <ZoomEndTime time="36800001fs"></ZoomEndTime>
+      <Cursor1Time time="6000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="76"></ValueColumnWidth>
+      <ValueColumnWidth column_width="64"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="28" />
+   <WVObjectSize size="14" />
    <wave_markers>
       <marker time="502656000000" label="" />
    </wave_markers>
-   <wvobject fp_name="/rob_top/rob/clk" type="logic">
+   <wvobject fp_name="/TOP/IF/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
       <obj_property name="ObjectShortName">clk</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/rst" type="logic">
+   <wvobject fp_name="/TOP/IF/rst" type="logic">
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/head_pt" type="array">
-      <obj_property name="ElementShortName">head_pt[3:0]</obj_property>
-      <obj_property name="ObjectShortName">head_pt[3:0]</obj_property>
+   <wvobject fp_name="/TOP/IF/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/rob_info" type="array">
+   <wvobject fp_name="/TOP/DE/de_cur_pc" type="array">
+      <obj_property name="ElementShortName">de_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">de_cur_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/DE/DE_pip_reg" type="array">
+      <obj_property name="ElementShortName">DE_pip_reg[167:0]</obj_property>
+      <obj_property name="ObjectShortName">DE_pip_reg[167:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rob_info" type="array">
       <obj_property name="ElementShortName">rob_info[167:0]</obj_property>
       <obj_property name="ObjectShortName">rob_info[167:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/rob_info_stack" type="array">
-      <obj_property name="ElementShortName">rob_info_stack[9:0][167:0]</obj_property>
-      <obj_property name="ObjectShortName">rob_info_stack[9:0][167:0]</obj_property>
+   <wvobject fp_name="/TOP/rob/end_pt" type="array">
+      <obj_property name="ElementShortName">end_pt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">end_pt[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/ex_done" type="logic">
-      <obj_property name="ElementShortName">ex_done</obj_property>
-      <obj_property name="ObjectShortName">ex_done</obj_property>
+   <wvobject fp_name="/TOP/rob/head_pt" type="array">
+      <obj_property name="ElementShortName">head_pt[3:0]</obj_property>
+      <obj_property name="ObjectShortName">head_pt[3:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/func_part_done" type="array">
-      <obj_property name="ElementShortName">func_part_done[14:0]</obj_property>
-      <obj_property name="ObjectShortName">func_part_done[14:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/func2rob" type="array">
-      <obj_property name="ElementShortName">func2rob[14:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">func2rob[14:0][3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/issuer/issue" type="logic">
-      <obj_property name="ElementShortName">issue</obj_property>
-      <obj_property name="ObjectShortName">issue</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/iss_inst" type="array">
-      <obj_property name="ElementShortName">iss_inst[3:0]</obj_property>
-      <obj_property name="ObjectShortName">iss_inst[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/iss_flag" type="array">
-      <obj_property name="ElementShortName">iss_flag[9:0]</obj_property>
-      <obj_property name="ObjectShortName">iss_flag[9:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/func2rob" type="array">
-      <obj_property name="ElementShortName">func2rob[14:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">func2rob[14:0][3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/forward_flag_rs1" type="array">
-      <obj_property name="ElementShortName">forward_flag_rs1[9:0]</obj_property>
-      <obj_property name="ObjectShortName">forward_flag_rs1[9:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/forward_flag_rs2" type="array">
-      <obj_property name="ElementShortName">forward_flag_rs2[9:0]</obj_property>
-      <obj_property name="ObjectShortName">forward_flag_rs2[9:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/related_busy" type="array">
+   <wvobject fp_name="/TOP/rob/related_busy" type="array">
       <obj_property name="ElementShortName">related_busy[9:0]</obj_property>
       <obj_property name="ObjectShortName">related_busy[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/related" type="array">
+   <wvobject fp_name="/TOP/rob/related" type="array">
       <obj_property name="ElementShortName">related[9:0]</obj_property>
       <obj_property name="ObjectShortName">related[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/wb_inst" type="array">
-      <obj_property name="ElementShortName">wb_inst[3:0]</obj_property>
-      <obj_property name="ObjectShortName">wb_inst[3:0]</obj_property>
+   <wvobject fp_name="/TOP/rob/hw_relation" type="array">
+      <obj_property name="ElementShortName">hw_relation[9:0]</obj_property>
+      <obj_property name="ObjectShortName">hw_relation[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/forwd_data_rs1" type="array">
-      <obj_property name="ElementShortName">forwd_data_rs1[31:0]</obj_property>
-      <obj_property name="ObjectShortName">forwd_data_rs1[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/m1911/issue_v" type="logic">
+      <obj_property name="ElementShortName">issue_v</obj_property>
+      <obj_property name="ObjectShortName">issue_v</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/forwd_data_rs2" type="array">
-      <obj_property name="ElementShortName">forwd_data_rs2[31:0]</obj_property>
-      <obj_property name="ObjectShortName">forwd_data_rs2[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/rob/rob_imm_data" type="array">
+      <obj_property name="ElementShortName">rob_imm_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rob_imm_data[31:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/rob_top/rob/forwd_data_rs1_v" type="logic">
-      <obj_property name="ElementShortName">forwd_data_rs1_v</obj_property>
-      <obj_property name="ObjectShortName">forwd_data_rs1_v</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/forwd_data_rs2_v" type="logic">
-      <obj_property name="ElementShortName">forwd_data_rs2_v</obj_property>
-      <obj_property name="ObjectShortName">forwd_data_rs2_v</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/rs1" type="array">
-      <obj_property name="ElementShortName">rs1[4:0]</obj_property>
-      <obj_property name="ObjectShortName">rs1[4:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/rs2" type="array">
-      <obj_property name="ElementShortName">rs2[4:0]</obj_property>
-      <obj_property name="ObjectShortName">rs2[4:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/prepare_rs1_en" type="logic">
-      <obj_property name="ElementShortName">prepare_rs1_en</obj_property>
-      <obj_property name="ObjectShortName">prepare_rs1_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/prepare_rs2_en" type="logic">
-      <obj_property name="ElementShortName">prepare_rs2_en</obj_property>
-      <obj_property name="ObjectShortName">prepare_rs2_en</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/wb_v" type="logic">
-      <obj_property name="ElementShortName">wb_v</obj_property>
-      <obj_property name="ObjectShortName">wb_v</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/dst" type="array">
-      <obj_property name="ElementShortName">dst[4:0]</obj_property>
-      <obj_property name="ObjectShortName">dst[4:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/rob_top/rob/wb_res" type="array">
-      <obj_property name="ElementShortName">wb_res[31:0]</obj_property>
-      <obj_property name="ObjectShortName">wb_res[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/rob/imm_use" type="array">
+      <obj_property name="ElementShortName">imm_use[9:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_use[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
 </wave_config>
