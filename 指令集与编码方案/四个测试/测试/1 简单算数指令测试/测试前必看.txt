@@ -1,0 +1,10 @@
+（程序使用的是我第二版的汇编代码）
+1、将init_file放到 cpu\cpu.sim\sim_1\behav\xsim 下
+2、在Headfile中修改pc初值 INIT_PC 为0
+3、如果程序正确的话，计算出第8个斐波那契值
+	最终结果为：
+	t0(x5)=1
+	t1(x6)=2
+	t2(x7)=3
+	t3(x28)=4
+	t4(x29)=5

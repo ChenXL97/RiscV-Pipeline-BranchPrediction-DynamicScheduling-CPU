@@ -51,6 +51,7 @@ module ROB (
 
     input       [`ROB_ITEM_INDEX]               rob_info,
     input       [31:0]                          de_cur_pc,
+    output      [31:0]                          rob_cur_pc,
     
     // send to issuer
     output      [3:0]                           end_pt,
@@ -99,7 +100,21 @@ module ROB (
 
     // write data into regfile
     output      reg     [4:0]                   dst,
-    output      reg     [31:0]                  wb_res
+    output      reg     [31:0]                  wb_res,
+
+    // func_part_start signal
+    output      reg     [14:0]                  rob_func_part_start,
+
+    // issued inst's pc
+    output      reg     [31:0]                  iss_inst_pc,
+    
+    // imm data use
+    output   reg           [31:0]                  rob_imm_data,
+    output   reg           [9:0]                   imm_use,        
+
+    // op mode
+    output      reg     [1:0]                   rob_op_mode1,
+    output      reg     [2:0]                   rob_op_mode2
 
 );
 
@@ -108,7 +123,7 @@ module ROB (
 // simple rob writing content
 reg         [`ROB_ITEM_INDEX]                   rob_info_stack      [9:0];
 reg         [9:0]                               rob_inst_done;
-reg         [14:0]                              rob_hw_tar;
+
 
 // rob_stack_pt to and full signal
 reg         [3:0]                               end_pt;
@@ -125,6 +140,7 @@ reg         [3:0]                               done_inst;
 // related to inst pc
 reg         [31:0]                              last_pc;
 reg         [31:0]                              cur_pc;
+reg         [31:0]                              rob_inst_pc     [9:0];
 
 
 // related to data relation check
@@ -164,6 +180,9 @@ reg         [3:0]                               related_inst_rs2     [9:0];
 reg         [31:0]                              forward_data_rs1     [9:0];
 reg         [31:0]                              forward_data_rs2     [9:0];
 
+// related to imm_data and imm_use
+reg         [31:0]                              imm_data             [9:0]; 
+
 
 
 
@@ -183,6 +202,26 @@ always @ (posedge clk) begin
     end
 end
 assign rob_stall = rob_full;
+
+
+
+
+
+// generate func_part_start signal
+always @ (iss_inst) begin
+    if(!rst) begin
+        if(issue_v) begin
+            rob_func_part_start = 15'b0;
+            rob_func_part_start[iss_inst] = 'b1;
+        end
+        else begin
+            rob_func_part_start = 15'b0;
+        end
+    end
+    else begin
+        rob_func_part_start = 15'b0;
+    end
+end
 
 
 
@@ -356,6 +395,128 @@ always @ (posedge clk) begin
         last_pc <= 32'hffff_ffff;
     end
 end
+assign rob_cur_pc = last_pc;
+
+
+
+
+
+// store each inst's pc value
+always @ (posedge clk) begin
+    if(!rst) begin
+        // let new inst in
+        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+            rob_inst_pc[head_pt] <= de_cur_pc;
+        end
+    end
+    else begin
+        rob_inst_pc[0] <= 'd0;
+        rob_inst_pc[1] <= 'd0;
+        rob_inst_pc[2] <= 'd0;
+        rob_inst_pc[3] <= 'd0;
+        rob_inst_pc[4] <= 'd0;
+        rob_inst_pc[5] <= 'd0;
+        rob_inst_pc[6] <= 'd0;
+        rob_inst_pc[7] <= 'd0;
+        rob_inst_pc[8] <= 'd0;
+        rob_inst_pc[9] <= 'd0;
+    end
+end
+
+
+
+
+
+
+// control imm_data and imm_use signal
+always @ (posedge clk) begin
+    if(!rst) begin
+        // let new inst in
+        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+            imm_data[head_pt] <= rob_info[`IMM];
+            imm_use[head_pt] <= rob_info[`IMMUSE];
+        end
+    end
+    else begin
+        imm_data[0] <= 'd0;
+        imm_data[1] <= 'd0;
+        imm_data[2] <= 'd0;
+        imm_data[3] <= 'd0;
+        imm_data[4] <= 'd0;
+        imm_data[5] <= 'd0;
+        imm_data[6] <= 'd0;
+        imm_data[7] <= 'd0;
+        imm_data[8] <= 'd0;
+        imm_data[9] <= 'd0;
+
+        imm_use <= 10'b0;
+    end
+end
+
+
+
+
+// set op_mode1 and op_mode2
+always @ (iss_inst) begin
+    if(!rst) begin
+        if(issue_v) begin
+            rob_op_mode1 = rob_info_stack[iss_inst][`OP1];
+            rob_op_mode2 = rob_info_stack[iss_inst][`OP2];
+        end
+        else begin
+            rob_op_mode1 = 'b11;
+            rob_op_mode2 = 'b111;
+        end
+    end
+    else begin
+        rob_op_mode1 = 'b11;
+        rob_op_mode2 = 'b111;
+    end
+end
+
+
+
+
+
+// send imm_related information to dis_gun
+always @ (iss_inst) begin
+    if(!rst) begin
+        if(issue_v) begin
+            rob_imm_data = imm_data[iss_inst];
+        end
+        else begin
+            rob_imm_data = 'd0;
+        end
+    end
+    else begin
+        rob_imm_data = 'd0;
+    end
+end
+
+
+
+
+
+
+
+
+
+
+// send issued inst to issuer, then ex
+always @ (iss_inst) begin
+    if(!rst) begin
+        if(issue_v) begin
+            iss_inst_pc = rob_inst_pc[iss_inst];
+        end
+        else begin
+            iss_inst_pc = iss_inst_pc;
+        end
+    end
+    else begin
+        iss_inst_pc = 32'hffff_ffff;
+    end
+end
+
 
 
 

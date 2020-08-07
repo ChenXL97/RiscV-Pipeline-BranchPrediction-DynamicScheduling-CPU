@@ -1,0 +1,40 @@
+ADDI 1 zero t0	  ##func1入口,生成一个整数1
+FCVT t0 t0			将整数1转化成浮点数1
+FEQ t0 a0 t1		浮点数1与输入值n相比，结果为整数1/0
+BEQ 8 zero t1  		若为0即不相等，则跳转					*命中33次
+ADDI 0 t0 a0		把浮点数1放在返回值寄存器a0中
+JALR 0 ra zero		返回父函数							*不命中
+SW 0 sp a0			准备调用func1函数,将参数存入栈指针中
+FSUB a0 t0 a0		计算子函数的参数n-1
+ADDI -8 sp sp		准备调用func1函数,栈指针前移
+SW 4 sp ra			将父函数的返回地址压入栈中
+JAL -44 ra			跳转到func1入口						*命中33次
+ADDI 8 sp sp		返回后，弹栈
+LW -4 sp ra			取父函数返回地址
+LW 0 sp t1			取局部参数n
+FMUL t1 a0 a0		计算结果 n * a0 （a0为函数返回值）
+JALR 0 ra zero		返回父函数							*命中33次
+ADDI 2 zero t0	  ##func2入口，生成一个整数2，放在t0
+ADDI 1 zero t1		生成一个整数1，t1 = 1
+BEQ 40 a0 t1		如果n等于1，则跳转						*命中但无效果
+BEQ 36 a0 t0		如果n等于2，则跳转						*命中但无效果
+ADDI 1 zero t2		生成一个整数 t2 = 1
+ADD t1 t2 t2		t2 = t1 + t2
+SUB t2 t1 t1		t1 = t2 - t1
+ADDI 1 t0 t0		t0 = t0 + 1
+BLT -16 t0 a0 		如果 i < n 则继续循环					*命中33次
+ADDI 0 t2 a0 		把t2放到a0
+JALR 0 ra zero		返回父函数							*不命中
+ADDI 1 zero a0 		返回值1放在a0
+JALR 0 ra zero		返回父函数							*不命中
+ADDI 1020 zero sp //main函数入口，栈指针初始化
+LW 0 zero s0		读取外设的输入，放在s0
+SW 4 zero s0		s0输出到外设
+FCVT s0 a0			整数n转化为浮点数n，作为func1参数
+JAL -136 ra			跳转到func1入口						*不命中
+ADDI 0 a0 s1		浮点数结果化整数结果，存入s1中，fn1值
+ADDI 0 s0 a0		整数n作为func2参数
+JAL -84 ra			跳转到func2入口					  	*不命中
+ADDI 0 a0 s2		返回值放到s2中，作为fn2的值
+SW 4 zero s1		s1输出到外设
+SW 4 zero s2		s2输出到外设

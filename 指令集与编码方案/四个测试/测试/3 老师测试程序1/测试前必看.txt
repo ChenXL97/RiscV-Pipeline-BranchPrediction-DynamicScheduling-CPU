@@ -1,0 +1,8 @@
+（程序使用的是我第一版的汇编代码）
+1、将init_file放到 cpu\cpu.sim\sim_1\behav\xsim 下
+2、依次打开四个ram的ip核，用 init_file_datamem 中四个文件赋初值
+3、在Headfile中修改pc初值 INIT_PC 为116
+4、如果程序正确的话，计算出8！和第8个斐波那契数，
+	最终结果为:
+	s1(x9)=40320
+	s2(x18)=21

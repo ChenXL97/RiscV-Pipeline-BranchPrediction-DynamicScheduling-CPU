@@ -52,15 +52,34 @@ module EX(
     output      reg                     ex_stall,
     
     // set flush when branch inst need jmp
-    output       reg                       ex_flush,
-    output      reg     [4:0]           ex_rd,
-    output  ex_need_jump,
-    output reg revert_jump,
-    output reg [31:0] revert_addr,
-    output reg [31:0] ex_cur_pc,
+    output       reg                    ex_flush,
+    output       reg     [4:0]          ex_rd,
+    output                              ex_need_jump,
+    output       reg                    revert_jump,
+    output       reg     [31:0]         revert_addr,
+    output       reg     [31:0]         ex_cur_pc,
 
     // Tell BTB is brannch
-    output ex_is_branch
+    output ex_is_branch,
+
+    // signal to rob
+    output      reg     [14:0]                          func_part_done,
+    output      reg     [31:0]                          ram_res,
+    output      reg     [31:0]                          branch_res,
+    output      reg     [31:0]                          shift_res,
+    output      reg     [31:0]                          logic_res,
+    output      reg     [31:0]                          cmp_res,
+    output      reg     [31:0]                          add_res,
+    output      reg     [31:0]                          mul_res,
+    output      reg     [31:0]                          div_res,
+    output      reg     [31:0]                          sp_res,
+    output      reg     [31:0]                          rinfo_res,
+    output      reg     [31:0]                          fadd_res,
+    output      reg     [31:0]                          fmul_res,
+    output      reg     [31:0]                          fdiv_res,
+    output      reg     [31:0]                          fsp_res,
+    output      reg     [31:0]                          fcmp_res
+
     );
 
 // assign ex_flush = ex_need_jmp;
@@ -76,13 +95,13 @@ reg         [31:0]                      dis_cur_pc_r;
 reg         [31:0]                      reg_a;
 reg         [31:0]                      reg_b;
 reg         [31:0]                      reg_imm;
-reg         BTB_is_taken_r;
-reg [31:0] BTB_predict_pc_r;
+reg                                     BTB_is_taken_r;
+reg         [31:0]                      BTB_predict_pc_r;
 
 
 
 // wire between sub module
-wire ex_flush_w;
+wire                                    ex_flush_w;
 wire                                    logic_done;
 wire        [31:0]                      logic_res;
 wire                                    shift_done;
@@ -104,6 +123,36 @@ wire                                    fcmp_done;
 wire        [31:0]                      fcmp_res;
 wire                                    fmul_done;
 wire        [31:0]                      fmul_res;
+
+reg                                     cmp_done;
+reg                                     mul_done;
+reg                                     div_done;
+reg                                     sp_done;
+reg                                     rinfo_done;
+reg                                     fdiv_done;
+reg                                     fsp_done;
+
+always @ (posedge clk) begin
+    if(!rst) begin
+        cmp_done <= cmp_done;
+        mul_done <= mul_done;
+        div_done <= div_done;
+        sp_done <= sp_done;
+        rinfo_done <= rinfo_done;
+        fdiv_done <= fdiv_done;
+        fsp_done <= fsp_done;
+    end
+    else begin
+        cmp_done <= 'd0;
+        mul_done <= 'd0;
+        div_done <= 'd0;
+        sp_done <= 'd0;
+        rinfo_done <= 'd0;
+        fdiv_done <= 'd0;
+        fsp_done <= 'd0;
+    end
+end
+
 
 
 assign ex_is_branch = branch_done;
@@ -131,12 +180,9 @@ assign ex_done = add_done | logic_done | ram_done | branch_done
                 | shift_done ;
 
 
-// assign ex_done = add_done | logic_done | ram_done | branch_done;
 
 
-
-
-
+// prepare operation data and ex_cur_pc
 always @ (posedge clk) begin
     if(!rst) begin
         dis_cur_pc_r <= dis_cur_pc;
@@ -151,6 +197,127 @@ always @ (posedge clk) begin
         reg_imm <= 'd0;
     end
 end
+
+
+
+
+
+// generate func_part_done signal
+always @ (*) begin
+    if(!rst) begin
+        if(ram_done) begin
+            func_part_done[`RAM_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`RAM_USE] = 'b0;
+        end
+
+        if(branch_done) begin
+            func_part_done[`BRANCH_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`BRANCH_USE] = 'b0;
+        end
+
+        if(shift_done) begin
+            func_part_done[`SHIFT_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`SHIFT_USE] = 'b0;
+        end
+
+        if(logic_done) begin
+            func_part_done[`LOGIC_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`LOGIC_USE] = 'b0;
+        end
+
+        if(cmp_done) begin
+            func_part_done[`CMP_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`CMP_USE] = 'b0;
+        end
+
+        if(add_done) begin
+            func_part_done[`ADD_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`ADD_USE] = 'b0;
+        end
+
+        if(mul_done) begin
+            func_part_done[`MUL_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`MUL_USE] = 'b0;
+        end
+
+        if(div_done) begin
+            func_part_done[`DIV_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`DIV_USE] = 'b0;
+        end
+
+        if(sp_done) begin
+            func_part_done[`SP_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`SP_USE] = 'b0;
+        end
+
+        if(rinfo_done) begin
+            func_part_done[`RINFO_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`RINFO_USE] = 'b0;
+        end
+
+        if(fadd_done) begin
+            func_part_done[`FADD_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`FADD_USE] = 'b0;
+        end
+
+        if(fmul_done) begin
+            func_part_done[`FMUL_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`FMUL_USE] = 'b0;
+        end
+
+        if(fdiv_done) begin
+            func_part_done[`FDIV_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`FDIV_USE] = 'b0;
+        end
+
+        if(fsp_done) begin
+            func_part_done[`FSP_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`FSP_USE] = 'b0;
+        end
+
+        if(fcmp_done) begin
+            func_part_done[`FCMP_USE] = 'b1;
+        end
+        else begin
+            func_part_done[`FCMP_USE] = 'b0;
+        end
+    end
+    else begin
+        func_part_done = 15'b0;
+    end
+end
+
+
+
+
 
 
 always @(posedge clk ) begin
@@ -334,102 +501,102 @@ always @ (*) begin
 end
 
 
-always @ (*) begin
-    if(!rst) begin
-        // when inst is done, keep fetching
-        if(ex_done) begin
-            ex_stall = 'd0;
-        end
+// always @ (*) begin
+//     if(!rst) begin
+//         // when inst is done, keep fetching
+//         if(ex_done) begin
+//             ex_stall = 'd0;
+//         end
 
-        // some inst can be done in 1 clk so there's no need to set stall
-        // while some inst cannot done in 1 clk and stall the whole pipeline
-        else begin
-            // add & sub need multiple clk
-            if(func_part[`ADD - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`RAM - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`BRANCH - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`FADD - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`FMUL - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`FCMP - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`FSP - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else if (func_part[`SHIFT - `OFFSET] && func_busy) begin
-                ex_stall = 'd1;
-            end
-            else begin
-                ex_stall = 'd0;
-            end
-        end
-    end
-    else begin
-        ex_stall = 'd0;
-    end
-end
-
-
+//         // some inst can be done in 1 clk so there's no need to set stall
+//         // while some inst cannot done in 1 clk and stall the whole pipeline
+//         else begin
+//             // add & sub need multiple clk
+//             if(func_part[`ADD - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`RAM - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`BRANCH - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`FADD - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`FMUL - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`FCMP - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`FSP - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else if (func_part[`SHIFT - `OFFSET] && func_busy) begin
+//                 ex_stall = 'd1;
+//             end
+//             else begin
+//                 ex_stall = 'd0;
+//             end
+//         end
+//     end
+//     else begin
+//         ex_stall = 'd0;
+//     end
+// end
 
 
-/* choosing output res */
-always @ (*) begin
-    if(!rst) begin
-        if(add_done) begin
-            ex_res = add_res;
-        end
+
+
+// /* choosing output res */
+// always @ (*) begin
+//     if(!rst) begin
+//         if(add_done) begin
+//             ex_res = add_res;
+//         end
         
-        else if (logic_done) begin
-            ex_res = logic_res;
-        end
+//         else if (logic_done) begin
+//             ex_res = logic_res;
+//         end
 
-        else if (ram_done) begin
-            ex_res = ram_res;
-        end
+//         else if (ram_done) begin
+//             ex_res = ram_res;
+//         end
 
-        else if (branch_done) begin
-            ex_res = branch_res;
-        end
+//         else if (branch_done) begin
+//             ex_res = branch_res;
+//         end
 
-        else if (fadd_done) begin
-            ex_res = fadd_res;
-        end
+//         else if (fadd_done) begin
+//             ex_res = fadd_res;
+//         end
 
-        else if (int_float_done) begin
-            ex_res = int_float_res;
-        end
+//         else if (int_float_done) begin
+//             ex_res = int_float_res;
+//         end
 
-        else if (fcmp_done) begin
-            ex_res = fcmp_res;
-        end
+//         else if (fcmp_done) begin
+//             ex_res = fcmp_res;
+//         end
 
-        else if (fmul_done) begin
-            ex_res = fmul_res;
-        end
+//         else if (fmul_done) begin
+//             ex_res = fmul_res;
+//         end
 
-        else if (shift_done) begin
-            ex_res = shift_res;
-        end
+//         else if (shift_done) begin
+//             ex_res = shift_res;
+//         end
 
-        else begin
-            ex_res = ex_res;
-        end
-    end
+//         else begin
+//             ex_res = ex_res;
+//         end
+//     end
 
-    else begin
-        ex_res = 'd0;
-    end
-end
+//     else begin
+//         ex_res = 'd0;
+//     end
+// end
 
 
 
