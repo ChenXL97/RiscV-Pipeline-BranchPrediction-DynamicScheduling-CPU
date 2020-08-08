@@ -34,7 +34,7 @@
 `define PREDICT 167
 `define FLOAT_INI_DELAY 3'd5
 `define FLOAT_DELAY 3'd4
-`define INIT_PC 'd0
+`define INIT_PC 'd116
 `define RAM_USE 0
 `define BRANCH_USE  1
 `define SHIFT_USE  2

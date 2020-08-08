@@ -59,13 +59,36 @@ initial begin
     #3 aresetn=1;
 end
 
+
+
+reg [31:0]  op1_r;
+reg [31:0]  op2_r;
+
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            op1_r = op1;
+            op2_r = op2;
+        end
+        else begin
+            op1_r = op1_r;
+            op2_r = op2_r;
+        end
+    end
+    else begin
+        op1_r = 'd0;
+        op2_r = 'd0;
+    end
+end
+
+
 floating_multiply float_multiply_u(
         .aclk                       (clk),
         .aresetn                    (1'b1),
         .s_axis_a_tvalid            (1'b1),
-        .s_axis_a_tdata             (op1),
+        .s_axis_a_tdata             (op1_r),
         .s_axis_b_tvalid            (1'b1),
-        .s_axis_b_tdata             (op2),
+        .s_axis_b_tdata             (op2_r),
         .m_axis_result_tready       (1'b1),
         .m_axis_result_tdata        (u_res)
     );    

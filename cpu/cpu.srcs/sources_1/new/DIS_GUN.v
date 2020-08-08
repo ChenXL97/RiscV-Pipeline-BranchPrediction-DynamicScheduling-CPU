@@ -21,7 +21,7 @@
 
 module ISSUSER_GUN(
     input                                       clk,
-    input                                       rst,
+    input                                       rst1,
 	
 	// rob control flag
 	input		[3:0]							end_pt,
@@ -72,10 +72,12 @@ module ISSUSER_GUN(
 	input		[1:0]							rob_op_mode1,
 	input		[2:0]							rob_op_mode2,
 	output		reg [1:0]							iss_op_mode1,
-	output		reg [2:0]							iss_op_mode2
+	output		reg [2:0]							iss_op_mode2,
+	input										rob_flush
 );
 
-
+wire rst;
+assign rst = rst1 || rob_flush; 
 
 
 reg			[3:0]								inst_search_pt;

@@ -60,11 +60,31 @@ initial begin
     #3 aresetn=1;
 end
 
+
+reg [31:0]  op1_r;
+
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            op1_r = op1;
+        end
+        else begin
+            op1_r = op1_r;
+        end
+    end
+    else begin
+        op1_r = 'd0;
+    end
+end
+
+
+
+
 int_to_float int_to_float_u(
         .aclk                       (clk),
         .aresetn                    (1'b1),
         .s_axis_a_tvalid            (1'b1),
-        .s_axis_a_tdata             (op1),
+        .s_axis_a_tdata             (op1_r),
         .m_axis_result_tready       (1'b1),
         .m_axis_result_tdata        (u_res_int_to_float)
     );    
@@ -73,7 +93,7 @@ float_to_int float_to_int_u(
         .aclk                       (clk),
         .aresetn                    (1'b1),
         .s_axis_a_tvalid            (1'b1),
-        .s_axis_a_tdata             (op1),
+        .s_axis_a_tdata             (op1_r),
         .m_axis_result_tready       (1'b1),
         .m_axis_result_tdata        (u_res_float_to_int)
     );    

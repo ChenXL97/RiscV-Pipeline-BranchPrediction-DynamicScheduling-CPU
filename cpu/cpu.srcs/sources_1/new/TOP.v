@@ -366,8 +366,8 @@ wire        [31:0]                      forward_data_rs2_w;
 
 ISSUSER_GUN m1911(
     .clk                                    (clk),
-    .rst                                    (rst),
-	
+    .rst1                                    (rst),
+	.rob_flush                              (rob_flush),
 	// rob control flag
 	.end_pt                                 (end_pt),
 	.head_pt                                (head_pt),
@@ -505,7 +505,8 @@ EX ex (
     .fsp_res                (fsp_res),
     .fcmp_res               (fcmp_res),
 
-    .issue_v                (issue_v)
+    .issue_v                (issue_v),
+    .rob_flush              (rob_flush)
 
 );
 

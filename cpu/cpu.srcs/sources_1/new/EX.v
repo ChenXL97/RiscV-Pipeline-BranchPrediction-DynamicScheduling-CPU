@@ -80,7 +80,8 @@ module EX(
     output      reg     [31:0]                          fsp_res,
     output      reg     [31:0]                          fcmp_res,
 
-    input                                               issue_v
+    input                                               issue_v,
+    input                                               rob_flush
 
     );
 
@@ -125,6 +126,8 @@ wire                                    fcmp_done;
 wire        [31:0]                      fcmp_res;
 wire                                    fmul_done;
 wire        [31:0]                      fmul_res;
+wire        [31:0]                      fsp_res;
+wire                                    fsp_done;
 
 reg                                     cmp_done;
 reg                                     mul_done;
@@ -132,17 +135,15 @@ reg                                     div_done;
 reg                                     sp_done;
 reg                                     rinfo_done;
 reg                                     fdiv_done;
-reg                                     fsp_done;
 
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         cmp_done <= cmp_done;
         mul_done <= mul_done;
         div_done <= div_done;
         sp_done <= sp_done;
         rinfo_done <= rinfo_done;
         fdiv_done <= fdiv_done;
-        fsp_done <= fsp_done;
     end
     else begin
         cmp_done <= 'd0;
@@ -151,7 +152,6 @@ always @ (posedge clk) begin
         sp_done <= 'd0;
         rinfo_done <= 'd0;
         fdiv_done <= 'd0;
-        fsp_done <= 'd0;
     end
 end
 
@@ -178,7 +178,7 @@ reg         [3:0]                       stall_clk;
 
 
 assign ex_done = add_done | logic_done | ram_done | branch_done
-                | fadd_done | int_float_done | fcmp_done | fmul_done
+                | fadd_done | fsp_done | fcmp_done | fmul_done
                 | shift_done ;
 
 
@@ -186,7 +186,7 @@ assign ex_done = add_done | logic_done | ram_done | branch_done
 
 // prepare operation data and ex_cur_pc
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         dis_cur_pc_r <= dis_cur_pc;
         reg_a <= op1;
         reg_b <= op2;
@@ -206,7 +206,7 @@ end
 
 // generate func_part_done signal
 always @ (*) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(ram_done) begin
             func_part_done[`RAM_USE] = 'b1;
         end
@@ -370,7 +370,7 @@ end
 /* parts' control signal */
 // start signal only keeps positive for 1 clk
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(func_part != 'd0 && func_start != 0) begin
             func_working <= func_part;
@@ -401,7 +401,7 @@ end
 
 
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(ex_cur_pc != dis_cur_pc && !ex_stall && !ex_flush) begin
             ex_cur_pc <= dis_cur_pc;
         end
@@ -417,7 +417,7 @@ end
 
 
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(issue_v) begin
             func_start <= func_part;
@@ -434,7 +434,7 @@ end
 
 
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(func_part != 'd0) begin
             imm_data_r <= imm_data;
@@ -466,7 +466,7 @@ end
 
 
 always @ (*) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // current inst is not running
         if(func_part != 'd0 && func_busy == 'd0) begin
             func_busy = 'd1;
@@ -597,7 +597,7 @@ end
 
 LOGIC logic(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (logic_extra_data),
             .start                  (func_part[`LOGIC_USE]),
@@ -610,7 +610,7 @@ LOGIC logic(
 
 SHIFT shift(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (shift_extra_data),
             .start                  (func_part[`SHIFT_USE]),
@@ -623,7 +623,7 @@ SHIFT shift(
 
 ADD_SUB add_sub(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (add_extra_data),
             .start                  (func_part[`ADD_USE]),
@@ -638,7 +638,7 @@ ADD_SUB add_sub(
 
 RAM data_ram(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (op2),
             .imm_data               (imm_data),
@@ -654,7 +654,7 @@ RAM data_ram(
 
 BRANCH branch(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (op2),
             .imm_data               (imm_data + 'd4),
@@ -674,7 +674,7 @@ BRANCH branch(
 
 FADD_SUB fadd_sub(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (op2),
             .start                  (func_part[`FADD_USE]),
@@ -687,19 +687,19 @@ FADD_SUB fadd_sub(
 
 INT_FLOAT int_float(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .start                  (func_part[`FSP_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
-            .done                   (int_float_done),
-            .res                    (int_float_res)
+            .done                   (fsp_done),
+            .res                    (fsp_res)
 );
 
 FCMP fcmp(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (op2),
             .start                  (func_part[`FCMP_USE]),
@@ -712,7 +712,7 @@ FCMP fcmp(
 
 FMUL fmul(
             .clk                    (clk),
-            .rst                    (rst),
+            .rst                    (rst | rob_flush),
             .op1                    (op1),
             .op2                    (op2),
             .start                  (func_part[`FMUL_USE]),

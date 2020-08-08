@@ -168,7 +168,6 @@ reg         [4:0]                               tar_func_part   [9:0];
 
 // combined with write back process
 reg                                             wb_v;
-reg         [31:0]                              wb_res;
 reg         [4:0]                               wd_dst;
 reg         [31:0]                              inst_reslt      [9:0];
 reg         [3:0]                               wb_inst;
@@ -282,7 +281,7 @@ always @ (*) begin
                 func2rob[12] = iss_inst;
             if(rob_info_stack[iss_inst][`FSP])
                 func2rob[13] = iss_inst;
-            if(rob_info_stack[iss_inst][`BRANCH])
+            if(rob_info_stack[iss_inst][`FCMP])
                 func2rob[14] = iss_inst;
         end
 
@@ -421,7 +420,7 @@ assign rob_cur_pc = last_pc;
 
 
 // store each inst's pc value
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
@@ -571,7 +570,7 @@ end
 // set inst_reslt array to store inst's
 // computing result. Write when ex_done.
 always @ (func_part_done) begin
-    if(!rst && !rob_flush) begin
+    if(!rst) begin
          // let inst result in
         if (ex_done) begin
             ex_res_wr_pt = 'd0;
@@ -730,29 +729,38 @@ end
 // use this part to control write-back process
 // adding branch write back logic
 always @ (posedge clk) begin
-    if(!rst && !rob_flush) begin
+    if(!rst) begin
         if(rob_inst_done[end_pt]) begin
             if(need_jump[end_pt] && rob_flush != 'd1) begin
-                rob_flush <= 'd1;                
+                rob_flush <= 'd1;       
+                end_pt <= 'd0;         
             end
             else begin
                 rob_flush <= 'd0;
+                if(end_pt == 'd9 ) begin
+                    end_pt <= 'd0;
+                end
+                else begin
+                    end_pt <= end_pt + 'd1;
+                end
             end
 
             // oridinay write back
             wb_v <= 'd1;
             wb_res <= inst_reslt[end_pt];
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("%d", end_pt);
+            $display("%d", wb_res);
             wb_inst <= end_pt;
             rob_flush <= need_jump[end_pt];
             rob_need_jump <= need_jump[end_pt];
             rob_tar_addr <= tar_addr[end_pt];
 
-            if(end_pt == 'd9) begin
-                end_pt <= 'd0;
-            end
-            else begin
-                end_pt <= end_pt + 'd1;
-            end
         end
         else begin
             wb_v <= 'd0;
@@ -784,7 +792,7 @@ end
 // when new inst come or when clk posedge arrive
 // check existed inst first
 // when an inst is write back, free element
-always @ (wb_inst or func_part_done or de_cur_pc) begin
+always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
     if(!rst && !rob_flush) begin
         // when a inst is write back, free
         if(wb_v) begin
@@ -4100,6 +4108,13 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
         if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
+            $display("gtnm");
+            $display("gtnm");
+            $display("gtnm");
+            $display("gtnm");
+            $display("%d", de_cur_pc);
+            $display("%d", rob_info[`FCMP:`RAM]);
+
 
             // set zero before use
             // no need to free when write back
@@ -8979,19 +8994,16 @@ end
 
 // control write back data and dst_addr of regfile
 always @ (wb_inst) begin
-    if(!rst && !rob_flush) begin
+    if(!rst) begin
         if(wb_v) begin
             dst = rob_info_stack[wb_inst][`DST];
-            wb_res = inst_reslt[wb_inst];
         end
         else begin
             dst = 'd0;
-            wb_res = 'd0;
         end
     end
     else begin
         dst = 'd0;
-        wb_res = 'd0;
     end
 end
 

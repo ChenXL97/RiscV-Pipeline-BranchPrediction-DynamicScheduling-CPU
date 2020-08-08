@@ -1,11 +1,11 @@
 // Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 // --------------------------------------------------------------------------------
 // Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
-// Date        : Sat Aug  8 23:42:16 2020
+// Date        : Sat Aug  8 23:40:57 2020
 // Host        : DESKTOP-P4UPRAE running 64-bit major release  (build 9200)
 // Command     : write_verilog -force -mode synth_stub -rename_top decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix -prefix
-//               decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_ four_body_bram_2_stub.v
-// Design      : four_body_bram_2
+//               decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_ four_body_bram_0_stub.v
+// Design      : four_body_bram_0
 // Purpose     : Stub declaration of top-level module interface
 // Device      : xcku115-flvd1517-1L-i
 // --------------------------------------------------------------------------------

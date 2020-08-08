@@ -1,18 +1,18 @@
 -- Copyright 1986-2018 Xilinx, Inc. All Rights Reserved.
 -- --------------------------------------------------------------------------------
 -- Tool Version: Vivado v.2018.1 (win64) Build 2188600 Wed Apr  4 18:40:38 MDT 2018
--- Date        : Sat Aug  8 23:40:58 2020
+-- Date        : Sat Aug  8 23:41:35 2020
 -- Host        : DESKTOP-P4UPRAE running 64-bit major release  (build 9200)
--- Command     : write_vhdl -force -mode synth_stub
---               c:/Users/Administrator/Desktop/RV-052BG/RiscV-Pipeline-BranchPrediction-DynamicScheduling-CPU/cpu/cpu.srcs/sources_1/ip/four_body_bram_0_1/four_body_bram_0_stub.vhdl
--- Design      : four_body_bram_0
+-- Command     : write_vhdl -force -mode synth_stub -rename_top decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix -prefix
+--               decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix_ four_body_bram_1_stub.vhdl
+-- Design      : four_body_bram_1
 -- Purpose     : Stub declaration of top-level module interface
 -- Device      : xcku115-flvd1517-1L-i
 -- --------------------------------------------------------------------------------
 library IEEE;
 use IEEE.STD_LOGIC_1164.ALL;
 
-entity four_body_bram_0 is
+entity decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix is
   Port ( 
     clka : in STD_LOGIC;
     ena : in STD_LOGIC;
@@ -22,9 +22,9 @@ entity four_body_bram_0 is
     douta : out STD_LOGIC_VECTOR ( 7 downto 0 )
   );
 
-end four_body_bram_0;
+end decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix;
 
-architecture stub of four_body_bram_0 is
+architecture stub of decalper_eb_ot_sdeen_pot_pi_dehcac_xnilix is
 attribute syn_black_box : boolean;
 attribute black_box_pad_pin : string;
 attribute syn_black_box of stub : architecture is true;
