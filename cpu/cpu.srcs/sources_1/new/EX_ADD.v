@@ -297,7 +297,7 @@ end
 
 
 
-always @ (posedge clk) begin
+always @ (*) begin
     if(!rst) begin
         if(u0_run_cnter == 'd0 || u1_run_cnter == 'd0) begin
             if(u0_run_cnter == 'd0)

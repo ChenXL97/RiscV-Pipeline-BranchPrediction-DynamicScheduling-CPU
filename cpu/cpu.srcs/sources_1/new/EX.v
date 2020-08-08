@@ -420,18 +420,21 @@ always @ (*) begin
         if(dis_cur_pc_r != dis_cur_pc && func_part != 'd0) begin
             func_start = func_part;
         end
-
-        // current inst is running
-        if(func_busy == 'd1) begin
-            if(trick)
-                func_start = 'd0;
-            else 
-                func_start = func_start;
-        end
-
         else begin
             func_start = 'd0;
         end
+
+        // current inst is running
+        // if(func_busy == 'd1) begin
+        //     if(trick)
+        //         func_start = 'd0;
+        //     else 
+        //         func_start = func_start;
+        // end
+
+        // else begin
+        //     func_start = 'd0;
+        // end
     end
 
     else begin
@@ -607,7 +610,7 @@ LOGIC logic(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (logic_extra_data),
-            .start                  (func_start[`LOGIC - `OFFSET]),
+            .start                  (func_start[`LOGIC_USE]),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
             .done                   (logic_done),
@@ -620,7 +623,7 @@ SHIFT shift(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (shift_extra_data),
-            .start                  (func_start[`SHIFT - `OFFSET]),
+            .start                  (func_start[`SHIFT_USE]),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
             .done                   (shift_done),
@@ -633,7 +636,7 @@ ADD_SUB add_sub(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (add_extra_data),
-            .start                  (func_start[`ADD - `OFFSET]),
+            .start                  (func_start[`ADD_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -649,7 +652,7 @@ RAM data_ram(
             .op1                    (op1),
             .op2                    (op2),
             .imm_data               (imm_data),
-            .start                  (func_start[`RAM - `OFFSET]),
+            .start                  (func_start[`RAM_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -666,7 +669,7 @@ BRANCH branch(
             .op2                    (op2),
             .imm_data               (imm_data + 'd4),
             .cur_pc                 (ex_cur_pc),
-            .start                  (func_start[`BRANCH - `OFFSET]),
+            .start                  (func_start[`BRANCH_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -684,7 +687,7 @@ FADD_SUB fadd_sub(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FADD - `OFFSET]),
+            .start                  (func_start[`FADD_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -696,7 +699,7 @@ INT_FLOAT int_float(
             .clk                    (clk),
             .rst                    (rst),
             .op1                    (op1),
-            .start                  (func_start[`FSP - `OFFSET]),
+            .start                  (func_start[`FSP_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -709,7 +712,7 @@ FCMP fcmp(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FCMP - `OFFSET]),
+            .start                  (func_start[`FCMP_USE]),
             .use_part               (2'b01),
             .op_mode1               (2'b0),
             .op_mode2               (3'b0),
@@ -722,7 +725,7 @@ FMUL fmul(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FMUL - `OFFSET]),
+            .start                  (func_start[`FMUL_USE]),
             .use_part               (2'b01),
             .op_mode1               (2'b0),
             .op_mode2               (3'b0),

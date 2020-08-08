@@ -38,7 +38,7 @@ module ISSUSER_GUN(
 	// issue valid signal and inst-issued's number
 	output		reg								issue_v,
 	output		reg		[3:0]					iss_inst,
-	output				[9:0]					iss_flag,
+	output		reg		[9:0]					iss_flag,
 
 	// signal input from rob due from write back
 	input		[3:0]							wb_inst,
@@ -51,8 +51,8 @@ module ISSUSER_GUN(
 	input										forwd_data_rs2_v,
 	output		[31:0]							forward_data_rs1_w,
 	output		[31:0]							forward_data_rs2_w,
-	output		[31:0]							forward_data_rs1_v_w,
-	output		[31:0]							forward_data_rs2_v_w,
+	output										forward_data_rs1_v_w,
+	output										forward_data_rs2_v_w,
 
 	// singal to start ex
 	input		[14:0]							rob_func_part_start,
@@ -81,12 +81,18 @@ module ISSUSER_GUN(
 reg			[3:0]								inst_search_pt;
 reg												check_iss_done;
 reg												issue;
-reg			[9:0]								iss_flag;
+// reg			[9:0]								iss_flag;
 
 reg			[31:0]								forward_data_rs1;
 reg			[31:0]								forward_data_rs2;
 reg												forward_data_rs1_v;
 reg												forward_data_rs2_v;
+
+reg												rob_imm_use_reg;
+reg			[31:0]								rob_imm_data_reg;
+reg			[1:0]								rob_op_mode1_reg;
+reg			[2:0]								rob_op_mode2_reg;
+
 
 
 
@@ -256,7 +262,7 @@ always @ (posedge clk) begin
 		check_iss_done = 'd0;
 		issue = 'd0;
 		iss_inst = 'd11;
-		iss_flag = 10'd0;
+		iss_flag = 10'b0;
 	end
 end
 
@@ -293,7 +299,7 @@ always @ (posedge clk) begin
 	end
 end
 assign forward_data_rs1_v_w = forward_data_rs1_v;
-assign forward_data_rs1_w = forwd_data_rs1;
+assign forward_data_rs1_w = forward_data_rs1;
 assign forward_data_rs2_v_w = forward_data_rs2_v;
 assign forward_data_rs2_w = forward_data_rs2;
 
@@ -304,13 +310,21 @@ assign forward_data_rs2_w = forward_data_rs2;
 always @ (posedge clk) begin
 	if(!rst) begin
 		if(issue) begin
-			iss_imm_use <= rob_imm_use[iss_inst];
-			iss_imm_data <= rob_imm_data;
+			rob_imm_use_reg <= rob_imm_use[iss_inst];
 		end
 		else begin
-			iss_imm_use <= 'd0;
-			iss_imm_data <= 'd0;
+			rob_imm_use_reg <= 'd0;
 		end
+	end
+	else begin
+		rob_imm_use_reg <= 'd0;
+	end
+end
+
+always @ (posedge clk) begin
+	if(!rst) begin
+		iss_imm_use <= rob_imm_use_reg;
+		iss_imm_data <= rob_imm_data;
 	end
 	else begin
 		iss_imm_use <= 'd0;
@@ -325,14 +339,8 @@ end
 // func_part_start and iss_inst_pc to start ex
 always @ (posedge clk) begin
 	if(!rst) begin
-		if(issue) begin
-			func_part_start <= rob_func_part_start;
-			iss_iss_inst_pc <= rob_iss_inst_pc;
-		end
-		else begin
-			func_part_start <= 15'b0;
-			iss_iss_inst_pc <= iss_iss_inst_pc;
-		end
+		func_part_start <= rob_func_part_start;
+		iss_iss_inst_pc <= rob_iss_inst_pc;
 	end
 	else begin
 		func_part_start <= 'd0;
@@ -344,16 +352,27 @@ end
 
 
 // op_mode1 and op_mode2
-always @ (posedge clk) begin
+always @ (*) begin
 	if(!rst) begin
 		if(issue) begin
-			iss_op_mode1 <= rob_op_mode1;
-			iss_op_mode2 <= rob_op_mode2;
+			rob_op_mode1_reg <= rob_op_mode1;
+			rob_op_mode2_reg <= rob_op_mode2;
 		end
-		else begin
-			iss_op_mode1 <= 2'b11;
-			iss_op_mode2 <= 3'b111;
-		end
+		// else begin
+		// 	iss_op_mode1 <= 2'b11;
+		// 	iss_op_mode2 <= 3'b111;
+		// end
+	end
+	else begin
+		rob_op_mode1_reg <= 2'b11;
+		rob_op_mode2_reg <= 3'b111;
+	end
+end
+
+always @ (posedge clk) begin
+	if(!rst) begin
+		iss_op_mode1 <= rob_op_mode1_reg;
+		iss_op_mode2 <= rob_op_mode2_reg;
 	end
 	else begin
 		iss_op_mode1 <= 2'b11;

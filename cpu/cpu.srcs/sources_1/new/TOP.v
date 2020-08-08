@@ -246,7 +246,8 @@ wire     [31:0]                          rob_imm_data;
 wire     [9:0]                           rob_imm_use;
 wire     [1:0]                           rob_op_mode1;
 wire     [2:0]                           rob_op_mode2;
-
+wire     [3:0]                           iss_inst;
+wire     [9:0]                           iss_flag;
 
 
 
@@ -341,7 +342,12 @@ wire        [31:0]                      iss_iss_inst_pc;
 wire        [31:0]                      iss_imm_data;
 wire                                    iss_imm_use;
 wire        [1:0]                       iss_op_mode1;
-wire        [1:0]                       iss_op_mode2;
+wire        [2:0]                       iss_op_mode2;
+wire                                    forward_data_rs1_v_w;
+wire                                    forward_data_rs2_v_w;
+wire        [31:0]                      forward_data_rs1_w;
+wire        [31:0]                      forward_data_rs2_w;
+
 
 
 
@@ -412,11 +418,20 @@ ISSUSER_GUN m1911(
 //#####################################################
 //##########   EX Module  #############################
 //#####################################################
+wire        [31:0]                      op1;
+wire        [31:0]                      op2;
+
+assign op1 = forward_data_rs1_v_w ? forward_data_rs1_w : ra0_value_o;
+assign op2 = forward_data_rs2_v_w ? forward_data_rs2_w : rb0_value_o;
+
+
+
+
 EX ex (
     .clk                    (clk),
     .rst                    (rst),
-    .op1                    (ra0_value_o),
-    .op2                    (rb0_value_o),
+    .op1                    (op1),
+    .op2                    (op2),
     .imm_data               (iss_imm_data),
     .dis_cur_pc             (iss_iss_inst_pc),
     .imm_use                (iss_imm_use),

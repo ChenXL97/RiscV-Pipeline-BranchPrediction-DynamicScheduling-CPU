@@ -183,36 +183,45 @@ reg         [31:0]                              forward_data_rs2     [9:0];
 // related to imm_data and imm_use
 reg         [31:0]                              imm_data             [9:0]; 
 
+reg         [14:0]                              inst_hw_use          [9:0];
+reg         [3:0]                               ex_res_wr_pt;
+
+
+
+assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
+                    related_busy[3] & related_busy[4] & related_busy[5] &
+                    related_busy[6] & related_busy[7] & related_busy[8] & 
+                    related_busy[9];
 
 
 
 
-// when rob is full, global stall
-always @ (posedge clk) begin
+always @ (de_cur_pc) begin
     if(!rst) begin
-        if(head_pt == end_pt && related_busy[end_pt]) begin
-            rob_full <= 'd1;
-        end
-        else begin
-            rob_full <= 'd0;
+        if(de_cur_pc != last_pc && rob_info[`FCMP:`RAM] != 'd0) begin
+            inst_hw_use[head_pt] = rob_info[`FCMP:`RAM];
         end
     end
     else begin
-        rob_full <= 'd0;
+        inst_hw_use[0] = 'd0;
+        inst_hw_use[1] = 'd0;
+        inst_hw_use[2] = 'd0;
+        inst_hw_use[3] = 'd0;
+        inst_hw_use[4] = 'd0;
+        inst_hw_use[5] = 'd0;
+        inst_hw_use[6] = 'd0;
+        inst_hw_use[7] = 'd0;
+        inst_hw_use[8] = 'd0;
+        inst_hw_use[9] = 'd0;
     end
 end
-assign rob_stall = rob_full;
-
-
-
-
 
 // generate func_part_start signal
 always @ (iss_inst) begin
     if(!rst) begin
         if(issue_v) begin
-            rob_func_part_start = 15'b0;
-            rob_func_part_start[iss_inst] = 'b1;
+            // rob_func_part_start = 15'b0;
+            rob_func_part_start = inst_hw_use[iss_inst];
         end
         else begin
             rob_func_part_start = 15'b0;
@@ -405,7 +414,7 @@ assign rob_cur_pc = last_pc;
 always @ (posedge clk) begin
     if(!rst) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
             rob_inst_pc[head_pt] <= de_cur_pc;
         end
     end
@@ -429,15 +438,10 @@ end
 
 
 // control imm_data and imm_use signal
-always @ (posedge clk) begin
+always @ (de_cur_pc) begin
     if(!rst) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info != 'd0) begin
-            $display("nt");
-            $display("nt");
-            $display("nt");
-            $display("%d", head_pt);
-            $display("%h", rob_info);
+        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
 
             imm_data[head_pt] <= rob_info[`IMM];
             imm_use[head_pt] <= rob_info[`IMMUSE];
@@ -531,7 +535,7 @@ end
 always @ (posedge clk) begin
     if(!rst) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
             rob_info_stack[head_pt] <= rob_info;
         end
     end
@@ -560,64 +564,81 @@ always @ (func_part_done) begin
     if(!rst) begin
          // let inst result in
         if (ex_done) begin
+
+            ex_res_wr_pt = 'd0;
             if(func_part_done[`RAM_USE]) begin
-                inst_reslt[end_pt] <= ram_res;
+                ex_res_wr_pt = func2rob[0];
+                inst_reslt[ex_res_wr_pt] = ram_res;
             end
             
             if(func_part_done[`BRANCH_USE]) begin
-                inst_reslt[end_pt] <= branch_res;
+                ex_res_wr_pt = func2rob[1];
+                inst_reslt[ex_res_wr_pt] = branch_res;
             end
 
             if(func_part_done[`SHIFT_USE]) begin
-                inst_reslt[end_pt] <= shift_res;
+                ex_res_wr_pt = func2rob[2];
+                inst_reslt[ex_res_wr_pt] = shift_res;
             end
 
             if(func_part_done[`LOGIC_USE]) begin
-                inst_reslt[end_pt] <= logic_res;
+                ex_res_wr_pt = func2rob[3];
+                inst_reslt[ex_res_wr_pt] = logic_res;
             end
 
             if(func_part_done[`CMP_USE]) begin
-                inst_reslt[end_pt] <= cmp_res;
+                ex_res_wr_pt = func2rob[4];
+                inst_reslt[ex_res_wr_pt] = cmp_res;
             end
 
             if(func_part_done[`ADD_USE]) begin
-                inst_reslt[end_pt] <= add_res;
+                ex_res_wr_pt = func2rob[5];
+                inst_reslt[ex_res_wr_pt] = add_res;
             end
 
             if(func_part_done[`MUL_USE]) begin
-                inst_reslt[end_pt] <= mul_res;
+                ex_res_wr_pt = func2rob[6];
+                inst_reslt[ex_res_wr_pt] = mul_res;
             end
 
             if(func_part_done[`DIV_USE]) begin
-                inst_reslt[end_pt] <= div_res;
+                ex_res_wr_pt = func2rob[7];
+                inst_reslt[ex_res_wr_pt] = div_res;
             end
 
             if(func_part_done[`SP_USE]) begin
-                inst_reslt[end_pt] <= sp_res;
+                ex_res_wr_pt = func2rob[8];
+                inst_reslt[ex_res_wr_pt] = sp_res;
             end
 
             if(func_part_done[`RINFO_USE]) begin
-                inst_reslt[end_pt] <= rinfo_res;
+                ex_res_wr_pt = func2rob[9];
+                inst_reslt[ex_res_wr_pt] = rinfo_res;
             end
 
             if(func_part_done[`FADD_USE]) begin
-                inst_reslt[end_pt] <= fadd_res;
+                ex_res_wr_pt = func2rob[10];
+                inst_reslt[ex_res_wr_pt] = fadd_res;
             end
 
             if(func_part_done[`FMUL_USE]) begin
-                inst_reslt[end_pt] <= fmul_res;
+                ex_res_wr_pt = func2rob[11];
+                inst_reslt[ex_res_wr_pt] = fmul_res;
             end
 
             if(func_part_done[`FDIV_USE]) begin
-                inst_reslt[end_pt] <= fdiv_res;
+                ex_res_wr_pt = func2rob[12];
+                inst_reslt[ex_res_wr_pt] = fdiv_res;
             end
 
             if(func_part_done[`FSP_USE]) begin
-                inst_reslt[end_pt] <= fsp_res;
+                ex_res_wr_pt = func2rob[13];
+                inst_reslt[ex_res_wr_pt] = fsp_res;
             end
 
             if(func_part_done[`FCMP_USE]) begin
-                inst_reslt[end_pt] <= fcmp_res;
+                ex_res_wr_pt = func2rob[14];
+                inst_reslt[ex_res_wr_pt] = fcmp_res;
             end
         end
     end
@@ -637,19 +658,23 @@ end
 
 
 
-
-
 // control head_pt
 always @ (posedge clk) begin
     if(!rst) begin
-        if(last_pc != de_cur_pc && rob_info != 'd0) begin
-            if(head_pt == 'd9) begin
-                head_pt <= 'd0;
+        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+            if(rob_stall) begin
+                head_pt <= head_pt;
             end
             else begin
-                head_pt <= head_pt + 'd1;
+                if(head_pt == 'd9) begin
+                    head_pt <= 'd0;
+                end
+                else begin
+                    head_pt <= head_pt + 'd1;
+                end
             end
         end
+
         else begin
             head_pt <= head_pt;
         end
@@ -3910,7 +3935,7 @@ always @ (*) begin
 
 
         // new inst come
-        if(last_pc != de_cur_pc && rob_info != 'd0 && !related_busy[head_pt]) begin
+        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
 
@@ -4756,7 +4781,7 @@ end
 // when an inst is issued or ex_done
 // when an inst is issued, set hw_use
 // when an inst is ex_done, free hw_use
-always @ (*) begin
+always @ (iss_inst or func_part_done or de_cur_pc) begin
     if(!rst) begin
         
         // when an inst is issued, set hw_use
@@ -7277,7 +7302,7 @@ always @ (*) begin
             if(func_part_done[`ADD_USE]) begin
                 check_hw_pt = end_pt;
                 global_hw_use[`ADD_USE] = 'b0;
-
+                
                 // inst 1
                 if(tar_func_part[check_hw_pt] == `ADD_USE && 
                     related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
@@ -7290,10 +7315,27 @@ always @ (*) begin
                     check_hw_pt = check_hw_pt + 'd1;
                 end
 
+                $display("wcnm");
+                $display("wcnm");
+                $display("wcnm");
+                $display("wcnm");
+                $display("wcnm");
+                $display("wcnm");
+                $display("%d", check_hw_pt);
+                $display("%d", tar_func_part[check_hw_pt]);
+                $display("%d", related_busy[check_hw_pt]);
+                $display("%d", iss_flag[check_hw_pt]);
+
                 // inst 2
                 if(tar_func_part[check_hw_pt] == `ADD_USE && 
                     related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
                     hw_relation[check_hw_pt] = 'b0;
+                    $display("stalin");
+                    $display("stalin");
+                    $display("stalin");
+                    $display("stalin");
+                    $display("stalin");
+
                 end
                 if(check_hw_pt == 'd9) begin
                     check_hw_pt = 'd0;
@@ -8538,7 +8580,7 @@ always @ (*) begin
 
         // new inst arrive
         // set tar_func_part, hw_relation and hw_relation busy
-        if (last_pc != de_cur_pc && rob_info != 'd0) begin
+        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
             if(rob_info[`RAM]) begin
                 tar_func_part[head_pt] = 'd0;
                 if(global_hw_use[`RAM_USE]) begin
