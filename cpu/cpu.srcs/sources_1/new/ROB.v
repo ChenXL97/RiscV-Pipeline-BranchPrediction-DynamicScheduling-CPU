@@ -748,7 +748,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -772,7 +772,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -795,7 +795,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -818,7 +818,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -841,7 +841,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -864,7 +864,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -887,7 +887,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -910,7 +910,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -933,7 +933,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -966,7 +966,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -990,7 +990,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1013,7 +1013,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1036,7 +1036,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1059,7 +1059,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1082,7 +1082,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1105,7 +1105,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1128,7 +1128,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1151,7 +1151,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1184,7 +1184,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -1217,7 +1217,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1249,7 +1249,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1281,7 +1281,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1304,7 +1304,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1327,7 +1327,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1350,7 +1350,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1373,7 +1373,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1396,7 +1396,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1429,7 +1429,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -1453,7 +1453,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1476,7 +1476,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1499,7 +1499,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1522,7 +1522,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1545,7 +1545,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1568,7 +1568,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1591,7 +1591,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1614,7 +1614,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1647,7 +1647,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -1671,7 +1671,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1694,7 +1694,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1717,7 +1717,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1740,7 +1740,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1763,7 +1763,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1786,7 +1786,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1809,7 +1809,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1832,7 +1832,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1865,7 +1865,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -1889,7 +1889,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1912,7 +1912,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1935,7 +1935,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1958,7 +1958,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -1981,7 +1981,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2004,7 +2004,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2027,7 +2027,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2050,7 +2050,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2083,7 +2083,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -2107,7 +2107,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2130,7 +2130,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2153,7 +2153,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2176,7 +2176,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2199,7 +2199,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2222,7 +2222,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2245,7 +2245,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2268,7 +2268,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2301,7 +2301,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -2325,7 +2325,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2348,7 +2348,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2371,7 +2371,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2394,7 +2394,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2417,7 +2417,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2440,7 +2440,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2463,7 +2463,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2486,7 +2486,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2519,7 +2519,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -2543,7 +2543,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2566,7 +2566,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2589,7 +2589,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2612,7 +2612,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2635,7 +2635,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2658,7 +2658,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2681,7 +2681,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2704,7 +2704,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2737,7 +2737,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -2761,7 +2761,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2784,7 +2784,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2807,7 +2807,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2830,7 +2830,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2853,7 +2853,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2876,7 +2876,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2899,7 +2899,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2922,7 +2922,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -2955,7 +2955,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -2979,7 +2979,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3002,7 +3002,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3025,7 +3025,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3048,7 +3048,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3071,7 +3071,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3094,7 +3094,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3117,7 +3117,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3140,7 +3140,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3173,7 +3173,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -3197,7 +3197,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3220,7 +3220,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3243,7 +3243,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3266,7 +3266,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3289,7 +3289,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3312,7 +3312,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3335,7 +3335,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3358,7 +3358,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3391,7 +3391,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -3415,7 +3415,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3438,7 +3438,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3461,7 +3461,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3484,7 +3484,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3507,7 +3507,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3530,7 +3530,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3553,7 +3553,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3576,7 +3576,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3609,7 +3609,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -3633,7 +3633,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3656,7 +3656,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3679,7 +3679,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3702,7 +3702,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3725,7 +3725,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3748,7 +3748,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3771,7 +3771,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3794,7 +3794,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3827,7 +3827,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     // prepare forwarding data-flow
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
@@ -3851,7 +3851,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 2
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3874,7 +3874,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 3
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3897,7 +3897,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 4
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3920,7 +3920,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 5
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3943,7 +3943,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 6
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3966,7 +3966,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 7
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -3989,7 +3989,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 8
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -4012,7 +4012,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                 // check 9
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
-                    related_busy[check_data_pt]) begin
+                    related_busy[check_data_pt] && rob_inst_done[after_done_dcheck]) begin
                     // cancel related flag
                     if(related_inst_rs1[check_data_pt] == after_done_dcheck) begin
                         related_rs1[check_data_pt] = 'd0;
@@ -4063,7 +4063,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
             if(!rob_info[`IMMUSE]) begin
                 // 1 data check
 
-                if(related_busy[check_data_pt] && 
+                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4108,7 +4108,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 2 data check
-                if(related_busy[check_data_pt] && 
+                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4153,7 +4153,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 3 data check
-                if(related_busy[check_data_pt] && 
+                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4198,7 +4198,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 4 data check
-                if(related_busy[check_data_pt] && 
+                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
