@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="32500000fs"></ZoomStartTime>
-      <ZoomEndTime time="60491907fs"></ZoomEndTime>
-      <Cursor1Time time="44554000fs"></Cursor1Time>
+      <ZoomStartTime time="25000000fs"></ZoomStartTime>
+      <ZoomEndTime time="70750001fs"></ZoomEndTime>
+      <Cursor1Time time="54000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
-      <NameColumnWidth column_width="175"></NameColumnWidth>
-      <ValueColumnWidth column_width="259"></ValueColumnWidth>
+      <NameColumnWidth column_width="293"></NameColumnWidth>
+      <ValueColumnWidth column_width="247"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="30" />
+   <WVObjectSize size="35" />
    <wave_markers>
       <marker time="502656000000" label="" />
    </wave_markers>
@@ -52,11 +52,6 @@
       <obj_property name="ObjectShortName">related_busy[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/related" type="array">
-      <obj_property name="ElementShortName">related[9:0]</obj_property>
-      <obj_property name="ObjectShortName">related[9:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/rob/hw_relation" type="array">
       <obj_property name="ElementShortName">hw_relation[9:0]</obj_property>
       <obj_property name="ObjectShortName">hw_relation[9:0]</obj_property>
@@ -66,13 +61,40 @@
       <obj_property name="ElementShortName">tar_func_part[9:0][4:0]</obj_property>
       <obj_property name="ObjectShortName">tar_func_part[9:0][4:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/rob/related" type="array">
+      <obj_property name="ElementShortName">related[9:0]</obj_property>
+      <obj_property name="ObjectShortName">related[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/rob/iss_inst" type="array">
       <obj_property name="ElementShortName">iss_inst[3:0]</obj_property>
       <obj_property name="ObjectShortName">iss_inst[3:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/rob/related_rs1" type="array">
+      <obj_property name="ElementShortName">related_rs1[9:0]</obj_property>
+      <obj_property name="ObjectShortName">related_rs1[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/related_rs2" type="array">
+      <obj_property name="ElementShortName">related_rs2[9:0]</obj_property>
+      <obj_property name="ObjectShortName">related_rs2[9:0]</obj_property>
+      <obj_property name="Radix">BINARYRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/related_inst_rs1" type="array">
+      <obj_property name="ElementShortName">related_inst_rs1[9:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">related_inst_rs1[9:0][3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/related_inst_rs2" type="array">
+      <obj_property name="ElementShortName">related_inst_rs2[9:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">related_inst_rs2[9:0][3:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/m1911/issue_v" type="logic">
       <obj_property name="ElementShortName">issue_v</obj_property>
       <obj_property name="ObjectShortName">issue_v</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/ex_done" type="logic">
+      <obj_property name="ElementShortName">ex_done</obj_property>
+      <obj_property name="ObjectShortName">ex_done</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/m1911/func_part_start" type="array">
       <obj_property name="ElementShortName">func_part_start[14:0]</obj_property>
@@ -88,17 +110,9 @@
       <obj_property name="ObjectShortName">iss_flag[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/ex_done" type="logic">
-      <obj_property name="ElementShortName">ex_done</obj_property>
-      <obj_property name="ObjectShortName">ex_done</obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/rob/func_part_done" type="array">
       <obj_property name="ElementShortName">func_part_done[14:0]</obj_property>
       <obj_property name="ObjectShortName">func_part_done[14:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/inst_reslt" type="array">
-      <obj_property name="ElementShortName">inst_reslt[9:0][31:0]</obj_property>
-      <obj_property name="ObjectShortName">inst_reslt[9:0][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/rob/wb_v" type="logic">
       <obj_property name="ElementShortName">wb_v</obj_property>
@@ -116,22 +130,6 @@
       <obj_property name="ElementShortName">dst[4:0]</obj_property>
       <obj_property name="ObjectShortName">dst[4:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/m1911/forward_data_rs1_w" type="array">
-      <obj_property name="ElementShortName">forward_data_rs1_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">forward_data_rs1_w[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/m1911/forward_data_rs2_w" type="array">
-      <obj_property name="ElementShortName">forward_data_rs2_w[31:0]</obj_property>
-      <obj_property name="ObjectShortName">forward_data_rs2_w[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/m1911/forward_data_rs1_v_w" type="logic">
-      <obj_property name="ElementShortName">forward_data_rs1_v_w</obj_property>
-      <obj_property name="ObjectShortName">forward_data_rs1_v_w</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/m1911/forward_data_rs2_v_w" type="logic">
-      <obj_property name="ElementShortName">forward_data_rs2_v_w</obj_property>
-      <obj_property name="ObjectShortName">forward_data_rs2_v_w</obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/ex/op1" type="array">
       <obj_property name="ElementShortName">op1[31:0]</obj_property>
       <obj_property name="ObjectShortName">op1[31:0]</obj_property>
@@ -140,6 +138,10 @@
       <obj_property name="ElementShortName">op2[31:0]</obj_property>
       <obj_property name="ObjectShortName">op2[31:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/rob/shift_res" type="array">
+      <obj_property name="ElementShortName">shift_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_res[31:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/ex/shift_done" type="logic">
       <obj_property name="ElementShortName">shift_done</obj_property>
       <obj_property name="ObjectShortName">shift_done</obj_property>
@@ -147,5 +149,25 @@
    <wvobject fp_name="/TOP/ex/logic/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
       <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r5_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r6_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r6_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r7_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r7_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r28_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r28_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r28_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r29_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
    </wvobject>
 </wave_config>

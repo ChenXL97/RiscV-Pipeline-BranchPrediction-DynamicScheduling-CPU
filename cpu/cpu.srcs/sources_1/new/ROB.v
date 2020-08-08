@@ -303,7 +303,7 @@ end
 // set rob_inst_done flag
 // when ex_done, set corresponding inst as done
 // when an inst is write back, free corresponding element
-always @ (func_part_done or wb_inst) begin
+always @ (func_part_done) begin
     if(!rst) begin
         if(ex_done) begin
             if (func_part_done[`RAM_USE]) begin
@@ -724,7 +724,7 @@ end
 // when new inst come or when clk posedge arrive
 // check existed inst first
 // when an inst is write back, free element
-always @ (*) begin
+always @ (wb_inst or func_part_done or de_cur_pc) begin
     if(!rst) begin
         // when a inst is write back, free
         if(wb_v) begin
@@ -738,7 +738,12 @@ always @ (*) begin
 
             if(func_part_done[0]) begin
                 after_done_dcheck = func2rob[0];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -951,7 +956,12 @@ always @ (*) begin
 
             if(func_part_done[1]) begin
                 after_done_dcheck = func2rob[1];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -1164,8 +1174,13 @@ always @ (*) begin
 
             if(func_part_done[2]) begin
                 after_done_dcheck = func2rob[2];
-                check_data_pt = end_pt;
-
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end;
+                
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
                     related_inst_rs2[check_data_pt] == after_done_dcheck) && 
@@ -1182,6 +1197,15 @@ always @ (*) begin
                     end
                     related[check_data_pt] = related_rs1[check_data_pt] | 
                                                 related_rs2[check_data_pt];
+                    $display("wcnm0");
+                    $display("wcnm0");
+                    $display("wcnm0");
+                    $display("wcnm0");
+                    $display("wcnm0");
+                    $display("wcnm0");
+                    
+                    $display("%d", wb_inst);
+                    $display("%d", check_data_pt);
                 end
                 if(check_data_pt == 'd9) begin
                     check_data_pt = 'd0;
@@ -1205,6 +1229,15 @@ always @ (*) begin
                     end
                     related[check_data_pt] = related_rs1[check_data_pt] | 
                                                 related_rs2[check_data_pt];
+                    $display("wcnm1");
+                    $display("wcnm1");
+                    $display("wcnm1");
+                    $display("wcnm1");
+                    $display("wcnm1");
+                    $display("wcnm1");
+                    
+                    $display("%d", after_done_dcheck);
+                    $display("%d", check_data_pt);
                 end
                 if(check_data_pt == 'd9) begin
                     check_data_pt = 'd0;
@@ -1228,6 +1261,15 @@ always @ (*) begin
                     end
                     related[check_data_pt] = related_rs1[check_data_pt] | 
                                                 related_rs2[check_data_pt];
+                    $display("wcnm2");
+                    $display("wcnm2");
+                    $display("wcnm2");
+                    $display("wcnm2");
+                    $display("wcnm2");
+                    $display("wcnm2");
+                    
+                    $display("%d", wb_inst);
+                    $display("%d", check_data_pt);
                 end
                 if(check_data_pt == 'd9) begin
                     check_data_pt = 'd0;
@@ -1377,7 +1419,12 @@ always @ (*) begin
 
             if(func_part_done[3]) begin
                 after_done_dcheck = func2rob[3];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -1590,7 +1637,12 @@ always @ (*) begin
 
             if(func_part_done[4]) begin
                 after_done_dcheck = func2rob[4];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -1803,7 +1855,12 @@ always @ (*) begin
 
             if(func_part_done[5]) begin
                 after_done_dcheck = func2rob[5];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -2016,7 +2073,12 @@ always @ (*) begin
 
             if(func_part_done[6]) begin
                 after_done_dcheck = func2rob[6];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -2229,7 +2291,12 @@ always @ (*) begin
 
             if(func_part_done[7]) begin
                 after_done_dcheck = func2rob[7];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -2442,7 +2509,12 @@ always @ (*) begin
 
             if(func_part_done[8]) begin
                 after_done_dcheck = func2rob[8];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -2655,7 +2727,12 @@ always @ (*) begin
 
             if(func_part_done[9]) begin
                 after_done_dcheck = func2rob[9];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -2868,7 +2945,12 @@ always @ (*) begin
 
             if(func_part_done[10]) begin
                 after_done_dcheck = func2rob[10];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -3081,7 +3163,12 @@ always @ (*) begin
 
             if(func_part_done[11]) begin
                 after_done_dcheck = func2rob[11];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -3294,7 +3381,12 @@ always @ (*) begin
 
             if(func_part_done[12]) begin
                 after_done_dcheck = func2rob[12];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -3507,7 +3599,12 @@ always @ (*) begin
 
             if(func_part_done[13]) begin
                 after_done_dcheck = func2rob[13];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -3720,7 +3817,12 @@ always @ (*) begin
 
             if(func_part_done[14]) begin
                 after_done_dcheck = func2rob[14];
-                check_data_pt = end_pt;
+                if(end_pt == 'd9) begin
+                    check_data_pt = 'd0;
+                end
+                else begin
+                    check_data_pt = end_pt;
+                end
 
                 // check 1
                 if((related_inst_rs1[check_data_pt] == after_done_dcheck || 
@@ -3935,7 +4037,7 @@ always @ (*) begin
 
 
         // new inst come
-        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0 && !related_busy[head_pt]) begin
+        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
 
@@ -7315,27 +7417,10 @@ always @ (iss_inst or func_part_done or de_cur_pc) begin
                     check_hw_pt = check_hw_pt + 'd1;
                 end
 
-                $display("wcnm");
-                $display("wcnm");
-                $display("wcnm");
-                $display("wcnm");
-                $display("wcnm");
-                $display("wcnm");
-                $display("%d", check_hw_pt);
-                $display("%d", tar_func_part[check_hw_pt]);
-                $display("%d", related_busy[check_hw_pt]);
-                $display("%d", iss_flag[check_hw_pt]);
-
                 // inst 2
                 if(tar_func_part[check_hw_pt] == `ADD_USE && 
                     related_busy[check_hw_pt] && !iss_flag[check_hw_pt]) begin
                     hw_relation[check_hw_pt] = 'b0;
-                    $display("stalin");
-                    $display("stalin");
-                    $display("stalin");
-                    $display("stalin");
-                    $display("stalin");
-
                 end
                 if(check_hw_pt == 'd9) begin
                     check_hw_pt = 'd0;
