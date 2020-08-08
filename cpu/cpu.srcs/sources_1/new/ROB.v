@@ -4063,7 +4063,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
             if(!rob_info[`IMMUSE]) begin
                 // 1 data check
 
-                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
+                if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4108,7 +4108,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 2 data check
-                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
+                if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4153,7 +4153,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 3 data check
-                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
+                if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin
@@ -4198,7 +4198,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     check_data_pt = check_data_pt - 'd1;
 
                 // 4 data check
-                if(related_busy[check_data_pt] && rob_inst_done[after_done_dcheck] && 
+                if(related_busy[check_data_pt] && 
                     (inst_dst[check_data_pt] == rob_info[`RS1] || 
                     inst_dst[check_data_pt] == rob_info[`RS2]) && 
                     inst_dst[check_data_pt] != 'd0) begin

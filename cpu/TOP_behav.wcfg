@@ -11,15 +11,15 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="45000000fs"></ZoomStartTime>
-      <ZoomEndTime time="79299548fs"></ZoomEndTime>
-      <Cursor1Time time="58000000fs"></Cursor1Time>
+      <ZoomStartTime time="60000000fs"></ZoomStartTime>
+      <ZoomEndTime time="87204673fs"></ZoomEndTime>
+      <Cursor1Time time="24000000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="293"></NameColumnWidth>
-      <ValueColumnWidth column_width="243"></ValueColumnWidth>
+      <ValueColumnWidth column_width="235"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="32" />
+   <WVObjectSize size="28" />
    <wave_markers>
       <marker time="502656000000" label="" />
    </wave_markers>
@@ -96,11 +96,6 @@
       <obj_property name="ElementShortName">after_done_dcheck[4:0]</obj_property>
       <obj_property name="ObjectShortName">after_done_dcheck[4:0]</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/func2rob" type="array">
-      <obj_property name="ElementShortName">func2rob[14:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">func2rob[14:0][3:0]</obj_property>
-      <obj_property name="isExpanded"></obj_property>
-   </wvobject>
    <wvobject fp_name="/TOP/rob/wb_v" type="logic">
       <obj_property name="ElementShortName">wb_v</obj_property>
       <obj_property name="ObjectShortName">wb_v</obj_property>
@@ -124,18 +119,6 @@
    <wvobject fp_name="/TOP/ex/op2" type="array">
       <obj_property name="ElementShortName">op2[31:0]</obj_property>
       <obj_property name="ObjectShortName">op2[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/shift_res" type="array">
-      <obj_property name="ElementShortName">shift_res[31:0]</obj_property>
-      <obj_property name="ObjectShortName">shift_res[31:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/shift_done" type="logic">
-      <obj_property name="ElementShortName">shift_done</obj_property>
-      <obj_property name="ObjectShortName">shift_done</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/ex/logic/start" type="logic">
-      <obj_property name="ElementShortName">start</obj_property>
-      <obj_property name="ObjectShortName">start</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r5_q " type="array">
       <obj_property name="ElementShortName">\REGFILE.reg_r5_q [31:0]</obj_property>
