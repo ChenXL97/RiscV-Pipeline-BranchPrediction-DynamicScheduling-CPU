@@ -11,17 +11,19 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="60000000fs"></ZoomStartTime>
-      <ZoomEndTime time="87204673fs"></ZoomEndTime>
-      <Cursor1Time time="24000000fs"></Cursor1Time>
+      <ZoomStartTime time="63314773fs"></ZoomStartTime>
+      <ZoomEndTime time="89707956fs"></ZoomEndTime>
+      <Cursor1Time time="79115000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="293"></NameColumnWidth>
-      <ValueColumnWidth column_width="235"></ValueColumnWidth>
+      <ValueColumnWidth column_width="204"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="28" />
+   <WVObjectSize size="58" />
    <wave_markers>
       <marker time="502656000000" label="" />
+      <marker time="1000000000" label="" />
+      <marker time="79438000" label="" />
    </wave_markers>
    <wvobject fp_name="/TOP/IF/clk" type="logic">
       <obj_property name="ElementShortName">clk</obj_property>
@@ -34,6 +36,10 @@
    <wvobject fp_name="/TOP/IF/EX_block" type="logic">
       <obj_property name="ElementShortName">EX_block</obj_property>
       <obj_property name="ObjectShortName">EX_block</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/de_cur_pc" type="array">
+      <obj_property name="ElementShortName">de_cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">de_cur_pc[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/rob/rob_info" type="array">
       <obj_property name="ElementShortName">rob_info[167:0]</obj_property>
@@ -62,35 +68,14 @@
       <obj_property name="ObjectShortName">related[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/iss_inst" type="array">
-      <obj_property name="ElementShortName">iss_inst[3:0]</obj_property>
-      <obj_property name="ObjectShortName">iss_inst[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/related_rs1" type="array">
-      <obj_property name="ElementShortName">related_rs1[9:0]</obj_property>
-      <obj_property name="ObjectShortName">related_rs1[9:0]</obj_property>
+   <wvobject fp_name="/TOP/rob/need_jump" type="array">
+      <obj_property name="ElementShortName">need_jump[9:0]</obj_property>
+      <obj_property name="ObjectShortName">need_jump[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/related_rs2" type="array">
-      <obj_property name="ElementShortName">related_rs2[9:0]</obj_property>
-      <obj_property name="ObjectShortName">related_rs2[9:0]</obj_property>
-      <obj_property name="Radix">BINARYRADIX</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/related_inst_rs1" type="array">
-      <obj_property name="ElementShortName">related_inst_rs1[9:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">related_inst_rs1[9:0][3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/related_inst_rs2" type="array">
-      <obj_property name="ElementShortName">related_inst_rs2[9:0][3:0]</obj_property>
-      <obj_property name="ObjectShortName">related_inst_rs2[9:0][3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/m1911/issue_v" type="logic">
-      <obj_property name="ElementShortName">issue_v</obj_property>
-      <obj_property name="ObjectShortName">issue_v</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/ex_done" type="logic">
-      <obj_property name="ElementShortName">ex_done</obj_property>
-      <obj_property name="ObjectShortName">ex_done</obj_property>
+   <wvobject fp_name="/TOP/ex/func_part" type="array">
+      <obj_property name="ElementShortName">func_part[14:0]</obj_property>
+      <obj_property name="ObjectShortName">func_part[14:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/rob/after_done_dcheck" type="array">
       <obj_property name="ElementShortName">after_done_dcheck[4:0]</obj_property>
@@ -107,6 +92,30 @@
    <wvobject fp_name="/TOP/rob/wb_res" type="array">
       <obj_property name="ElementShortName">wb_res[31:0]</obj_property>
       <obj_property name="ObjectShortName">wb_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rob_flush" type="logic">
+      <obj_property name="ElementShortName">rob_flush</obj_property>
+      <obj_property name="ObjectShortName">rob_flush</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rob_need_jump" type="logic">
+      <obj_property name="ElementShortName">rob_need_jump</obj_property>
+      <obj_property name="ObjectShortName">rob_need_jump</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/IF/pc" type="array">
+      <obj_property name="ElementShortName">pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rob_tar_addr" type="array">
+      <obj_property name="ElementShortName">rob_tar_addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rob_tar_addr[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/ram_res" type="array">
+      <obj_property name="ElementShortName">ram_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ram_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/inst_reslt" type="array">
+      <obj_property name="ElementShortName">inst_reslt[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">inst_reslt[9:0][31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/rob/dst" type="array">
       <obj_property name="ElementShortName">dst[4:0]</obj_property>
@@ -139,5 +148,121 @@
    <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r29_q " type="array">
       <obj_property name="ElementShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
       <obj_property name="ObjectShortName">\REGFILE.reg_r29_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/regfile/\REGFILE.reg_r30_q " type="array">
+      <obj_property name="ElementShortName">\REGFILE.reg_r30_q [31:0]</obj_property>
+      <obj_property name="ObjectShortName">\REGFILE.reg_r30_q [31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/ex_tar_addr" type="array">
+      <obj_property name="ElementShortName">ex_tar_addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ex_tar_addr[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/m1911/issue_v" type="logic">
+      <obj_property name="ElementShortName">issue_v</obj_property>
+      <obj_property name="ObjectShortName">issue_v</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/func_part" type="array">
+      <obj_property name="ElementShortName">func_part[14:0]</obj_property>
+      <obj_property name="ObjectShortName">func_part[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/ex_done" type="logic">
+      <obj_property name="ElementShortName">ex_done</obj_property>
+      <obj_property name="ObjectShortName">ex_done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/add_res" type="array">
+      <obj_property name="ElementShortName">add_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">add_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/func_part_done" type="array">
+      <obj_property name="ElementShortName">func_part_done[14:0]</obj_property>
+      <obj_property name="ObjectShortName">func_part_done[14:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/imm_data" type="array">
+      <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ra0_value_o" type="array">
+      <obj_property name="ElementShortName">ra0_value_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ra0_value_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rb0_value_o" type="array">
+      <obj_property name="ElementShortName">rb0_value_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">rb0_value_o[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rs1" type="array">
+      <obj_property name="ElementShortName">rs1[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs1[4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rs2" type="array">
+      <obj_property name="ElementShortName">rs2[4:0]</obj_property>
+      <obj_property name="ObjectShortName">rs2[4:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/rob_inst_pc" type="array">
+      <obj_property name="ElementShortName">rob_inst_pc[9:0][31:0]</obj_property>
+      <obj_property name="ObjectShortName">rob_inst_pc[9:0][31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/iss_inst" type="array">
+      <obj_property name="ElementShortName">iss_inst[3:0]</obj_property>
+      <obj_property name="ObjectShortName">iss_inst[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/res" type="array">
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u0_en" type="logic">
+      <obj_property name="ElementShortName">u0_en</obj_property>
+      <obj_property name="ObjectShortName">u0_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u1_en" type="logic">
+      <obj_property name="ElementShortName">u1_en</obj_property>
+      <obj_property name="ObjectShortName">u1_en</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u0_run_cnter" type="array">
+      <obj_property name="ElementShortName">u0_run_cnter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">u0_run_cnter[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u1_run_cnter" type="array">
+      <obj_property name="ElementShortName">u1_run_cnter[1:0]</obj_property>
+      <obj_property name="ObjectShortName">u1_run_cnter[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u0_res" type="array">
+      <obj_property name="ElementShortName">u0_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">u0_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/u1_res" type="array">
+      <obj_property name="ElementShortName">u1_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">u1_res[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/op1_r" type="array">
+      <obj_property name="ElementShortName">op1_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_r[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/add_sub/op2_r" type="array">
+      <obj_property name="ElementShortName">op2_r[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2_r[31:0]</obj_property>
    </wvobject>
 </wave_config>

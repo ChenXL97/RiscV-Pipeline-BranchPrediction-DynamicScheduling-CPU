@@ -18,6 +18,7 @@ module DE(
     //IF input
     input [31:0] IF_pip_reg,
     input [31:0] pc,
+    input [31:0] IF_pc,
     input BTB_is_taken,
     //EX input
     input EX_update,
@@ -67,7 +68,7 @@ module DE(
         .ex_stall(ex_stall),
         .predict_is_taken(predict_is_taken),
         .de_out(de_out),
-        .pc(pc),
+        .pc(IF_pc),
         .predict_pc(predict_pc),
         .DE_pip_reg(DE_pip_reg)
         );

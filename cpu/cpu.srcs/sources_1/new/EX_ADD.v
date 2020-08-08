@@ -57,13 +57,36 @@ wire     [31:0]                         u0_res;
 wire     [31:0]                         u1_res;
 
 
+reg      [31:0]                         op1_r;
+reg      [31:0]                         op2_r;
+
+
+
+
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            op1_r = op1;
+            op2_r = op2;
+        end
+        else begin
+            op1_r = op1_r;
+            op2_r = op2_r;
+        end
+    end
+    else begin
+        op1_r = 'd0;
+        op2_r = 'd0;
+    end
+end
+
 
 
 
 
 adder_suber addsub_no_u_0(
-    .A                      (op1),
-    .B                      (op2),
+    .A                      (op1_r),
+    .B                      (op2_r),
     .CLK                    (clk),
     .ADD                    (u0_add),
     .CE                     (u0_en),
@@ -71,8 +94,8 @@ adder_suber addsub_no_u_0(
 );
 
 adder_suber addsub_no_u_1(
-    .A                      (op1),
-    .B                      (op2),
+    .A                      (op1_r),
+    .B                      (op2_r),
     .CLK                    (clk),
     .ADD                    (u1_add),
     .CE                     (u1_en),

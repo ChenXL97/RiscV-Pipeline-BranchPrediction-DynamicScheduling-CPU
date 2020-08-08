@@ -27,6 +27,7 @@ module IF(
     input [31:0] revert_addr,
     output [31:0] pc,
     output [31:0] IF_pip_reg,
+    output [31:0] IF_pc,
     output reg BTB_is_taken,
     output reg [31:0]btb_predict_pc
     );
@@ -72,7 +73,9 @@ module IF(
         .ex_stall(EX_block),
         .EX_rst(EX_rst),
         .ins(ins),
-        .IF_pip_reg(IF_pip_reg)
+        .pc(pc),
+        .IF_pip_reg(IF_pip_reg),
+        .IF_pc(IF_pc)
     );
    
     BTB BTB(

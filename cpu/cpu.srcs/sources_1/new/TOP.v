@@ -47,7 +47,6 @@ wire        [4:0]               reg_file_addr;
 /* ex */
 wire                            ex_done;
 wire        [31:0]              ex_res;
-wire        [31:0]              ex_tar_addr;               
 wire                            ex_need_jmp;
 wire                            ex_flush;
 wire        [4:0]               ex_rd;
@@ -80,8 +79,9 @@ wire                            rob_stall;
         //Wires to|from DE module
         wire predict_is_taken;  //1 when BTB need to write PC
         wire [31:0]predict_pc;  //Corresponding PC from BTB
-    
+        
         wire [31:0] pc;
+        wire [31:0] IF_pc;
         wire [31:0]IF_pip_reg;
         
         //Wires to|from EX module
@@ -95,6 +95,9 @@ wire                            rob_stall;
         wire [31:0] btb_predict_pc_w;
         wire revert_jump;
         wire [31:0] revert_addr;
+        wire                            rob_flush;
+        wire                            rob_need_jump;
+        wire    [31:0]                  rob_tar_addr;
         //IF module, including PC, InsMem, IF_PipReg
     IF IF
     (
@@ -102,16 +105,17 @@ wire                            rob_stall;
         .rst(rst),
         .revert_jump(revert_jump),
         .revert_addr(revert_addr),
-        .EX_rst('b0),
+        .EX_rst(rob_flush),
         .EX_pc_i(ex_cur_pc_w),
         .EX_block(rob_stall),
         .EX_write_pc(EX_update),
-        .EX_addr(ex_tar_addr),
+        .EX_addr(rob_tar_addr),
         .EX_is_branch(ex_is_branch_w),
-        .ex_need_jump(ex_need_jmp),
+        .ex_need_jump(rob_need_jump),
 //        .BTB_write_pc(predict_is_taken),
 //        .BTB_addr(predict_pc),
         .pc(pc),
+        .IF_pc(IF_pc),
         .IF_pip_reg(IF_pip_reg),
         .BTB_is_taken(BTB_is_taken_w),
         .btb_predict_pc(btb_predict_pc_w)
@@ -132,6 +136,7 @@ wire                            rob_stall;
         .IF_pip_reg(IF_pip_reg),
         .BTB_is_taken(BTB_is_taken_w),
         .pc(pc),
+        .IF_pc(IF_pc),
         .EX_update(EX_update),
         .EX_result_pc(EX_result_pc),
         .predict_is_taken(predict_is_taken),
@@ -248,6 +253,8 @@ wire     [1:0]                           rob_op_mode1;
 wire     [2:0]                           rob_op_mode2;
 wire     [3:0]                           iss_inst;
 wire     [9:0]                           iss_flag;
+wire     [31:0]                          ex_tar_addr;
+wire                                     ex_need_jump;
 
 
 
@@ -327,8 +334,14 @@ ROB rob(
 
     // op_mode
     .rob_op_mode1               (rob_op_mode1),
-    .rob_op_mode2               (rob_op_mode2)
+    .rob_op_mode2               (rob_op_mode2),
 
+    // branch inst
+    .ex_tar_addr                (ex_tar_addr),
+    .ex_need_jump                (ex_need_jump),
+    .rob_flush                  (rob_flush),
+    .rob_need_jump              (rob_need_jump),
+    .rob_tar_addr               (rob_tar_addr)
 );
 
 
@@ -425,6 +438,25 @@ assign op1 = forward_data_rs1_v_w ? forward_data_rs1_w : ra0_value_o;
 assign op2 = forward_data_rs2_v_w ? forward_data_rs2_w : rb0_value_o;
 
 
+// always @ (posedge clk) begin
+//     if(!rst && !rob_flush) begin
+//         if(forward_data_rs1_v_w) begin
+//             op1 <= forward_data_rs1_w;
+//             op2 <= forward_data_rs2_w;
+//         end
+//         else begin
+//             op1 <= ra0_value_o;
+//             op2 <= rb0_value_o;
+//         end
+//     end
+//     else begin
+//         op1 <= 'd0;
+//         op2 <= 'd0;
+//     end
+// end
+
+
+
 
 
 EX ex (
@@ -449,7 +481,7 @@ EX ex (
 
     // signal related with btb
     .ex_is_branch          (ex_is_branch_w),
-    .ex_need_jump           (ex_need_jmp),
+    .ex_need_jump           (ex_need_jump),
     .BTB_is_taken(BTB_dis_ex),
     .BTB_predict_pc(BTB_pc_dis_ex),
     .revert_jump(revert_jump),
@@ -471,7 +503,9 @@ EX ex (
     .fmul_res               (fmul_res),
     .fdiv_res               (fdiv_res),
     .fsp_res                (fsp_res),
-    .fcmp_res               (fcmp_res)
+    .fcmp_res               (fcmp_res),
+
+    .issue_v                (issue_v)
 
 );
 

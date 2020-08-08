@@ -14,16 +14,23 @@ module IF_PipReg(
     input rst,
     input EX_rst,
     input [31:0]ins,
+    input [31:0]pc,
     input ex_stall,
-    output reg[31:0] IF_pip_reg
+    output reg[31:0] IF_pip_reg,
+    output reg[31:0] IF_pc
     );
     
     always@(posedge clk or posedge rst or posedge EX_rst)
-        if(rst || EX_rst)
-            IF_pip_reg <= 32'hx;
-        else if (ex_stall)
+        if(rst || EX_rst) begin
+            IF_pip_reg <= 'd0;
+            IF_pc <= 'd0;
+        end
+        else if (ex_stall) begin
             IF_pip_reg <= IF_pip_reg;
-        else 
+            IF_pc <= IF_pc;
+        end
+        else begin
             IF_pip_reg <= ins;
-    
+            IF_pc <= pc;
+        end
 endmodule

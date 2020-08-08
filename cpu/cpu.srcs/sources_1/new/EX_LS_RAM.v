@@ -295,9 +295,9 @@ end
 // set addr
 // set dout
 // set din
-always @ (*) begin
+always @ (start) begin
     if(!rst) begin
-        if(1) begin
+        if(start) begin
             out_addr = op1  + imm_data;
             case (op_mode2)
             // operation on word

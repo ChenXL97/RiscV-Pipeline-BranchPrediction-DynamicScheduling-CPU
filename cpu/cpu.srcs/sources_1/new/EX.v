@@ -78,7 +78,9 @@ module EX(
     output      reg     [31:0]                          fmul_res,
     output      reg     [31:0]                          fdiv_res,
     output      reg     [31:0]                          fsp_res,
-    output      reg     [31:0]                          fcmp_res
+    output      reg     [31:0]                          fcmp_res,
+
+    input                                               issue_v
 
     );
 
@@ -360,7 +362,7 @@ always @(negedge clk) begin
     end
 end
 
-always @(posedge clk ) begin
+always @(posedge clk) begin
     revert_jump <= 0;
 end
     //ex_flush <= ex_done?  ex_need_jump^BTB_is_taken_r ? 1 : BTB_predict_pc_r==branch_res :0;
@@ -414,31 +416,19 @@ end
 
 
 
-always @ (*) begin
+always @ (posedge clk) begin
     if(!rst) begin
         // current inst is valid and not running 
-        if(dis_cur_pc_r != dis_cur_pc && func_part != 'd0) begin
-            func_start = func_part;
+        if(issue_v) begin
+            func_start <= func_part;
         end
         else begin
-            func_start = 'd0;
+            func_start <= 'd0;
         end
-
-        // current inst is running
-        // if(func_busy == 'd1) begin
-        //     if(trick)
-        //         func_start = 'd0;
-        //     else 
-        //         func_start = func_start;
-        // end
-
-        // else begin
-        //     func_start = 'd0;
-        // end
     end
 
     else begin
-        func_start = 'd0;
+        func_start <= 'd0;
     end
 end
 
@@ -446,7 +436,7 @@ end
 always @ (posedge clk) begin
     if(!rst) begin
         // current inst is valid and not running 
-        if(dis_cur_pc_r != dis_cur_pc && func_part != 'd0) begin
+        if(func_part != 'd0) begin
             imm_data_r <= imm_data;
             op1_r <= op1;
             op2_r <= op2;
@@ -610,7 +600,7 @@ LOGIC logic(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (logic_extra_data),
-            .start                  (func_start[`LOGIC_USE]),
+            .start                  (func_part[`LOGIC_USE]),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
             .done                   (logic_done),
@@ -623,7 +613,7 @@ SHIFT shift(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (shift_extra_data),
-            .start                  (func_start[`SHIFT_USE]),
+            .start                  (func_part[`SHIFT_USE]),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
             .done                   (shift_done),
@@ -636,7 +626,7 @@ ADD_SUB add_sub(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (add_extra_data),
-            .start                  (func_start[`ADD_USE]),
+            .start                  (func_part[`ADD_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -652,7 +642,7 @@ RAM data_ram(
             .op1                    (op1),
             .op2                    (op2),
             .imm_data               (imm_data),
-            .start                  (func_start[`RAM_USE]),
+            .start                  (func_part[`RAM_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -668,8 +658,8 @@ BRANCH branch(
             .op1                    (op1),
             .op2                    (op2),
             .imm_data               (imm_data + 'd4),
-            .cur_pc                 (ex_cur_pc),
-            .start                  (func_start[`BRANCH_USE]),
+            .cur_pc                 (dis_cur_pc),
+            .start                  (func_part[`BRANCH_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -687,7 +677,7 @@ FADD_SUB fadd_sub(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FADD_USE]),
+            .start                  (func_part[`FADD_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -699,7 +689,7 @@ INT_FLOAT int_float(
             .clk                    (clk),
             .rst                    (rst),
             .op1                    (op1),
-            .start                  (func_start[`FSP_USE]),
+            .start                  (func_part[`FSP_USE]),
             .use_part               (2'b01),
             .op_mode1               (op_mode1),
             .op_mode2               (op_mode2),
@@ -712,7 +702,7 @@ FCMP fcmp(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FCMP_USE]),
+            .start                  (func_part[`FCMP_USE]),
             .use_part               (2'b01),
             .op_mode1               (2'b0),
             .op_mode2               (3'b0),
@@ -725,7 +715,7 @@ FMUL fmul(
             .rst                    (rst),
             .op1                    (op1),
             .op2                    (op2),
-            .start                  (func_start[`FMUL_USE]),
+            .start                  (func_part[`FMUL_USE]),
             .use_part               (2'b01),
             .op_mode1               (2'b0),
             .op_mode2               (3'b0),

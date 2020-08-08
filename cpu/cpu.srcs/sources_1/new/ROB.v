@@ -114,7 +114,14 @@ module ROB (
 
     // op mode
     output      reg     [1:0]                   rob_op_mode1,
-    output      reg     [2:0]                   rob_op_mode2
+    output      reg     [2:0]                   rob_op_mode2,
+
+    // branch inst related
+    input               [31:0]                  ex_tar_addr,
+    input                                       ex_need_jump,
+    output      reg                             rob_flush,
+    output      reg                             rob_need_jump,
+    output      reg     [31:0]                  rob_tar_addr
 
 );
 
@@ -129,7 +136,6 @@ reg         [9:0]                               rob_inst_done;
 reg         [3:0]                               end_pt;
 reg         [3:0]                               head_pt;
 reg         [3:0]                               check_data_pt;
-reg                                             rob_full;
 
 
 // each func part map to one inst, one inst map to a rob
@@ -186,6 +192,10 @@ reg         [31:0]                              imm_data             [9:0];
 reg         [14:0]                              inst_hw_use          [9:0];
 reg         [3:0]                               ex_res_wr_pt;
 
+// branch jump flag
+reg         [9:0]                               need_jump;
+reg         [31:0]                              tar_addr    [9:0];
+
 
 
 assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
@@ -197,7 +207,7 @@ assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
 
 
 always @ (de_cur_pc) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(de_cur_pc != last_pc && rob_info[`FCMP:`RAM] != 'd0) begin
             inst_hw_use[head_pt] = rob_info[`FCMP:`RAM];
         end
@@ -218,7 +228,7 @@ end
 
 // generate func_part_start signal
 always @ (iss_inst) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             // rob_func_part_start = 15'b0;
             rob_func_part_start = inst_hw_use[iss_inst];
@@ -242,7 +252,7 @@ end
 // combine a func_part with an inst
 // when an inst is write back, free corresponding element
 always @ (*) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             if(rob_info_stack[iss_inst][`RAM])
                 func2rob[0] = iss_inst;
@@ -304,7 +314,7 @@ end
 // when ex_done, set corresponding inst as done
 // when an inst is write back, free corresponding element
 always @ (func_part_done) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(ex_done) begin
             if (func_part_done[`RAM_USE]) begin
                 done_inst = func2rob[`RAM_USE];
@@ -388,7 +398,7 @@ end
 
 // store current inst_pc and last inst_pc
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         cur_pc <= de_cur_pc;
     end
     else begin
@@ -397,7 +407,7 @@ always @ (posedge clk) begin
 end
 
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
        last_pc <= de_cur_pc; 
     end
     else begin
@@ -412,10 +422,10 @@ assign rob_cur_pc = last_pc;
 
 // store each inst's pc value
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
-            rob_inst_pc[head_pt] <= de_cur_pc;
+            rob_inst_pc[head_pt] <= rob_info[`OPC];
         end
     end
     else begin
@@ -439,7 +449,7 @@ end
 
 // control imm_data and imm_use signal
 always @ (de_cur_pc) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
 
@@ -468,7 +478,7 @@ end
 
 // set op_mode1 and op_mode2
 always @ (iss_inst) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             rob_op_mode1 = rob_info_stack[iss_inst][`OP1];
             rob_op_mode2 = rob_info_stack[iss_inst][`OP2];
@@ -490,7 +500,7 @@ end
 
 // send imm_related information to dis_gun
 always @ (iss_inst) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             rob_imm_data = imm_data[iss_inst];
         end
@@ -514,7 +524,7 @@ end
 
 // send issued inst to issuer, then ex
 always @ (iss_inst) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             iss_inst_pc = rob_inst_pc[iss_inst];
         end
@@ -533,7 +543,7 @@ end
 
 // write rob when decode info is valid
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
             rob_info_stack[head_pt] <= rob_info;
@@ -561,84 +571,100 @@ end
 // set inst_reslt array to store inst's
 // computing result. Write when ex_done.
 always @ (func_part_done) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
          // let inst result in
         if (ex_done) begin
-
             ex_res_wr_pt = 'd0;
+
             if(func_part_done[`RAM_USE]) begin
                 ex_res_wr_pt = func2rob[0];
                 inst_reslt[ex_res_wr_pt] = ram_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
             
             if(func_part_done[`BRANCH_USE]) begin
                 ex_res_wr_pt = func2rob[1];
                 inst_reslt[ex_res_wr_pt] = branch_res;
+                need_jump[ex_res_wr_pt] = ex_need_jump;
+                tar_addr[ex_res_wr_pt] = ex_tar_addr;
             end
 
             if(func_part_done[`SHIFT_USE]) begin
                 ex_res_wr_pt = func2rob[2];
                 inst_reslt[ex_res_wr_pt] = shift_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`LOGIC_USE]) begin
                 ex_res_wr_pt = func2rob[3];
                 inst_reslt[ex_res_wr_pt] = logic_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`CMP_USE]) begin
                 ex_res_wr_pt = func2rob[4];
                 inst_reslt[ex_res_wr_pt] = cmp_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`ADD_USE]) begin
                 ex_res_wr_pt = func2rob[5];
                 inst_reslt[ex_res_wr_pt] = add_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`MUL_USE]) begin
                 ex_res_wr_pt = func2rob[6];
                 inst_reslt[ex_res_wr_pt] = mul_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`DIV_USE]) begin
                 ex_res_wr_pt = func2rob[7];
                 inst_reslt[ex_res_wr_pt] = div_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`SP_USE]) begin
                 ex_res_wr_pt = func2rob[8];
                 inst_reslt[ex_res_wr_pt] = sp_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`RINFO_USE]) begin
                 ex_res_wr_pt = func2rob[9];
                 inst_reslt[ex_res_wr_pt] = rinfo_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`FADD_USE]) begin
                 ex_res_wr_pt = func2rob[10];
                 inst_reslt[ex_res_wr_pt] = fadd_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`FMUL_USE]) begin
                 ex_res_wr_pt = func2rob[11];
                 inst_reslt[ex_res_wr_pt] = fmul_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`FDIV_USE]) begin
                 ex_res_wr_pt = func2rob[12];
                 inst_reslt[ex_res_wr_pt] = fdiv_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`FSP_USE]) begin
                 ex_res_wr_pt = func2rob[13];
                 inst_reslt[ex_res_wr_pt] = fsp_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
 
             if(func_part_done[`FCMP_USE]) begin
                 ex_res_wr_pt = func2rob[14];
                 inst_reslt[ex_res_wr_pt] = fcmp_res;
+                need_jump[ex_res_wr_pt] = 'b0;
             end
         end
     end
@@ -653,6 +679,19 @@ always @ (func_part_done) begin
         inst_reslt[7] = 'd0;
         inst_reslt[8] = 'd0;
         inst_reslt[9] = 'd0;
+
+        need_jump = 10'b0;
+
+        tar_addr[0] = 'd0;
+        tar_addr[1] = 'd0;
+        tar_addr[2] = 'd0;
+        tar_addr[3] = 'd0;
+        tar_addr[4] = 'd0;
+        tar_addr[5] = 'd0;
+        tar_addr[6] = 'd0;
+        tar_addr[7] = 'd0;
+        tar_addr[8] = 'd0;
+        tar_addr[9] = 'd0;
     end
 end
 
@@ -660,7 +699,7 @@ end
 
 // control head_pt
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
             if(rob_stall) begin
                 head_pt <= head_pt;
@@ -689,12 +728,25 @@ end
 
 // control end_pt and wb_v
 // use this part to control write-back process
+// adding branch write back logic
 always @ (posedge clk) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(rob_inst_done[end_pt]) begin
+            if(need_jump[end_pt] && rob_flush != 'd1) begin
+                rob_flush <= 'd1;                
+            end
+            else begin
+                rob_flush <= 'd0;
+            end
+
+            // oridinay write back
             wb_v <= 'd1;
             wb_res <= inst_reslt[end_pt];
             wb_inst <= end_pt;
+            rob_flush <= need_jump[end_pt];
+            rob_need_jump <= need_jump[end_pt];
+            rob_tar_addr <= tar_addr[end_pt];
+
             if(end_pt == 'd9) begin
                 end_pt <= 'd0;
             end
@@ -707,6 +759,10 @@ always @ (posedge clk) begin
             wb_res <= 'd0;
             end_pt <= end_pt;
             wb_inst <= 'd11;
+            rob_flush <= 'd0;
+            rob_flush <= 'd0;
+            rob_need_jump <= 'd0;
+            rob_tar_addr <= 32'hffff_ffff;
         end
     end
     else begin
@@ -714,6 +770,10 @@ always @ (posedge clk) begin
         wb_v <= 'd0;
         wb_res <= 'd0;
         wb_inst <= 'd11;
+        rob_flush <= 'd0;
+        rob_flush <= 'd0;
+        rob_need_jump <= 'd0;
+        rob_tar_addr <= 32'hffff_ffff;
     end
 end
 
@@ -725,7 +785,7 @@ end
 // check existed inst first
 // when an inst is write back, free element
 always @ (wb_inst or func_part_done or de_cur_pc) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         // when a inst is write back, free
         if(wb_v) begin
             related[wb_inst] = 'd0;
@@ -4884,7 +4944,7 @@ end
 // when an inst is issued, set hw_use
 // when an inst is ex_done, free hw_use
 always @ (iss_inst or func_part_done or de_cur_pc) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         
         // when an inst is issued, set hw_use
         // and set hw_relation at the same time
@@ -8841,7 +8901,7 @@ end
 
 // transfer forward data to dis_gun
 always @ (*) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             forwd_data_rs1 <= 'd0;
             forwd_data_rs2 <= 'd0;
@@ -8878,7 +8938,7 @@ end
 
 // let regfile prepare data
 always @ (*) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(issue_v) begin
             if(forward_flag_rs1[iss_inst]) begin
                rs1 = 'd0;
@@ -8901,8 +8961,8 @@ always @ (*) begin
         else begin
             prepare_rs1_en = 'd0;
             prepare_rs2_en = 'd0;
-            rs1 = 'd0;
-            rs2 = 'd0;
+            rs1 = rs1;
+            rs2 = rs2;
         end
     end
     else begin
@@ -8919,7 +8979,7 @@ end
 
 // control write back data and dst_addr of regfile
 always @ (wb_inst) begin
-    if(!rst) begin
+    if(!rst && !rob_flush) begin
         if(wb_v) begin
             dst = rob_info_stack[wb_inst][`DST];
             wb_res = inst_reslt[wb_inst];

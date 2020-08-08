@@ -139,7 +139,7 @@ begin: REGFILE
             //-----------------------------------------------------------------
             reg [31:0] ra0_value_r;
             reg [31:0] rb0_value_r;
-            always @ (*) begin
+            always @ (negedge clk_i) begin
                 case (ra0_i)
                 5'd1: ra0_value_r = reg_r1_q;
                 5'd2: ra0_value_r = reg_r2_q;
