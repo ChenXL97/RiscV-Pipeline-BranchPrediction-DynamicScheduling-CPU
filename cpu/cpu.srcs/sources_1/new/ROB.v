@@ -860,6 +860,176 @@ always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
             related[wb_inst] = 'd0;
             related_inst[wb_inst] = 'd11;
             related_busy[wb_inst] = 'd0;
+
+            // check 
+            if(head_pt != 'd0)
+                check_data_pt = head_pt - 'd1;
+            else 
+                check_data_pt = 'd9;
+
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+            // 1
+            if(related_busy[check_data_pt] ) begin
+                if (related_inst_rs1[check_data_pt] == wb_inst) begin
+                    related_inst_rs1[check_data_pt] = 'd11;
+                end
+                if (related_inst_rs2[check_data_pt] == wb_inst) begin
+                    related_inst_rs2[check_data_pt] = 'd11;
+                end
+                if (!related_inst_rs1[check_data_pt] && !related_inst_rs2[check_data_pt]) begin
+                    forward_flag_rs1 = 1'b0;
+                end
+            end
+            if(check_data_pt == 'd0) 
+                    check_data_pt = 'd9;
+                else 
+                    check_data_pt = check_data_pt - 'd1;
+
         end
 
         // when a inst is done in exe
@@ -4148,13 +4318,14 @@ always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
         end
 
 
+
         // new inst come
         if( rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
 
             // set zero before use
-            // no need to free when write back
+            // need to free when related instructions write back
             forward_flag_rs1[head_pt] = 'd0;
             forward_flag_rs2[head_pt] = 'd0;
             related_rs1[head_pt] = 'b0;

@@ -11,22 +11,25 @@
       </db_ref>
    </db_ref_list>
    <zoom_setting>
-      <ZoomStartTime time="9889276667fs"></ZoomStartTime>
-      <ZoomEndTime time="9905616668fs"></ZoomEndTime>
-      <Cursor1Time time="9892000000fs"></Cursor1Time>
+      <ZoomStartTime time="646416666666fs"></ZoomStartTime>
+      <ZoomEndTime time="705916666667fs"></ZoomEndTime>
+      <Cursor1Time time="660016667000fs"></Cursor1Time>
    </zoom_setting>
    <column_width_setting>
       <NameColumnWidth column_width="293"></NameColumnWidth>
-      <ValueColumnWidth column_width="91"></ValueColumnWidth>
+      <ValueColumnWidth column_width="87"></ValueColumnWidth>
    </column_width_setting>
-   <WVObjectSize size="86" />
+   <WVObjectSize size="113" />
    <wave_markers>
       <marker time="502656000000" label="" />
       <marker time="31632000000" label="" />
       <marker time="31166000000" label="" />
-      <marker time="9850000000" label="" />
       <marker time="31273950000" label="" />
       <marker time="31278000000" label="" />
+      <marker time="173000000" label="" />
+      <marker time="9609000000" label="" />
+      <marker time="9892000000" label="" />
+      <marker time="9864000000" label="" />
    </wave_markers>
    <wvobject fp_name="/TOP/IF/PC/pc" type="array">
       <obj_property name="ElementShortName">pc[31:0]</obj_property>
@@ -53,6 +56,7 @@
       <obj_property name="ElementShortName">related[9:0]</obj_property>
       <obj_property name="ObjectShortName">related[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
+      <obj_property name="isExpanded"></obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/rob/forward_flag_rs1" type="array">
       <obj_property name="ElementShortName">forward_flag_rs1[9:0]</obj_property>
@@ -76,6 +80,10 @@
       <obj_property name="ElementShortName">IF_pip_reg[31:0]</obj_property>
       <obj_property name="ObjectShortName">IF_pip_reg[31:0]</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/rob/related_rs1" type="array">
+      <obj_property name="ElementShortName">related_rs1[9:0]</obj_property>
+      <obj_property name="ObjectShortName">related_rs1[9:0]</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/rob/related_busy" type="array">
       <obj_property name="ElementShortName">related_busy[9:0]</obj_property>
       <obj_property name="ObjectShortName">related_busy[9:0]</obj_property>
@@ -94,6 +102,56 @@
       <obj_property name="ElementShortName">rob_inst_pc[9:0][31:0]</obj_property>
       <obj_property name="ObjectShortName">rob_inst_pc[9:0][31:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[9]" type="array">
+         <obj_property name="ElementShortName">[9][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[8]" type="array">
+         <obj_property name="ElementShortName">[8][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[7]" type="array">
+         <obj_property name="ElementShortName">[7][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[6]" type="array">
+         <obj_property name="ElementShortName">[6][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[5]" type="array">
+         <obj_property name="ElementShortName">[5][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[4]" type="array">
+         <obj_property name="ElementShortName">[4][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[3]" type="array">
+         <obj_property name="ElementShortName">[3][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[2]" type="array">
+         <obj_property name="ElementShortName">[2][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[1]" type="array">
+         <obj_property name="ElementShortName">[1][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/rob_inst_pc[0]" type="array">
+         <obj_property name="ElementShortName">[0][31:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][31:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
    </wvobject>
    <wvobject fp_name="/TOP/rob/rob_stall" type="logic">
       <obj_property name="ElementShortName">rob_stall</obj_property>
@@ -113,6 +171,19 @@
       <obj_property name="ObjectShortName">rob_iss_inst_pc[31:0]</obj_property>
       <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/rob/wb_inst" type="array">
+      <obj_property name="ElementShortName">wb_inst[3:0]</obj_property>
+      <obj_property name="ObjectShortName">wb_inst[3:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/wb_v" type="logic">
+      <obj_property name="ElementShortName">wb_v</obj_property>
+      <obj_property name="ObjectShortName">wb_v</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/rob/wb_res" type="array">
+      <obj_property name="ElementShortName">wb_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">wb_res[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/rob/rob_info" type="array">
       <obj_property name="ElementShortName">rob_info[167:0]</obj_property>
       <obj_property name="ObjectShortName">rob_info[167:0]</obj_property>
@@ -126,23 +197,48 @@
       <obj_property name="ElementShortName">rob_flush</obj_property>
       <obj_property name="ObjectShortName">rob_flush</obj_property>
    </wvobject>
+   <wvobject fp_name="/TOP/forward_data_rs1_v_w" type="logic">
+      <obj_property name="ElementShortName">forward_data_rs1_v_w</obj_property>
+      <obj_property name="ObjectShortName">forward_data_rs1_v_w</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/forward_data_rs1_w" type="array">
+      <obj_property name="ElementShortName">forward_data_rs1_w[31:0]</obj_property>
+      <obj_property name="ObjectShortName">forward_data_rs1_w[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ra0_value_o" type="array">
+      <obj_property name="ElementShortName">ra0_value_o[31:0]</obj_property>
+      <obj_property name="ObjectShortName">ra0_value_o[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/data_ram/imm_data" type="array">
+      <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
+      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/shift_res" type="array">
+      <obj_property name="ElementShortName">shift_res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">shift_res[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
    <wvobject fp_name="/TOP/rob/need_jump" type="array">
       <obj_property name="ElementShortName">need_jump[9:0]</obj_property>
       <obj_property name="ObjectShortName">need_jump[9:0]</obj_property>
       <obj_property name="Radix">BINARYRADIX</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/rob/wb_v" type="logic">
-      <obj_property name="ElementShortName">wb_v</obj_property>
-      <obj_property name="ObjectShortName">wb_v</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/wb_inst" type="array">
-      <obj_property name="ElementShortName">wb_inst[3:0]</obj_property>
-      <obj_property name="ObjectShortName">wb_inst[3:0]</obj_property>
-   </wvobject>
-   <wvobject fp_name="/TOP/rob/wb_res" type="array">
-      <obj_property name="ElementShortName">wb_res[31:0]</obj_property>
-      <obj_property name="ObjectShortName">wb_res[31:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/rob/related_inst_rs1" type="array">
+      <obj_property name="ElementShortName">related_inst_rs1[9:0][3:0]</obj_property>
+      <obj_property name="ObjectShortName">related_inst_rs1[9:0][3:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/regfile/reg_r1_q" type="array">
       <obj_property name="DisplayName">label</obj_property>
@@ -184,7 +280,7 @@
       <obj_property name="ElementShortName">reg_r6_q[31:0]</obj_property>
       <obj_property name="ObjectShortName">reg_r6_q[31:0]</obj_property>
       <obj_property name="label">t1</obj_property>
-      <obj_property name="Radix">ASCIIRADIX</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/regfile/reg_r7_q" type="array">
       <obj_property name="DisplayName">label</obj_property>
@@ -205,6 +301,7 @@
       <obj_property name="ElementShortName">reg_r8_q[31:0]</obj_property>
       <obj_property name="ObjectShortName">reg_r8_q[31:0]</obj_property>
       <obj_property name="label">s0</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/regfile/reg_r9_q" type="array">
       <obj_property name="DisplayName">label</obj_property>
@@ -310,20 +407,67 @@
       <obj_property name="ElementShortName">rst</obj_property>
       <obj_property name="ObjectShortName">rst</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/op1" type="array">
-      <obj_property name="ElementShortName">op1[31:0]</obj_property>
-      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/rob/inst_dst" type="array">
+      <obj_property name="ElementShortName">inst_dst[9:0][4:0]</obj_property>
+      <obj_property name="ObjectShortName">inst_dst[9:0][4:0]</obj_property>
+      <wvobject fp_name="/TOP/rob/inst_dst[9]" type="array">
+         <obj_property name="ElementShortName">[9][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[9][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[8]" type="array">
+         <obj_property name="ElementShortName">[8][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[8][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[7]" type="array">
+         <obj_property name="ElementShortName">[7][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[7][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[6]" type="array">
+         <obj_property name="ElementShortName">[6][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[6][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[5]" type="array">
+         <obj_property name="ElementShortName">[5][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[5][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[4]" type="array">
+         <obj_property name="ElementShortName">[4][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[4][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[3]" type="array">
+         <obj_property name="ElementShortName">[3][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[3][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[2]" type="array">
+         <obj_property name="ElementShortName">[2][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[2][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[1]" type="array">
+         <obj_property name="ElementShortName">[1][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[1][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
+      <wvobject fp_name="/TOP/rob/inst_dst[0]" type="array">
+         <obj_property name="ElementShortName">[0][4:0]</obj_property>
+         <obj_property name="ObjectShortName">[0][4:0]</obj_property>
+         <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+      </wvobject>
    </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/op2" type="array">
-      <obj_property name="ElementShortName">op2[31:0]</obj_property>
-      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
-      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/forward_data_rs2_v_w" type="logic">
+      <obj_property name="ElementShortName">forward_data_rs2_v_w</obj_property>
+      <obj_property name="ObjectShortName">forward_data_rs2_v_w</obj_property>
    </wvobject>
-   <wvobject fp_name="/TOP/ex/data_ram/imm_data" type="array">
-      <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
-      <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
-      <obj_property name="Radix">SIGNEDDECRADIX</obj_property>
+   <wvobject fp_name="/TOP/forward_data_rs2_w" type="array">
+      <obj_property name="ElementShortName">forward_data_rs2_w[31:0]</obj_property>
+      <obj_property name="ObjectShortName">forward_data_rs2_w[31:0]</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/ex/data_ram/start" type="logic">
       <obj_property name="ElementShortName">start</obj_property>
@@ -348,6 +492,7 @@
    <wvobject fp_name="/TOP/ex/data_ram/res" type="array">
       <obj_property name="ElementShortName">res[31:0]</obj_property>
       <obj_property name="ObjectShortName">res[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
    </wvobject>
    <wvobject fp_name="/TOP/ex/data_ram/out_addr" type="array">
       <obj_property name="ElementShortName">out_addr[11:0]</obj_property>
@@ -453,5 +598,80 @@
    <wvobject fp_name="/TOP/ex/data_ram/clk_cnter" type="array">
       <obj_property name="ElementShortName">clk_cnter[31:0]</obj_property>
       <obj_property name="ObjectShortName">clk_cnter[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/clk" type="logic">
+      <obj_property name="ElementShortName">clk</obj_property>
+      <obj_property name="ObjectShortName">clk</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/rst" type="logic">
+      <obj_property name="ElementShortName">rst</obj_property>
+      <obj_property name="ObjectShortName">rst</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op1" type="array">
+      <obj_property name="ElementShortName">op1[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op1[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op2" type="array">
+      <obj_property name="ElementShortName">op2[31:0]</obj_property>
+      <obj_property name="ObjectShortName">op2[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/imm_data" type="array">
+      <obj_property name="ElementShortName">imm_data[31:0]</obj_property>
+      <obj_property name="ObjectShortName">imm_data[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/cur_pc" type="array">
+      <obj_property name="ElementShortName">cur_pc[31:0]</obj_property>
+      <obj_property name="ObjectShortName">cur_pc[31:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/start" type="logic">
+      <obj_property name="ElementShortName">start</obj_property>
+      <obj_property name="ObjectShortName">start</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/use_part" type="array">
+      <obj_property name="ElementShortName">use_part[1:0]</obj_property>
+      <obj_property name="ObjectShortName">use_part[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op_mode1" type="array">
+      <obj_property name="ElementShortName">op_mode1[1:0]</obj_property>
+      <obj_property name="ObjectShortName">op_mode1[1:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op_mode2" type="array">
+      <obj_property name="ElementShortName">op_mode2[2:0]</obj_property>
+      <obj_property name="ObjectShortName">op_mode2[2:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/done" type="logic">
+      <obj_property name="ElementShortName">done</obj_property>
+      <obj_property name="ObjectShortName">done</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/res" type="array">
+      <obj_property name="ElementShortName">res[31:0]</obj_property>
+      <obj_property name="ObjectShortName">res[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/tar_addr" type="array">
+      <obj_property name="ElementShortName">tar_addr[31:0]</obj_property>
+      <obj_property name="ObjectShortName">tar_addr[31:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/need_jmp" type="logic">
+      <obj_property name="ElementShortName">need_jmp</obj_property>
+      <obj_property name="ObjectShortName">need_jmp</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op1_u" type="array">
+      <obj_property name="ElementShortName">op1_u[32:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_u[32:0]</obj_property>
+      <obj_property name="Radix">UNSIGNEDDECRADIX</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op2_u" type="array">
+      <obj_property name="ElementShortName">op2_u[32:0]</obj_property>
+      <obj_property name="ObjectShortName">op2_u[32:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op1_r" type="array">
+      <obj_property name="ElementShortName">op1_r[32:0]</obj_property>
+      <obj_property name="ObjectShortName">op1_r[32:0]</obj_property>
+   </wvobject>
+   <wvobject fp_name="/TOP/ex/branch/op2_r" type="array">
+      <obj_property name="ElementShortName">op2_r[32:0]</obj_property>
+      <obj_property name="ObjectShortName">op2_r[32:0]</obj_property>
    </wvobject>
 </wave_config>
