@@ -91,6 +91,9 @@ reg         [3:0]                       load_cnt;
 reg         [3:0]                       store_cnt;
 
 
+reg         [31:0]                      clk_cnter;
+
+
 
 
 
@@ -142,77 +145,77 @@ four_body_bram_3 ram_3(
 always @ (*) begin
     if(!rst) begin
         if(load_cnt == 'd0 || store_cnt == 'd0) begin
-            ram_en <= 'd0;
-            wea_0 <= 'd0;
-            wea_1 <= 'd0;
-            wea_2 <= 'd0;
-            wea_3 <= 'd0;
+            ram_en = 'd0;
+            wea_0 = 'd0;
+            wea_1 = 'd0;
+            wea_2 = 'd0;
+            wea_3 = 'd0;
         end
 
         else if(start) begin
             case (op_mode1_r)
             // load word 
             'b00: begin
-                wea_0 <= 'd0;
-                wea_1 <= 'd0;
-                wea_2 <= 'd0;
-                wea_3 <= 'd0;
+                wea_0 = 'd0;
+                wea_1 = 'd0;
+                wea_2 = 'd0;
+                wea_3 = 'd0;
 
                 if(load_cnt == 'd0) begin
-                    ram_en <= 'd0;
+                    ram_en = 'd0;
                 end
                 else begin
-                    ram_en <= 'd1;
+                    ram_en = 'd1;
                 end
             end     
 
             // store data
             'b01: begin
                 if(store_cnt == 'd0) begin
-                    ram_en <= 'd0;
-                    wea_0 <= 'd0;
-                    wea_1 <= 'd0;
-                    wea_2 <= 'd0;
-                    wea_3 <= 'd0;
+                    ram_en = 'd0;
+                    wea_0 = 'd0;
+                    wea_1 = 'd0;
+                    wea_2 = 'd0;
+                    wea_3 = 'd0;
                 end
                 else begin
-                    ram_en <= 'd1;
+                    ram_en = 'd1;
                     // store word
                     if(op_mode2_r == 'b100) begin
-                        wea_0 <= 'd1;
-                        wea_1 <= 'd1;
-                        wea_2 <= 'd1;
-                        wea_3 <= 'd1;
+                        wea_0 = 'd1;
+                        wea_1 = 'd1;
+                        wea_2 = 'd1;
+                        wea_3 = 'd1;
                     end
                     // store byte
                     else begin
                         case (out_addr[1:0])
                         'b00: begin
-                            wea_0 <= 'd1;
-                            wea_1 <= 'd0;
-                            wea_2 <= 'd0;
-                            wea_3 <= 'd0;
+                            wea_0 = 'd1;
+                            wea_1 = 'd0;
+                            wea_2 = 'd0;
+                            wea_3 = 'd0;
                         end
 
                         'b01: begin
-                            wea_0 <= 'd0;
-                            wea_1 <= 'd1;
-                            wea_2 <= 'd0;
-                            wea_3 <= 'd0;
+                            wea_0 = 'd0;
+                            wea_1 = 'd1;
+                            wea_2 = 'd0;
+                            wea_3 = 'd0;
                         end
 
                         'b10: begin
-                            wea_0 <= 'd0;
-                            wea_1 <= 'd0;
-                            wea_2 <= 'd1;
-                            wea_3 <= 'd0;
+                            wea_0 = 'd0;
+                            wea_1 = 'd0;
+                            wea_2 = 'd1;
+                            wea_3 = 'd0;
                         end
 
                         'b11: begin
-                            wea_0 <= 'd0;
-                            wea_1 <= 'd0;
-                            wea_2 <= 'd0;
-                            wea_3 <= 'd1;
+                            wea_0 = 'd0;
+                            wea_1 = 'd0;
+                            wea_2 = 'd0;
+                            wea_3 = 'd1;
                         end
                         endcase
                     end
@@ -220,32 +223,32 @@ always @ (*) begin
             end
 
             default: begin
-                ram_en <= ram_en;
-                wea_0 <= wea_0;
-                wea_1 <= wea_1;
-                wea_2 <= wea_2;
-                wea_3 <= wea_3;
+                ram_en = ram_en;
+                wea_0 = wea_0;
+                wea_1 = wea_1;
+                wea_2 = wea_2;
+                wea_3 = wea_3;
             end
 
             endcase
         end
 
         else begin
-            ram_en <= ram_en;
-            wea_0 <= wea_0;
-            wea_1 <= wea_1;
-            wea_2 <= wea_2;
-            wea_3 <= wea_3;
+            ram_en = ram_en;
+            wea_0 = wea_0;
+            wea_1 = wea_1;
+            wea_2 = wea_2;
+            wea_3 = wea_3;
         end
 
     end
 
     else begin
-        ram_en <= 'd0;
-        wea_0 <= 'd0;
-        wea_1 <= 'd0;
-        wea_2 <= 'd0;
-        wea_3 <= 'd0;
+        ram_en = 'd0;
+        wea_0 = 'd0;
+        wea_1 = 'd0;
+        wea_2 = 'd0;
+        wea_3 = 'd0;
     end
 end
 
@@ -291,6 +294,15 @@ always @ (posedge clk) begin
 end
 
 
+always @ (posedge clk) begin
+    if(rst) begin
+        clk_cnter <= 'd2;
+    end
+    else begin
+        clk_cnter <= clk_cnter + 'd2;
+    end
+end
+
 
 
 /* control multiple granularity memory access operation */
@@ -301,6 +313,16 @@ always @ (start) begin
     if(!rst) begin
         if(start) begin
             out_addr = op1  + imm_data;
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("mmp");
+            $display("%b", op_mode2_r);
+            $display("%d", clk_cnter);
+            op_mode1_r = op_mode1;
+            op_mode2_r = op_mode2;
+
             case (op_mode2_r)
             // operation on word
             'b100: begin
@@ -356,6 +378,8 @@ always @ (start) begin
         end
             
         else begin
+            op_mode1_r = op_mode1_r;
+            op_mode2_r = op_mode2_r;
             addr_0 = addr_0;
             addr_1 = addr_1;
             addr_2 = addr_2;
@@ -368,6 +392,9 @@ always @ (start) begin
         addr_1 = 'd0;
         addr_2 = 'd0;
         addr_3 = 'd0;
+        out_addr = 'd0;
+        op_mode1_r = 'd0;
+        op_mode2_r = 'd0;
     end
 end
 
@@ -415,23 +442,20 @@ end
 
 
 
-always @ (start) begin
-    if(!rst) begin
-        if(start) begin
-            op_mode1_r = op_mode1;
-            op_mode2_r = op_mode2;
-        end
-        else begin
-            op_mode1_r = op_mode1_r;
-            op_mode2_r = op_mode2_r;
-        end
-    end
+// always @ (start) begin
+//     if(!rst) begin
+//         if(start) begin
+            
+//         end
+//         else begin
+            
+//         end
+//     end
 
-    else begin
-        op_mode1_r = 'd0;
-        op_mode2_r = 'd0;
-    end
-end
+//     else begin
+        
+//     end
+// end
 
 
 assign res = (op_mode2_r == 'b100) ? {dout_3, dout_2, dout_1, dout_0} :

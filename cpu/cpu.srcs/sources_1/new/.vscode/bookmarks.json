@@ -23,8 +23,23 @@
 		"path": "$ROOTPATH$\\EX.v",
 		"bookmarks": [
 			{
-				"line": 244,
+				"line": 280,
 				"column": 26,
+				"label": ""
+			}
+		]
+	},
+	{
+		"path": "$ROOTPATH$\\EX_LS_RAM.v",
+		"bookmarks": [
+			{
+				"line": 310,
+				"column": 10,
+				"label": ""
+			},
+			{
+				"line": 447,
+				"column": 12,
 				"label": ""
 			}
 		]

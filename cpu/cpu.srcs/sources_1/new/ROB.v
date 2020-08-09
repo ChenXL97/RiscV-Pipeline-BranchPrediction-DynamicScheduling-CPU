@@ -572,7 +572,7 @@ end
 always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
+        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
             rob_info_stack[head_pt] <= rob_info;
         end
     end
@@ -1311,15 +1311,6 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     end
                     related[check_data_pt] = related_rs1[check_data_pt] | 
                                                 related_rs2[check_data_pt];
-                    $display("wcnm0");
-                    $display("wcnm0");
-                    $display("wcnm0");
-                    $display("wcnm0");
-                    $display("wcnm0");
-                    $display("wcnm0");
-                    
-                    $display("%d", wb_inst);
-                    $display("%d", check_data_pt);
                 end
                 if(check_data_pt == 'd9) begin
                     check_data_pt = 'd0;
@@ -1343,15 +1334,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                     end
                     related[check_data_pt] = related_rs1[check_data_pt] | 
                                                 related_rs2[check_data_pt];
-                    $display("wcnm1");
-                    $display("wcnm1");
-                    $display("wcnm1");
-                    $display("wcnm1");
-                    $display("wcnm1");
-                    $display("wcnm1");
-                    
-                    $display("%d", after_done_dcheck);
-                    $display("%d", check_data_pt);
+                
                 end
                 if(check_data_pt == 'd9) begin
                     check_data_pt = 'd0;
@@ -4623,15 +4606,6 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
                                 forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
                             end
                         end
-
-                        $display("mmp");
-                        $display("mmp");
-                        $display("mmp");
-                        $display("mmp");
-                        $display("mmp");
-                        $display("mmp");
-                        $display("%d", head_pt);
-                        $display("%d", check_data_pt);
 
                     end
                 if(check_data_pt == 'd0) 
