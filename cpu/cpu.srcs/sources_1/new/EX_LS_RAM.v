@@ -62,15 +62,17 @@ reg         [9:0]                       raddr;
 reg         [9:0]                       waddr;
 reg         [9:0]                       instant_addr;
 
+reg       [1:0]                   op_mode1_r;
+reg       [2:0]                   op_mode2_r;
 
 // use to store op2
 reg         [7:0]                       src_data        [3:0];
 reg         [7:0]                       din_reg;
 wire        [31:0]                       din;
-wire        [7:0]                       din_0;
-wire        [7:0]                       din_1;
-wire        [7:0]                       din_2;
-wire        [7:0]                       din_3;
+reg        [7:0]                       din_0;
+reg        [7:0]                       din_1;
+reg        [7:0]                       din_2;
+reg        [7:0]                       din_3;
 assign din = op2;
 wire        [31:0]                      dout;
 wire        [7:0]                       dout_0;
@@ -148,7 +150,7 @@ always @ (*) begin
         end
 
         else if(start) begin
-            case (op_mode1)
+            case (op_mode1_r)
             // load word 
             'b00: begin
                 wea_0 <= 'd0;
@@ -176,7 +178,7 @@ always @ (*) begin
                 else begin
                     ram_en <= 'd1;
                     // store word
-                    if(op_mode2 == 'b100) begin
+                    if(op_mode2_r == 'b100) begin
                         wea_0 <= 'd1;
                         wea_1 <= 'd1;
                         wea_2 <= 'd1;
@@ -299,7 +301,7 @@ always @ (start) begin
     if(!rst) begin
         if(start) begin
             out_addr = op1  + imm_data;
-            case (op_mode2)
+            case (op_mode2_r)
             // operation on word
             'b100: begin
                 addr_0 = out_addr[11:2];
@@ -354,10 +356,10 @@ always @ (start) begin
         end
             
         else begin
-            addr_0 = 'd0;
-            addr_1 = 'd0;
-            addr_2 = 'd0;
-            addr_3 = 'd0;
+            addr_0 = addr_0;
+            addr_1 = addr_1;
+            addr_2 = addr_2;
+            addr_3 = addr_3;
         end
     end
 
@@ -370,38 +372,75 @@ always @ (start) begin
 end
 
 
-assign res = (op_mode2 == 'b100) ? {dout_3, dout_2, dout_1, dout_0} :
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            din_0 = (op_mode2_r == 'b100) ? din[7:0] :
+                            (out_addr[1:0] == 'b00) ? {din[7:0]} :
+                            (out_addr[1:0] == 'b01) ? {8'b0} :
+                            (out_addr[1:0] == 'b10) ? {8'b0} :
+                            {8'b0};
+            din_1 = (op_mode2_r == 'b100) ? din[15:8] :
+                            (out_addr[1:0] == 'b00) ? {8'b0} :
+                            (out_addr[1:0] == 'b01) ? {din[7:0]} :
+                            (out_addr[1:0] == 'b10) ? {8'b0} :
+                            {8'b0};
+            din_2 = (op_mode2_r == 'b100) ? din[23:16] :
+                            (out_addr[1:0] == 'b00) ? {8'b0} :
+                            (out_addr[1:0] == 'b01) ? {8'b0} :
+                            (out_addr[1:0] == 'b10) ? {din[7:0]} :
+                            {8'b0};
+            din_3 = (op_mode2_r == 'b100) ? din[31:24] :
+                            (out_addr[1:0] == 'b00) ? {8'b0} :
+                            (out_addr[1:0] == 'b01) ? {8'b0} :
+                            (out_addr[1:0] == 'b10) ? {8'b0} :
+                            {din[7:0]};
+        end
+        else begin
+            din_0 = din_0;
+            din_1 = din_1;
+            din_2 = din_2;
+            din_3 = din_3;
+        end
+    end
+
+    else begin
+        din_0 = 'd0;
+        din_1 = 'd0;
+        din_2 = 'd0;
+        din_3 = 'd0;
+    end
+end
+
+
+
+
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            op_mode1_r = op_mode1;
+            op_mode2_r = op_mode2;
+        end
+        else begin
+            op_mode1_r = op_mode1_r;
+            op_mode2_r = op_mode2_r;
+        end
+    end
+
+    else begin
+        op_mode1_r = 'd0;
+        op_mode2_r = 'd0;
+    end
+end
+
+
+assign res = (op_mode2_r == 'b100) ? {dout_3, dout_2, dout_1, dout_0} :
                 (out_addr[1:0] == 'b00) ? {24'b0, dout_0} :
                 (out_addr[1:0] == 'b01) ? {24'b0, dout_1} :
                 (out_addr[1:0] == 'b10) ? {24'b0, dout_2} :
                 {24'b0, dout_3};
 
 
-assign din_0 = (op_mode2 == 'b100) ? din[7:0] :
-                (out_addr[1:0] == 'b00) ? {din[7:0]} :
-                (out_addr[1:0] == 'b01) ? {8'b0} :
-                (out_addr[1:0] == 'b10) ? {8'b0} :
-                {8'b0};
-
-
-assign din_1 = (op_mode2 == 'b100) ? din[15:8] :
-                (out_addr[1:0] == 'b00) ? {8'b0} :
-                (out_addr[1:0] == 'b01) ? {din[7:0]} :
-                (out_addr[1:0] == 'b10) ? {8'b0} :
-                {8'b0};
-
-
-assign din_2 = (op_mode2 == 'b100) ? din[23:16] :
-                (out_addr[1:0] == 'b00) ? {8'b0} :
-                (out_addr[1:0] == 'b01) ? {8'b0} :
-                (out_addr[1:0] == 'b10) ? {din[7:0]} :
-                {8'b0};
-
-assign din_3 = (op_mode2 == 'b100) ? din[31:24] :
-                (out_addr[1:0] == 'b00) ? {8'b0} :
-                (out_addr[1:0] == 'b01) ? {8'b0} :
-                (out_addr[1:0] == 'b10) ? {8'b0} :
-                {din[7:0]};
 
 
 

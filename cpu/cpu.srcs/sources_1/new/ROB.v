@@ -196,6 +196,34 @@ reg         [9:0]                               need_jump;
 reg         [31:0]                              tar_addr    [9:0];
 
 
+reg         [31:0]                              clk_cnter;
+
+
+always @ (posedge clk) begin
+    if(rst) begin
+        clk_cnter <= 'd2;
+    end
+    else begin
+        clk_cnter <= clk_cnter + 'd2;
+    end
+end
+
+
+always @ (clk_cnter) begin
+    if(clk_cnter == 'd46) begin
+        $display("cnm");
+        $display("cnm");
+        $display("cnm");
+        $display("cnm");
+        $display("%d", rob_info[`RS1]);
+        $display("%d", rob_info[`RS2]);
+        $display("%b", rob_info[`FCMP:`RAM]);
+        $display("%b", related_busy);
+    end
+end
+
+
+
 
 assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
                     related_busy[3] & related_busy[4] & related_busy[5] &
@@ -250,7 +278,7 @@ end
 // when an inst is write back
 // combine a func_part with an inst
 // when an inst is write back, free corresponding element
-always @ (*) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         if(issue_v) begin
             if(rob_info_stack[iss_inst][`RAM])
@@ -312,7 +340,7 @@ end
 // set rob_inst_done flag
 // when ex_done, set corresponding inst as done
 // when an inst is write back, free corresponding element
-always @ (func_part_done) begin
+always @ (func_part_done or rob_flush) begin
     if(!rst && !rob_flush) begin
         if(ex_done) begin
             if (func_part_done[`RAM_USE]) begin
@@ -541,7 +569,7 @@ end
 
 
 // write rob when decode info is valid
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // let new inst in
         if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
@@ -728,12 +756,13 @@ end
 // control end_pt and wb_v
 // use this part to control write-back process
 // adding branch write back logic
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst) begin
-        if(rob_inst_done[end_pt]) begin
+        if(rob_inst_done[end_pt] && !rob_flush) begin
             if(need_jump[end_pt] && rob_flush != 'd1) begin
                 rob_flush <= 'd1;       
-                end_pt <= 'd0;         
+                end_pt <= 'd0;     
+                need_jump <= 'd0;    
             end
             else begin
                 rob_flush <= 'd0;
@@ -748,14 +777,6 @@ always @ (posedge clk) begin
             // oridinay write back
             wb_v <= 'd1;
             wb_res <= inst_reslt[end_pt];
-            $display("mmp");
-            $display("mmp");
-            $display("mmp");
-            $display("mmp");
-            $display("mmp");
-            $display("mmp");
-            $display("%d", end_pt);
-            $display("%d", wb_res);
             wb_inst <= end_pt;
             rob_flush <= need_jump[end_pt];
             rob_need_jump <= need_jump[end_pt];
@@ -787,12 +808,37 @@ end
 
 
 
+// control related_busy
+// always @ (negedge clk) begin
+//     if(!rst && !rob_flush) begin
+//         if(wb_v) begin
+//             related_busy[wb_inst] = 'd0;
+//         end
+//         if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+//             if(rob_stall) begin
+//                 related_busy <= related_busy;
+//             end
+//             else begin
+//                 related_busy[head_pt] = 'd1;
+//             end
+//         end
+//         else begin
+//             related_busy = related_busy;
+//         end
+//     end
+//     else begin
+//         related_busy <= 'd0;
+//     end
+// end
+
+
 
 // check data relation
 // when new inst come or when clk posedge arrive
 // check existed inst first
 // when an inst is write back, free element
-always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
+always @ (wb_inst or func_part_done or de_cur_pc) begin
+// always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // when a inst is write back, free
         if(wb_v) begin
@@ -4108,13 +4154,6 @@ always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
         if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
-            $display("gtnm");
-            $display("gtnm");
-            $display("gtnm");
-            $display("gtnm");
-            $display("%d", de_cur_pc);
-            $display("%d", rob_info[`FCMP:`RAM]);
-
 
             // set zero before use
             // no need to free when write back
@@ -4135,7 +4174,7 @@ always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
             // need to check rst1 and rst2
             // search order: from newest to oldest
             // from head_pt to end_pt
-            if(!rob_info[`IMMUSE]) begin
+            if(!rob_info[`IMMUSE] || ( rob_info[`BRANCH] && rob_info[`OP1] == 2'b01 )) begin
                 // 1 data check
 
                 if(related_busy[check_data_pt] && 
@@ -4584,6 +4623,16 @@ always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
                                 forward_data_rs1[head_pt] = inst_reslt[check_data_pt];
                             end
                         end
+
+                        $display("mmp");
+                        $display("mmp");
+                        $display("mmp");
+                        $display("mmp");
+                        $display("mmp");
+                        $display("mmp");
+                        $display("%d", head_pt);
+                        $display("%d", check_data_pt);
+
                     end
                 if(check_data_pt == 'd0) 
                     check_data_pt = 'd9;

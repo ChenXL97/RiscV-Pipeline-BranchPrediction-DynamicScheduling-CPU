@@ -52,7 +52,26 @@ module BRANCH (
 // used to compare unsigned data
 reg         [32:0]                      op1_u;
 reg         [32:0]                      op2_u;
+reg         [32:0]                      op1_r;
+reg         [32:0]                      op2_r;
 
+
+always @ (start) begin
+    if(!rst) begin
+        if(start) begin
+            op1_r = op1;
+            op2_r = op2;
+        end
+        else begin
+            op1_r = op1_r;
+            op2_r = op2_r;
+        end
+    end
+    else begin
+        op1_r = 'd0;
+        op2_r = 'd0;
+    end
+end
 
 
 
@@ -60,8 +79,8 @@ reg         [32:0]                      op2_u;
 always @ (*) begin
     if(!rst) begin
         if(op_mode2[2]) begin
-            op1_u = {1'b0, op1};
-            op2_u = {1'b0, op2};
+            op1_u = {1'b0, op1_r};
+            op2_u = {1'b0, op2_r};
         end
     end
 
@@ -146,7 +165,7 @@ always @ (posedge clk) begin
 
                 // JALR absolute jump
                 else begin
-                    tar_addr <= op1 + imm_data;
+                    tar_addr <= op1_r + imm_data;
                 end
             end
 
@@ -155,7 +174,7 @@ always @ (posedge clk) begin
                 case (op_mode2) 
                 // beq
                 'b000: begin
-                    if(op1 == op2) begin
+                    if(op1_r == op2_r) begin
                         need_jmp <= 'd1;
                         tar_addr <= imm_data + cur_pc;
                     end
@@ -167,7 +186,7 @@ always @ (posedge clk) begin
 
                 // bne
                 'b001: begin
-                    if(op1 != op2) begin
+                    if(op1_r != op2_r) begin
                         need_jmp <= 'd1;
                         tar_addr <= imm_data + cur_pc;
                     end
@@ -179,7 +198,7 @@ always @ (posedge clk) begin
 
                 // blt
                 'b010: begin
-                    if(op1 < op2) begin
+                    if(op1_r < op2_r) begin
                         need_jmp <= 'd1;
                         tar_addr <= imm_data + cur_pc;
                     end
@@ -191,7 +210,7 @@ always @ (posedge clk) begin
 
                 // bge
                 'b011: begin
-                    if(op1 >= op2) begin
+                    if(op1_r >= op2_r) begin
                         need_jmp <= 'd1;
                         tar_addr <= imm_data + cur_pc;
                     end

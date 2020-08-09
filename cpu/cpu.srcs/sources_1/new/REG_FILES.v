@@ -32,8 +32,11 @@ module REG_FILES(
     output [31:0] rb0_value_o
     );
     
-generate
-begin: REGFILE
+
+
+    
+// generate
+// begin: REGFILE
     reg [31:0] reg_r1_q;
     reg [31:0] reg_r2_q;
     reg [31:0] reg_r3_q;
@@ -214,8 +217,8 @@ begin: REGFILE
             assign ra0_value_o = ra0_value_r;
             assign rb0_value_o = rb0_value_r;
             
-end
-endgenerate
+// end
+// endgenerate
     
     
 endmodule

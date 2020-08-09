@@ -29,7 +29,7 @@ module Decoder(
         de_out[`PREDICT] = BTB_is_taken;
         //assign values to IMMUSE, PART, OP1, OP2 and IMM
         case(ins[5:2])
-            // 1 RAM £º Ins 1-10
+            // 1 RAM ï¿½ï¿½ Ins 1-10
             4'h1: 
             begin
                 de_out[`RAM] = 1'b1;

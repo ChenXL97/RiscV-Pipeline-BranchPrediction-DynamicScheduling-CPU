@@ -63,21 +63,25 @@ end
 
 reg [31:0]  op1_r;
 reg [31:0]  op2_r;
+reg [1:0] op_mode1_r;
 
 always @ (start) begin
     if(!rst) begin
         if(start) begin
             op1_r = op1;
             op2_r = op2;
+            op_mode1_r = op_mode1;
         end
         else begin
             op1_r = op1_r;
             op2_r = op2_r;
+            op_mode1_r = op_mode1_r;
         end
     end
     else begin
         op1_r = 'd0;
         op2_r = 'd0;
+        op_mode1_r = 'd0;
     end
 end
 
@@ -92,7 +96,7 @@ floating_addsub float_addsub_u(
         .s_axis_b_tvalid            (1'b1),
         .s_axis_b_tdata             (op2_r),
         .s_axis_operation_tvalid    (1'b1),
-        .s_axis_operation_tdata     ( {5'b0 , op_mode1[1]} ),
+        .s_axis_operation_tdata     ( {5'b0 , op_mode1_r[1]} ),
         .m_axis_result_tready       (1'b1),
         .m_axis_result_tdata        (u_res)
     );    
