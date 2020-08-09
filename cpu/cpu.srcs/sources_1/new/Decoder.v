@@ -96,6 +96,7 @@ module Decoder(
                                     de_out[`IMM] = {20'b11111_11111_11111_11111, ins[31:25],ins[11:7]};
                                 else
                                     de_out[`IMM] = {20'b0,  ins[31:25],ins[11:7]};
+                                de_out[`DST] = 5'd0;
                             end
                     endcase
                 else
@@ -129,6 +130,7 @@ module Decoder(
                             de_out[`IMM] = {11'b11111_11111_1, ins[31],ins[19:12],ins[20],ins[30:21],1'b0};
                         else
                             de_out[`IMM] = {11'b0, ins[31],ins[19:12],ins[20],ins[30:21],1'b0};
+                            
                     end
                 else //12 Jump And Link Register JALR (x[rd]=pc+4, pc = x[rs1] + sign_extend(offset), pc[0] = 0)
                     begin
@@ -144,6 +146,7 @@ module Decoder(
             begin
                 de_out[`BRANCH] = 1'b1;
                 de_out[`IMMUSE] = 1'b1;
+                de_out[`DST] = 5'd0;
                 if(!ins[6]) //13-18 Conditional Branch:
                     begin
                         de_out[`DST] = 5'b0;

@@ -852,7 +852,7 @@ end
 // when new inst come or when clk posedge arrive
 // check existed inst first
 // when an inst is write back, free element
-always @ (wb_inst or func_part_done or de_cur_pc) begin
+always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
 // always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // when a inst is write back, free
@@ -4172,7 +4172,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
             // need to check rst1 and rst2
             // search order: from newest to oldest
             // from head_pt to end_pt
-            if(!rob_info[`IMMUSE] || ( rob_info[`BRANCH] && rob_info[`OP1] == 2'b01 )) begin
+            if(!rob_info[`IMMUSE] || ( rob_info[`BRANCH] && rob_info[`OP1] == 2'b01 ) || ( rob_info[`RAM] && rob_info[`OP1] == 2'b01 )) begin
                 // 1 data check
 
                 if(related_busy[check_data_pt] && 
