@@ -225,6 +225,21 @@ end
 
 
 
+// always @ (posedge clk or posedge rst or posedge rob_flush) begin
+//     if(!rst && !rob_flush) begin
+//         rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
+//                     related_busy[3] & related_busy[4] & related_busy[5] &
+//                     related_busy[6] & related_busy[7] & related_busy[8] & 
+//                     related_busy[9];
+//     end
+//     else begin
+//         rob_stall <= 'd0;
+//     end
+// end
+
+
+
+
 assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
                     related_busy[3] & related_busy[4] & related_busy[5] &
                     related_busy[6] & related_busy[7] & related_busy[8] & 
@@ -451,7 +466,7 @@ assign rob_cur_pc = last_pc;
 always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
+        if ( rob_info[`FCMP:`RAM] !=0) begin
             rob_inst_pc[head_pt] <= rob_info[`OPC];
         end
     end
@@ -478,7 +493,7 @@ end
 always @ (de_cur_pc) begin
     if(!rst && !rob_flush) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] !=0) begin
+        if ( rob_info[`FCMP:`RAM] !=0) begin
 
             imm_data[head_pt] <= rob_info[`IMM];
             imm_use[head_pt] <= rob_info[`IMMUSE];
@@ -572,7 +587,7 @@ end
 always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // let new inst in
-        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+        if ( rob_info[`FCMP:`RAM] != 0) begin
             rob_info_stack[head_pt] <= rob_info;
         end
     end
@@ -727,7 +742,7 @@ end
 // control head_pt
 always @ (posedge clk) begin
     if(!rst && !rob_flush) begin
-        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+        if( rob_info[`FCMP:`RAM] != 0) begin
             if(rob_stall) begin
                 head_pt <= head_pt;
             end
@@ -814,7 +829,7 @@ end
 //         if(wb_v) begin
 //             related_busy[wb_inst] = 'd0;
 //         end
-//         if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+//         if( rob_info[`FCMP:`RAM] != 0) begin
 //             if(rob_stall) begin
 //                 related_busy <= related_busy;
 //             end
@@ -4134,7 +4149,7 @@ always @ (wb_inst or func_part_done or de_cur_pc) begin
 
 
         // new inst come
-        if(last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
+        if( rob_info[`FCMP:`RAM] != 0 && !related_busy[head_pt]) begin
             inst_dst[head_pt] = rob_info[`DST];
             related_busy[head_pt] = 'd1;
 
@@ -8763,7 +8778,7 @@ always @ (iss_inst or func_part_done or de_cur_pc) begin
 
         // new inst arrive
         // set tar_func_part, hw_relation and hw_relation busy
-        if (last_pc != de_cur_pc && rob_info[`FCMP:`RAM] != 0) begin
+        if ( rob_info[`FCMP:`RAM] != 0) begin
             if(rob_info[`RAM]) begin
                 tar_func_part[head_pt] = 'd0;
                 if(global_hw_use[`RAM_USE]) begin
