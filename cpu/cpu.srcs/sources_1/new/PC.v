@@ -30,17 +30,17 @@ module PC(
           if(rst)
               pc<= `INIT_PC;
           else if (op[2])
-            //   pc <= revert_addr;
-            pc <= pc + 'd4;
+               pc <= revert_addr;
+//            pc <= pc + 'd4;
           else if (EX_rst && op[1]) begin
               pc <= EX_addr;
           end
           else if (EX_block) begin
               pc <= pc;
           end
-          else if (BTB_write_pc) begin
-            //   pc <= BTB_addr;
-              pc <= pc + 'd4;
+          else if (op[0]) begin
+               pc <= BTB_addr;
+//              pc <= pc + 'd4;
           end
           else begin
               pc <= pc + 'd4;

@@ -34,29 +34,16 @@ module EX(
 
     input       [1:0]                   op_mode1,
     input       [2:0]                   op_mode2,
-    input       [4:0]                   dis_rd,
-    input  BTB_is_taken,
-    input [31:0] BTB_predict_pc,
-
     output                              ex_done,
 
     // when there's need to store the current pc or other addr, use res reg to 
     // transfer this addr, while tar_addr only be used to store branch target
     // address.
-    output      reg     [31:0]                  ex_res,
-
     //  jmp info signal 
     output      [31:0]                  ex_tar_addr,
-
-    // set stall when some inst needs multiply clks
-    output      reg                     ex_stall,
     
     // set flush when branch inst need jmp
-    output       reg                    ex_flush,
-    output       reg     [4:0]          ex_rd,
     output                              ex_need_jump,
-    output       reg                    revert_jump,
-    output       reg     [31:0]         revert_addr,
     output       reg     [31:0]         ex_cur_pc,
 
     // Tell BTB is brannch
@@ -183,7 +170,6 @@ assign ex_done = add_done | logic_done | ram_done | branch_done
 
 
 
-
 // prepare operation data and ex_cur_pc
 always @ (posedge clk) begin
     if(!rst && !rob_flush) begin
@@ -199,9 +185,6 @@ always @ (posedge clk) begin
         reg_imm <= 'd0;
     end
 end
-
-
-
 
 
 // generate func_part_done signal
@@ -319,90 +302,38 @@ end
 
 
 
-
-
-
-always @(posedge clk ) begin
-if (ex_stall) begin
-    BTB_is_taken_r <= BTB_is_taken_r;
-    BTB_predict_pc_r <=BTB_predict_pc_r;
-end
-else begin
-    BTB_is_taken_r <= BTB_is_taken;
-    BTB_predict_pc_r<=BTB_predict_pc;
-end
-end
-
-always @(negedge clk) begin
-    if (ex_done)
-        begin
-            if ( ex_need_jump ^BTB_is_taken_r)
-                begin
-                    ex_flush<=1'b1;
-                    if (!ex_need_jump)
-                        begin
-                            revert_jump <= 1;
-                            revert_addr <= ex_cur_pc + 4;
-                        end
-                end
-            else if (ex_need_jump == 1'b1 && BTB_is_taken_r ==1'b1)
-                begin
-                    if (BTB_predict_pc_r!=ex_tar_addr)
-                        ex_flush<=1'b1;
-                    else begin
-                        ex_flush<=1'b0;
-                    end
-                end
-            else begin
-                ex_flush<=1'b0;
-            end
-        end
-    else begin
-        ex_flush<=1'b0;
-    end
-end
-
-always @(posedge clk) begin
-    revert_jump <= 0;
-end
-    //ex_flush <= ex_done?  ex_need_jump^BTB_is_taken_r ? 1 : BTB_predict_pc_r==branch_res :0;
-
 /* parts' control signal */
 // start signal only keeps positive for 1 clk
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(func_part != 'd0 && func_start != 0) begin
             func_working <= func_part;
-            ex_rd <= dis_rd;
             trick <= 'd1;
         end
 
         // current inst is running
         else if(func_busy == 'd1) begin
             func_working <= func_working;
-            ex_rd <= ex_rd;
             trick <= 'd0;
         end
 
         else begin
             func_working <= 'd0;
-            ex_rd <= ex_rd;
             trick <= 'd0;
         end
     end
 
     else begin
         func_working <= 'd0;
-        ex_rd <= 'd0;
         trick <= 'd0;
     end
 end
 
 
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
-        if(ex_cur_pc != dis_cur_pc && !ex_stall && !ex_flush) begin
+        if(ex_cur_pc != dis_cur_pc ) begin
             ex_cur_pc <= dis_cur_pc;
         end
         
@@ -416,7 +347,7 @@ end
 
 
 
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(issue_v) begin
@@ -433,7 +364,7 @@ always @ (posedge clk) begin
 end
 
 
-always @ (posedge clk) begin
+always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // current inst is valid and not running 
         if(func_part != 'd0) begin
@@ -492,105 +423,6 @@ always @ (*) begin
         func_busy = 'd0;
     end
 end
-
-
-// always @ (*) begin
-//     if(!rst) begin
-//         // when inst is done, keep fetching
-//         if(ex_done) begin
-//             ex_stall = 'd0;
-//         end
-
-//         // some inst can be done in 1 clk so there's no need to set stall
-//         // while some inst cannot done in 1 clk and stall the whole pipeline
-//         else begin
-//             // add & sub need multiple clk
-//             if(func_part[`ADD - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`RAM - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`BRANCH - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`FADD - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`FMUL - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`FCMP - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`FSP - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else if (func_part[`SHIFT - `OFFSET] && func_busy) begin
-//                 ex_stall = 'd1;
-//             end
-//             else begin
-//                 ex_stall = 'd0;
-//             end
-//         end
-//     end
-//     else begin
-//         ex_stall = 'd0;
-//     end
-// end
-
-
-
-
-// /* choosing output res */
-// always @ (*) begin
-//     if(!rst) begin
-//         if(add_done) begin
-//             ex_res = add_res;
-//         end
-        
-//         else if (logic_done) begin
-//             ex_res = logic_res;
-//         end
-
-//         else if (ram_done) begin
-//             ex_res = ram_res;
-//         end
-
-//         else if (branch_done) begin
-//             ex_res = branch_res;
-//         end
-
-//         else if (fadd_done) begin
-//             ex_res = fadd_res;
-//         end
-
-//         else if (int_float_done) begin
-//             ex_res = int_float_res;
-//         end
-
-//         else if (fcmp_done) begin
-//             ex_res = fcmp_res;
-//         end
-
-//         else if (fmul_done) begin
-//             ex_res = fmul_res;
-//         end
-
-//         else if (shift_done) begin
-//             ex_res = shift_res;
-//         end
-
-//         else begin
-//             ex_res = ex_res;
-//         end
-//     end
-
-//     else begin
-//         ex_res = 'd0;
-//     end
-// end
-
 
 
 

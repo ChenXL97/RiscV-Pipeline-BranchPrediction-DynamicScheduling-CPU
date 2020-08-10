@@ -121,8 +121,10 @@ module ROB (
     input                                       ex_need_jump,
     output      reg                             rob_flush,
     output      reg                             rob_need_jump,
-    output      reg     [31:0]                  rob_tar_addr
-
+    output      reg     [31:0]                  rob_tar_addr,
+    output      reg                             rob_is_branch,
+    output      reg     	                    rob_revert_jump,
+    output      reg     [31:0]                  rob_branch_pc
 );
 
 
@@ -248,32 +250,35 @@ assign rob_stall = related_busy[0] & related_busy[1] & related_busy[2] &
 
 
 
-always @ (de_cur_pc) begin
-    if(!rst && !rob_flush) begin
-        if(de_cur_pc != last_pc && rob_info[`FCMP:`RAM] != 'd0) begin
-            inst_hw_use[head_pt] = rob_info[`FCMP:`RAM];
-        end
-    end
-    else begin
-        inst_hw_use[0] = 'd0;
-        inst_hw_use[1] = 'd0;
-        inst_hw_use[2] = 'd0;
-        inst_hw_use[3] = 'd0;
-        inst_hw_use[4] = 'd0;
-        inst_hw_use[5] = 'd0;
-        inst_hw_use[6] = 'd0;
-        inst_hw_use[7] = 'd0;
-        inst_hw_use[8] = 'd0;
-        inst_hw_use[9] = 'd0;
-    end
-end
+// always @ (de_cur_pc) begin
+//     if(!rst && !rob_flush) begin
+//         if(de_cur_pc != last_pc && rob_info[`FCMP:`RAM] != 'd0) begin
+//             inst_hw_use[head_pt] = rob_info[`FCMP:`RAM];
+//         end
+//     end
+//     else begin
+//         inst_hw_use[0] = 'd0;
+//         inst_hw_use[1] = 'd0;
+//         inst_hw_use[2] = 'd0;
+//         inst_hw_use[3] = 'd0;
+//         inst_hw_use[4] = 'd0;
+//         inst_hw_use[5] = 'd0;
+//         inst_hw_use[6] = 'd0;
+//         inst_hw_use[7] = 'd0;
+//         inst_hw_use[8] = 'd0;
+//         inst_hw_use[9] = 'd0;
+//     end
+// end
+
+
+wire [`ROB_ITEM_INDEX] rob_iss_info;
+assign rob_iss_info = rob_info_stack[iss_inst] ;
 
 // generate func_part_start signal
 always @ (iss_inst) begin
     if(!rst && !rob_flush) begin
         if(issue_v) begin
-            // rob_func_part_start = 15'b0;
-            rob_func_part_start = inst_hw_use[iss_inst];
+            rob_func_part_start = rob_iss_info[`FCMP:`RAM];
         end
         else begin
             rob_func_part_start = 15'b0;
@@ -283,8 +288,6 @@ always @ (iss_inst) begin
         rob_func_part_start = 15'b0;
     end
 end
-
-
 
 
 
@@ -347,9 +350,6 @@ always @ (negedge clk) begin
         func2rob[14] = 'd11;
     end
 end
-
-
-
 
 
 // set rob_inst_done flag
@@ -434,10 +434,6 @@ always @ (func_part_done or rob_flush) begin
 end
 
 
-
-
-
-
 // store current inst_pc and last inst_pc
 always @ (posedge clk) begin
     if(!rst && !rob_flush) begin
@@ -457,10 +453,6 @@ always @ (posedge clk) begin
     end
 end
 assign rob_cur_pc = last_pc;
-
-
-
-
 
 // store each inst's pc value
 always @ (negedge clk) begin
@@ -483,10 +475,6 @@ always @ (negedge clk) begin
         rob_inst_pc[9] <= 'd0;
     end
 end
-
-
-
-
 
 
 // control imm_data and imm_use signal
@@ -516,8 +504,6 @@ always @ (de_cur_pc) begin
 end
 
 
-
-
 // set op_mode1 and op_mode2
 always @ (iss_inst) begin
     if(!rst && !rob_flush) begin
@@ -537,9 +523,6 @@ always @ (iss_inst) begin
 end
 
 
-
-
-
 // send imm_related information to dis_gun
 always @ (iss_inst) begin
     if(!rst && !rob_flush) begin
@@ -556,14 +539,6 @@ always @ (iss_inst) begin
 end
 
 
-
-
-
-
-
-
-
-
 // send issued inst to issuer, then ex
 always @ (iss_inst) begin
     if(!rst && !rob_flush) begin
@@ -578,10 +553,6 @@ always @ (iss_inst) begin
         iss_inst_pc = 32'hffff_ffff;
     end
 end
-
-
-
-
 
 // write rob when decode info is valid
 always @ (negedge clk) begin
@@ -605,9 +576,6 @@ always @ (negedge clk) begin
 
     end
 end
-
-
-
 
 
 // set inst_reslt array to store inst's
@@ -738,7 +706,6 @@ always @ (func_part_done) begin
 end
 
 
-
 // control head_pt
 always @ (posedge clk) begin
     if(!rst && !rob_flush) begin
@@ -765,48 +732,62 @@ always @ (posedge clk) begin
     end
 end
 
-
-
-
+wire [`ROB_ITEM_INDEX] rob_end_info;
+wire [31:0] rob_end_pc;
+assign rob_end_info = rob_info_stack[end_pt];
+assign rob_end_pc = rob_end_info[`OPC];
 // control end_pt and wb_v
 // use this part to control write-back process
 // adding branch write back logic
 always @ (negedge clk) begin
-    if(!rst) begin
-        if(rob_inst_done[end_pt] && !rob_flush) begin
-            if(need_jump[end_pt] && rob_flush != 'd1) begin
-                rob_flush <= 'd1;       
-                end_pt <= 'd0;     
-                need_jump <= 'd0;    
-            end
-            else begin
-                rob_flush <= 'd0;
-                if(end_pt == 'd9 ) begin
+    if(!rst && !rob_flush) begin
+    	// ins done, write back
+        if(rob_inst_done[end_pt]) begin
+            // need jump
+            if(need_jump[end_pt]) begin
+	                rob_flush <= 'd1; 
+	                end_pt <= 'd0;
+	                need_jump <= 'd0; 
+	                rob_need_jump <= 'd1; 
+	                rob_tar_addr <= tar_addr[end_pt];
+	        end
+            // needn't jump but btb jumped
+            else 
+	            if(rob_end_info[`PREDICT]) begin
+	                rob_flush <= 'd1; 
+	                end_pt <= 'd0;
+	                need_jump <= 'd0; 
+	                rob_revert_jump <= 'd1; 
+	                rob_tar_addr <= rob_end_info[`OPC] + 'd4;
+	            end
+	        // not branch
+            else
+            	need_jump <= need_jump;
+                if(end_pt == 'd9 ) 
                     end_pt <= 'd0;
-                end
-                else begin
+                else 
                     end_pt <= end_pt + 'd1;
-                end
-            end
 
-            // oridinay write back
-            wb_v <= 'd1;
-            wb_res <= inst_reslt[end_pt];
-            wb_inst <= end_pt;
-            rob_flush <= need_jump[end_pt];
-            rob_need_jump <= need_jump[end_pt];
-            rob_tar_addr <= tar_addr[end_pt];
+            rob_is_branch <= rob_end_info[`BRANCH];
+	        rob_branch_pc <= rob_end_info[`OPC];
 
-        end
+	        // write back
+	        wb_v <= 'd1;
+	        wb_res <= inst_reslt[end_pt];
+	        wb_inst <= end_pt;
+	        dst <= rob_end_info[`DST];
+	    	end
         else begin
-            wb_v <= 'd0;
-            wb_res <= 'd0;
-            end_pt <= end_pt;
-            wb_inst <= 'd11;
-            rob_flush <= 'd0;
-            rob_flush <= 'd0;
-            rob_need_jump <= 'd0;
-            rob_tar_addr <= 32'hffff_ffff;
+	        end_pt <= end_pt;
+	        wb_v <= 'd0;
+	        wb_res <= 'd0;
+	        wb_inst <= 'd11;
+	        rob_flush <= 'd0;
+	        rob_need_jump <= 'd0;
+	        rob_revert_jump <= 'd0;
+	        rob_is_branch <= 'b0;
+	        rob_branch_pc <= 'b0;
+	        rob_tar_addr <= 32'hffff_ffff;
         end
     end
     else begin
@@ -815,36 +796,13 @@ always @ (negedge clk) begin
         wb_res <= 'd0;
         wb_inst <= 'd11;
         rob_flush <= 'd0;
-        rob_flush <= 'd0;
         rob_need_jump <= 'd0;
+        rob_revert_jump <= 'd0;
+        rob_is_branch <= 'b0;
+        rob_branch_pc <= 'b0;
         rob_tar_addr <= 32'hffff_ffff;
     end
 end
-
-
-
-// control related_busy
-// always @ (negedge clk) begin
-//     if(!rst && !rob_flush) begin
-//         if(wb_v) begin
-//             related_busy[wb_inst] = 'd0;
-//         end
-//         if( rob_info[`FCMP:`RAM] != 0) begin
-//             if(rob_stall) begin
-//                 related_busy <= related_busy;
-//             end
-//             else begin
-//                 related_busy[head_pt] = 'd1;
-//             end
-//         end
-//         else begin
-//             related_busy = related_busy;
-//         end
-//     end
-//     else begin
-//         related_busy <= 'd0;
-//     end
-// end
 
 
 
@@ -853,7 +811,6 @@ end
 // check existed inst first
 // when an inst is write back, free element
 always @ (wb_inst or func_part_done or de_cur_pc or clk) begin
-// always @ (negedge clk) begin
     if(!rst && !rob_flush) begin
         // when a inst is write back, free
         if(wb_v) begin
@@ -9121,8 +9078,6 @@ always @ (iss_inst or func_part_done or de_cur_pc) begin
 end
 
 
-
-
 // transfer forward data to dis_gun
 always @ (*) begin
     if(!rst && !rob_flush) begin
@@ -9156,8 +9111,6 @@ always @ (*) begin
         forwd_data_rs2_v <= 'b0;
     end
 end
-
-
 
 
 // let regfile prepare data
@@ -9198,23 +9151,20 @@ always @ (*) begin
 end
 
 
-
-
-
-// control write back data and dst_addr of regfile
-always @ (wb_inst) begin
-    if(!rst) begin
-        if(wb_v) begin
-            dst = rob_info_stack[wb_inst][`DST];
-        end
-        else begin
-            dst = 'd0;
-        end
-    end
-    else begin
-        dst = 'd0;
-    end
-end
+// // control write back data and dst_addr of regfile
+// always @ (wb_inst) begin
+//     if(!rst) begin
+//         if(wb_v) begin
+//             dst = rob_info_stack[wb_inst][`DST];
+//         end
+//         else begin
+//             dst = 'd0;
+//         end
+//     end
+//     else begin
+//         dst = 'd0;
+//     end
+// end
 
 
 endmodule

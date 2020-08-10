@@ -69,6 +69,8 @@ wire                            dis_forward_b;
 /* rob */
 wire                            rob_stall;
 
+wire                            rob_is_branch;
+wire                            rob_revert_jump;
 
 
 
@@ -89,7 +91,6 @@ wire                            rob_stall;
         wire EX_block; //1 when EX need to be stalled
         wire EX_update;  //1 when EX need to write PC
         wire [31:0]EX_result_pc;  //Corresponding PC from EX
-        wire [31:0]ex_cur_pc_w;
         wire ex_is_branch_w;
         wire BTB_is_taken_w;
         wire [31:0] btb_predict_pc_w;
@@ -98,19 +99,20 @@ wire                            rob_stall;
         wire                            rob_flush;
         wire                            rob_need_jump;
         wire    [31:0]                  rob_tar_addr;
+        wire    [31:0]                  rob_branch_pc;
         //IF module, including PC, InsMem, IF_PipReg
     IF IF
     (
         .clk(clk),
         .rst(rst),
-        .revert_jump(revert_jump),
-        .revert_addr(revert_addr),
+        .revert_jump(rob_revert_jump),
+        .revert_addr(rob_tar_addr),
         .EX_rst(rob_flush),
-        .EX_pc_i(ex_cur_pc_w),
+        .EX_pc_i(rob_branch_pc),
         .EX_block(rob_stall),
         .EX_write_pc(EX_update),
         .EX_addr(rob_tar_addr),
-        .EX_is_branch(ex_is_branch_w),
+        .EX_is_branch(rob_is_branch),
         .ex_need_jump(rob_need_jump),
 //        .BTB_write_pc(predict_is_taken),
 //        .BTB_addr(predict_pc),
@@ -135,12 +137,11 @@ wire                            rob_stall;
         .ex_stall(rob_stall),
         .IF_pip_reg(IF_pip_reg),
         .BTB_is_taken(BTB_is_taken_w),
+        .BTB_pc(btb_predict_pc_w),
         .pc(pc),
         .IF_pc(IF_pc),
         .EX_update(EX_update),
         .EX_result_pc(EX_result_pc),
-        .predict_is_taken(predict_is_taken),
-        .predict_pc(btb_predict_pc_w),
         .DE_pip_reg(DE_pip_reg),
         .de_cur_pc(de_cur_pc),
         .EX_rst(ex_flush),
@@ -266,7 +267,6 @@ ROB rob(
     .rst                        (rst),
 
     // global control signal
-    .ex_flush                   (),
     .rob_stall                  (rob_stall),
 
     // signal from exe to help dispatch
@@ -337,11 +337,15 @@ ROB rob(
     .rob_op_mode2               (rob_op_mode2),
 
     // branch inst
+    //btb
     .ex_tar_addr                (ex_tar_addr),
-    .ex_need_jump                (ex_need_jump),
+    .ex_need_jump               (ex_need_jump),
     .rob_flush                  (rob_flush),
     .rob_need_jump              (rob_need_jump),
-    .rob_tar_addr               (rob_tar_addr)
+    .rob_tar_addr               (rob_tar_addr),
+    .rob_is_branch              (rob_is_branch),
+    .rob_revert_jump            (rob_revert_jump),
+    .rob_branch_pc              (rob_branch_pc)
 );
 
 
@@ -426,8 +430,6 @@ ISSUSER_GUN m1911(
 
 
 
-
-
 //#####################################################
 //##########   EX Module  #############################
 //#####################################################
@@ -436,26 +438,6 @@ wire        [31:0]                      op2;
 
 assign op1 = forward_data_rs1_v_w ? forward_data_rs1_w : ra0_value_o;
 assign op2 = forward_data_rs2_v_w ? forward_data_rs2_w : rb0_value_o;
-
-
-// always @ (posedge clk) begin
-//     if(!rst && !rob_flush) begin
-//         if(forward_data_rs1_v_w) begin
-//             op1 <= forward_data_rs1_w;
-//             op2 <= forward_data_rs2_w;
-//         end
-//         else begin
-//             op1 <= ra0_value_o;
-//             op2 <= rb0_value_o;
-//         end
-//     end
-//     else begin
-//         op1 <= 'd0;
-//         op2 <= 'd0;
-//     end
-// end
-
-
 
 
 
@@ -473,19 +455,20 @@ EX ex (
     .func_part              (func_part_start),
     .ex_done                   (ex_done),
     // .ex_res                    (ex_res),
-    .ex_tar_addr               (ex_tar_addr),
+
     // .ex_stall                   (ex_stall),
     // .ex_flush                   (ex_flush),
     // .ex_rd                      (ex_rd),
     .ex_cur_pc            (ex_cur_pc_w),
 
     // signal related with btb
-    .ex_is_branch          (ex_is_branch_w),
+   // .ex_is_branch          (ex_is_branch),
+    .ex_tar_addr            (ex_tar_addr),
     .ex_need_jump           (ex_need_jump),
-    .BTB_is_taken(BTB_dis_ex),
-    .BTB_predict_pc(BTB_pc_dis_ex),
-    .revert_jump(revert_jump),
-    .revert_addr(revert_addr),
+   // .BTB_is_taken(BTB_dis_ex),
+   // .BTB_predict_pc(BTB_pc_dis_ex),
+   // .revert_jump(revert_jump),
+   // .revert_addr(revert_addr),
 
     // signal to rob
     .func_part_done         (func_part_done),

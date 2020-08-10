@@ -31,7 +31,7 @@ module DE_PipReg(
         end
         else begin   
             DE_pip_reg <= de_out;
-            //DE_pip_reg[`PREDICT] <= predict_is_taken;
+            DE_pip_reg[`PREDICT] <= predict_is_taken;
             DE_pip_reg[`OPC] <= pc;
             DE_pip_reg[`PPC] <= predict_pc;
         end

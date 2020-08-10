@@ -44,11 +44,11 @@ always @(posedge clk or posedge rst)
     if(rst)
          for(entry=0; entry < 256; entry=entry+1) // reset BTB entries
             counter[entry] <= 2'b00;
-    else if(EX_is_branch && EX_branch_taken && counter[set_tb_entry] != 2'b11) begin
-         counter[set_tb_entry] <= counter[set_tb_entry] + 2'b01;
-    end
-    else if(EX_is_branch && !EX_branch_taken && counter[set_tb_entry] != 2'b00) begin
-         counter[set_tb_entry] <= counter[set_tb_entry] - 2'b01;
+        else if(EX_is_branch && EX_branch_taken && counter[set_tb_entry] != 2'b11) begin
+             counter[set_tb_entry] <= counter[set_tb_entry] + 2'b01;
+        end
+        else if(EX_is_branch && !EX_branch_taken && counter[set_tb_entry] != 2'b00) begin
+             counter[set_tb_entry] <= counter[set_tb_entry] - 2'b01;
     end
 
 always @(posedge clk or posedge rst) begin
@@ -56,13 +56,13 @@ always @(posedge clk or posedge rst) begin
         // reset
         for (entry=0; entry<256; entry=entry+1)
             btb[entry] <=32'd9999;
-    end
+        end
     else if (EX_is_branch) begin
         btb[set_tb_entry] <= EX_result_pc;
     end
 end
 
-always @(negedge clk or posedge rst) begin
+always @(posedge clk or posedge rst) begin
     if (rst) begin
         btb_taken<=0;// reset
     end
@@ -71,7 +71,7 @@ always @(negedge clk or posedge rst) begin
     end
 end
 
-always @(negedge clk or posedge rst)
+always @(posedge clk or posedge rst)
     if(rst)
         predict_pc<=32'd9999;
     else
